@@ -8,8 +8,8 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{xinzhewu}[14/05/2018]
 
-\LoadClass[12pt,a4paper]{book}	% notez le "twoside", essentiellement pour alterner les en-tete et pieds de page gauche et droit si on veut utliser les fancyhead. 
-%\LoadClass[twoside,12pt,a4paper]{book}
+%\LoadClass[12pt,a4paper]{book}	% notez le "twoside", essentiellement pour alterner les en-tete et pieds de page gauche et droit si on veut utliser les fancyhead. 
+\LoadClass[twoside,12pt,a4paper]{book}
 
 \RequirePackage[utf8]{inputenc} 
 \RequirePackage[french, english]{babel}
