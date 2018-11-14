@@ -1,0 +1,265 @@
+\documentclass{xinzhewu}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{hyperref}
+\usepackage[intoc, english]{nomencl}
+\usepackage{enumerate}
+\usepackage{multirow}
+ \usepackage{enumitem} 
+ \usepackage{multicol}
+\usepackage{booktabs} % For formal tables
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage[scientific-notation=true]{siunitx}
+\usepackage{algpseudocode}
+\usepackage{svg}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{nopageno}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{empheq}
+\usepackage{enumerate}
+\usepackage{mathrsfs}
+\usepackage{siunitx}
+\usepackage{xcolor,colortbl}
+\usepackage{array}
+\usepackage{latexsym}
+\usepackage{amsfonts}
+\usepackage{ulem}
+\usepackage{smartdiagram}
+\usepackage{easybmat}
+\usepackage{graphicx}
+%\usepackage[numbers]{natbib}
+\usepackage{dirtree} % for directory structure.
+
+\usepackage{csquotes}
+
+\usepackage{algorithm, float}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+
+\usepackage{xcolor}
+\usepackage{enumerate}
+\usepackage[scientific-notation=true]{siunitx}
+\usepackage[misc]{ifsym}
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\usepackage{amsmath}
+
+\usepackage{easybmat}
+
+\usepackage{minitoc} %List sections of chapter at beginning of that chapter
+
+
+
+\usepackage{rotating}
+
+\usepackage[square,numbers]{natbib}
+%\bibliographystyle{unsrtnat}
+\bibliographystyle{plainnat}
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+
+\definecolor{maroon}{rgb}{0.5,0,0}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\lstdefinelanguage{XML}
+{
+	basicstyle=\ttfamily,
+	morestring=[s]{"}{"},
+	morecomment=[s]{?}{?},
+	morecomment=[s]{!--}{--},
+	commentstyle=\color{darkgreen},
+	moredelim=[s][\color{black}]{>}{<},
+	moredelim=[s][\color{red}]{\ }{=},
+	stringstyle=\color{blue},
+	identifierstyle=\color{maroon}
+}
+
+
+
+
+
+\newenvironment{dedication}
+{\clearpage           % we want a new page
+	\thispagestyle{empty}% no header and footer
+	\vspace*{\stretch{1}}% some space at the top 
+	\itshape             % the text is in italics
+	\raggedleft          % flush to the right margin
+}
+{\par % end the paragraph
+	\vspace{\stretch{3}} % space at bottom is three times that at the top
+	\clearpage           % finish off the page
+}
+
+
+\setcounter{tocdepth}{2}
+
+\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
+
+%\usepackage[UTF8]{ctex}
+\hypersetup{colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue}} 
+
+\makeatletter
+\newenvironment{breakablealgorithm}
+{% \\makeatletter begin{breakablealgorithm}
+	\begin{center}
+		\refstepcounter{algorithm}% New algorithm
+		\hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+		\renewcommand{\caption}[2][\relax]{% Make a new \caption
+			{\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+			\ifx\relax##1\relax % #1 is \relax
+			\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+			\else % #1 is not \relax
+			\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+			\fi
+			\kern2pt\hrule\kern2pt
+		}
+	}{% \end{breakablealgorithm}
+		\kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+	\end{center}
+}
+\makeatother
+
+
+%
+\makenomenclature
+\renewcommand{\nomname}{List of Symbols}
+\renewcommand{\nompreamble}{The next list describes several symbols that will be later used within the body of the document}
+
+\title{\large \textrm{Contribution \`a l’\'emergence de nouvelles m\'ethodes parall\`eles et reparties intelligentes utilisant un paradigme de programmation multi-niveaux pour le calcul extr\^eme}}
+
+%\lesoustitre{Le sous titre est facultatif}
+
+\discipline{Informatique}
+
+\dirdethese{Serge G. Petiton}
+\titredudirdethese{Universit\'e de Lille}
+
+\jury{
+\begin{description}
+\item[Pr\'esident~:      ] %Prof. Hello \textsc{World}, University of blabla
+\item[Rapporteur~: Prof. Michel Dayd\'e, IRIT, Toulouse, France] 
+\item[Rapporteur~:]  
+\item[Examinateur~:] 
+\item[Examinateur~:] 
+\item[Examinateur~:] 
+\item[Directeur de la th\`ese~: Serge G. Petiton] 
+\end{description}
+}
+
+\author{M. Xinzhe WU}
+
+\date{le 22 Mars 2019}
+
+\nomdeuniversite{\textbf{\textrm{Universit\'e de Lille}}}
+\logouniversite{logo_univ} %nom du fichier
+\scalelogouniversite{0.2} % mise a l'echelle de l'image (0.5=50% par exemple)
+\logolabo{logo_labo}
+\scalelogolabo{0.2}
+
+%\unite{Département d'histoire de la typographie}
+\ecoledoc{École doctorale Sciences Pour l'Ing\'enieur Universit\'e Lille Nord-de-France}
+
+
+\begin{document}
+
+\maketitle
+
+\clearemptydoublepage
+
+\begin{dedication}
+	This thesis is dedicated to my grandmother. Hope you can hear in the heaven.
+\end{dedication}
+
+\clearemptydoublepage
+
+\chapter*{Acknowledgement}
+\thispagestyle{empty}
+First and foremost I would like to thank my adviser of the dissertation, Serge G. Petiton.
+
+\clearemptydoublepage
+\chapter*{Abstract}
+\thispagestyle{empty}
+The abstract of rapport $\cdots$
+
+\clearemptydoublepage
+
+\selectlanguage{english}
+
+\clearemptydoublepage
+
+\frontmatter
+
+\tableofcontents
+
+\listoffigures
+\addcontentsline{toc}{chapter}{\listfigurename}
+
+\listoftables
+\addcontentsline{toc}{chapter}{\listtablename}
+
+\nomenclature{$c$}{Speed of light in a vacuum inertial frame}
+\nomenclature{$h$}{Planck constant}
+
+\printnomenclature
+
+\mainmatter % Ne pas oublier, avec \frontmatter et \backmatter
+
+\chapter{Introduction}
+
+\textcolor{red}{(The introduction chapter need be rewritten.)}
+
+%\addcontentsline{toc}{chapter}{Introduction}
+\input{Introduction}
+
+\chapter{State-of-the-art in High-Performance Computing}
+
+\input{Chapter2}
+
+\chapter{Krylov Subspace Methods}
+
+\input{Chapter3}
+
+\chapter{Sparse Matrix Generator with Given Spectra}
+
+\input{Chapter4}
+
+\chapter[Unite and Conquer GMRES/LS-ERAM Method]{Unite and Conquer GMRES/LS-ERAM Method}
+
+\input{Chapter5}
+
+\chapter{UCGLE for Linear Systems with Sequences of Right-hand-sides}
+
+\input{Chapter6}
+
+\chapter{UCGLE for Linear Systems with Multiple Right-hand-sides}
+
+\input{Chapter7}
+
+\chapter{Parameters Autotuning}
+
+\input{Chapter8}
+
+\chapter{YML and XMP Multi-level Parallelism Programming Paradigm}
+
+\input{Chapter9}
+
+\chapter*{Conclusion and Pespectives}
+\addcontentsline{toc}{chapter}{Conclusion and Pespectives}
+
+\input{Conclusion}
+
+%\tableofcontents
+\chapter*{Scientific Communication}
+\addcontentsline{toc}{chapter}{Scientific Communication}
+
+\input{Communication}
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{biblio}
+\clearemptydoublepage
+
+\end{document}
