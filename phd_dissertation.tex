@@ -34,6 +34,8 @@
 %\usepackage[numbers]{natbib}
 \usepackage{dirtree} % for directory structure.
 
+\usepackage[Bjornstrup]{fncychap}  %chapter styles
+
 \usepackage{csquotes}
 
 \usepackage{algorithm, float}
@@ -51,7 +53,44 @@
 
 \usepackage{minitoc} %List sections of chapter at beginning of that chapter
 
+\usepackage{titlesec}
 
+\definecolor{dark-gray}{gray}{0.3}
+\titleformat
+{\section} % command
+[block] % shape
+{\color{dark-gray}\bfseries\Large\rmfamily} % format
+{\textcolor{dark-gray}{\LARGE\thesection}} % label
+{0.ex} % sep
+{
+	\hspace{0.2in}
+} % before-code
+[
+] 
+
+\titleformat
+{\subsection} % command
+[block] % shape
+{\color{dark-gray}\bfseries\large\rmfamily} % format
+{\textcolor{dark-gray}{\Large\thesubsection}} % label
+{0.ex} % sep
+{
+	\hspace{0.12in}
+} % before-code
+[
+] 
+
+\titleformat
+{\subsubsection} % command
+[block] % shape
+{\normalsize\itshape} % format
+{\large\thesubsubsection} % label
+{0.ex} % sep
+{
+	\hspace{0.08in}
+} % before-code
+[
+] 
 
 \usepackage{rotating}
 
@@ -139,15 +178,22 @@
 \titredudirdethese{Universit\'e de Lille}
 
 \jury{
-\begin{description}
-\item[Pr\'esident~:      ] %Prof. Hello \textsc{World}, University of blabla
-\item[Rapporteur~: Prof. Michel Dayd\'e, IRIT, Toulouse, France] 
-\item[Rapporteur~:]  
-\item[Examinateur~:] 
-\item[Examinateur~:] 
-\item[Examinateur~:] 
-\item[Directeur de la th\`ese~: Serge G. Petiton] 
-\end{description}
+	
+
+
+\begin{tabular}{>{\normalsize}l>{\normalsize}l>{\normalsize}l}
+	&& \\
+	Pr\'esident & Clarisse Dhaenens  &-  Universit\'e de Lille \\
+	Rapporteurs &  Michel Dayd\'e &- Institut de Recherche en Informatique de Toulouse\\
+	 &   &- ENSEEIHT\\
+	 & \textcolor{red}{Not decided}  &- \\
+	Examinateurs & Yutong Lu &- National Supercomputing Center in Guangzhou \\
+	&&- Sun Yat-Sen University\\
+	 & Mitsuhisa Sato & - RIKEN Center for Computational Science \\
+		&&- Tuskuba University\\
+	 & \textcolor{red}{A German ?} &-   \\
+	Directeur & Serge G. Petiton &- Universit\'e de Lille \\
+\end{tabular}
 }
 
 \author{M. Xinzhe WU}
@@ -163,13 +209,14 @@
 %\unite{Département d'histoire de la typographie}
 \ecoledoc{École doctorale Sciences Pour l'Ing\'enieur Universit\'e Lille Nord-de-France}
 
+\usepackage{nomencl}
+\makenomenclature
 
 \begin{document}
 
 \maketitle
 
 \clearemptydoublepage
-
 \begin{dedication}
 	This thesis is dedicated to my grandmother. Hope you can hear in the heaven.
 \end{dedication}
@@ -193,18 +240,17 @@ The abstract of rapport $\cdots$
 
 \frontmatter
 
-\tableofcontents
+{\small \tableofcontents}
 
+{\small
 \listoffigures
 \addcontentsline{toc}{chapter}{\listfigurename}
+}
 
+{\small
 \listoftables
 \addcontentsline{toc}{chapter}{\listtablename}
-
-\nomenclature{$c$}{Speed of light in a vacuum inertial frame}
-\nomenclature{$h$}{Planck constant}
-
-\printnomenclature
+}
 
 \mainmatter % Ne pas oublier, avec \frontmatter et \backmatter
 

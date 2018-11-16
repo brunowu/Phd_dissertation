@@ -217,7 +217,7 @@
  % \includegraphics[scale=\@scalelogolabo]{\@logolabo}
   };
    \node at (current page.center)
-{\parbox{14.5cm}{
+{\parbox{15.5cm}{
 
 	\begin{center}
 		\textsc{\LARGE \textbf{TH\`ESE DE DOCTORAT}}\\ 
@@ -246,27 +246,20 @@
 \@ecoledoc
 \end{center}
 \vspace{0.4cm}
-\noindent\rule{14.5cm}{0.5mm}
+\noindent\rule{15.5cm}{0.5mm}
 	\begin{center}
-		{\setlength{\baselineskip}{1.2\baselineskip}
+		{\setlength{\baselineskip}{1.1\baselineskip}
 		\begin{huge}
 			\textbf{\@title}
 		\end{huge}
 		\par}
 	\end{center}
-%	\begin{center}
-		
-		%\textbf{\@lesoustitre}
-%	\end{center}
-\noindent\rule{14.5cm}{0.5mm}
-%	\begin{flushright}
-%		\textsc{Par : \textbf{\@author}}
-%	\end{flushright}
-%\vspace{1cm}
+
+\noindent\rule{15.5cm}{0.5mm}
+
 \bigskip
-	\begin{flushleft}
-		\textbf{Sous la direction de} \textsc{\@dirdethese}, \@titredudirdethese
-	\end{flushleft}
+
+\vspace{0.2cm}
 	\textsc{Membres du jury:}
 	\begin{small}
 		\@jury
@@ -297,7 +290,7 @@
 		% \includegraphics[scale=\@scalelogolabo]{\@logolabo}
 	};
 	\node at (current page.center)
-	{\parbox{14.5cm}{
+	{\parbox{15.5cm}{
 			
 			\begin{center}
 			\textsc{\LARGE \textbf{TH\`ESE DE DOCTORAT}}\\ 
@@ -326,7 +319,7 @@
 			\@ecoledoc
 			\end{center}
 			\vspace{0.4cm}
-			\noindent\rule{14.5cm}{0.5mm}
+			\noindent\rule{15.5cm}{0.5mm}
 			\begin{center}
 			{\setlength{\baselineskip}{1.2\baselineskip}
 				\begin{huge}
@@ -334,19 +327,21 @@
 				\end{huge}
 				\par}
 			\end{center}
+			\vspace{0.4cm}
 			%	\begin{center}
 			
 			%\textbf{\@lesoustitre}
 			%	\end{center}
-			\noindent\rule{14.5cm}{0.5mm}
+			\noindent\rule{15.5cm}{0.5mm}
 			%	\begin{flushright}
 			%		\textsc{Par : \textbf{\@author}}
 			%	\end{flushright}
 			%\vspace{1cm}
 			\bigskip
 			\begin{flushleft}
-			\textbf{Sous la direction de} \textsc{\@dirdethese}, \@titredudirdethese
+			\textbf{Th\`ese dirig\'ee par} \textsc{\@dirdethese}, \@titredudirdethese
 			\end{flushleft}
+
 			\textsc{Membres du jury:}
 			\begin{small}
 			\@jury
