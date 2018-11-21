@@ -34,7 +34,7 @@
 %\usepackage[numbers]{natbib}
 \usepackage{dirtree} % for directory structure.
 
-\usepackage[Bjornstrup]{fncychap}  %chapter styles
+%\usepackage[Glenn]{fncychap}  %chapter styles
 
 \usepackage{csquotes}
 
@@ -52,6 +52,11 @@
 \usepackage{easybmat}
 
 \usepackage{minitoc} %List sections of chapter at beginning of that chapter
+
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
 
 \usepackage{titlesec}
 
@@ -179,21 +184,41 @@
 
 \jury{
 	
-
-
-\begin{tabular}{>{\normalsize}l>{\normalsize}l>{\normalsize}l}
-	&& \\
-	Pr\'esident & Clarisse Dhaenens  &-  Universit\'e de Lille \\
-	Rapporteurs &  Michel Dayd\'e &- Institut de Recherche en Informatique de Toulouse\\
-	 &   &- ENSEEIHT\\
-	 & \textcolor{red}{Not decided}  &- \\
-	Examinateurs & Yutong Lu &- National Supercomputing Center in Guangzhou \\
-	&&- Sun Yat-Sen University\\
-	 & Mitsuhisa Sato & - RIKEN Center for Computational Science \\
-		&&- Tuskuba University\\
-	 & \textcolor{red}{A German ?} &-   \\
-	Directeur & Serge G. Petiton &- Universit\'e de Lille \\
+	\iffalse
+\begin{tabular}{>{\normalsize}l>{\normalsize}l}
+	& \\
+	Pr\'esident & Catherine Lambert  \\ & \small - Directrice du CERFACS\\
+	Rapporteurs &  Michel Dayd\'e\\
+	& \small - Directeur de l'IRT de Toulouse \& Professeur \`a l'ENSEEIHT \\
+	& \textcolor{red}{Not decided} \\
+	& \small - Universit\'e \\
+	Examinateurs & Yutong Lu \\
+	& \small - Directrice de National Supercomputing Center in Guangzhou\\
+	&\small - Professeur \`a l'Universit\'e de  Sun Yat-Sen\\
+	& Mitsuhisa Sato  \\
+	&\small - Directeur adjoint de RIKEN Center for Computational Science  \\
+	&\small -  Professeur \`a l'Universit\'e de Tuskuba\\
+	& \textcolor{red}{A German ?}   \\
+	& \small - \\
+	Directeur & Serge G. Petiton \\
+	& \small - Professeur \`a l'Universit\'e de Lille
 \end{tabular}
+
+\fi
+\begin{tabular}{>{\small}l>{\small}l>{\footnotesize}l}
+	&& \\
+	Pr\'esident & Catherine Lambert  &- Directrice de CERFACS\\
+	Rapporteurs &  Michel Dayd\'e &- Directeur de l'IRT de Toulouse\\
+	 &   &- Professeur \`a l'ENSEEIHT\\
+	 & \textcolor{red}{Not decided}  &- \\
+	Examinateurs & Yutong Lu &- Directrice de National Supercomputing Center in Guangzhou \\
+	&&- Professeur \`a l'Universit\'e de  Sun Yat-Sen\\
+	 & Mitsuhisa Sato & - Directeur adjoint de RIKEN Center for Computational Science \\
+		&&-  Professeur \`a l'Universit\'e de Tuskuba\\
+	 & \textcolor{red}{A German ?} &-   \\
+	Directeur & Serge G. Petiton &- Professeur \`a l'Universit\'e de Lille \\
+\end{tabular}
+
 }
 
 \author{M. Xinzhe WU}
@@ -215,7 +240,7 @@
 \begin{document}
 
 \maketitle
-
+ 
 \clearemptydoublepage
 \begin{dedication}
 	This thesis is dedicated to my grandmother. Hope you can hear in the heaven.
@@ -256,45 +281,42 @@ The abstract of rapport $\cdots$
 
 \chapter{Introduction}
 
-\textcolor{red}{(The introduction chapter need be rewritten.)}
-
 %\addcontentsline{toc}{chapter}{Introduction}
 \input{Introduction}
 
-\chapter{State-of-the-art in High-Performance Computing}
+\chapter{State-of-the-art in High-Performance Computing} \label{State-of-the-art in High-Performance Computing}
 
 \input{Chapter2}
 
-\chapter{Krylov Subspace Methods}
+\chapter{Krylov Subspace Methods}\label{Krylov Subspace Methods}
 
 \input{Chapter3}
 
-\chapter{Sparse Matrix Generator with Given Spectra}
+\chapter{Sparse Matrix Generator with Given Spectra}\label{Sparse Matrix Generator with Given Spectra}
 
 \input{Chapter4}
 
-\chapter[Unite and Conquer GMRES/LS-ERAM Method]{Unite and Conquer GMRES/LS-ERAM Method}
+\chapter[Unite and Conquer GMRES/LS-ERAM Method]{Unite and Conquer GMRES/LS-ERAM Method}\label{Unite and Conquer GMRES/LS-ERAM Method}
 
 \input{Chapter5}
 
-\chapter{UCGLE for Linear Systems with Sequences of Right-hand-sides}
+\chapter{UCGLE for Linear Systems with Sequences of Right-hand-sides}\label{UCGLE for Linear Systems with Sequences of Right-hand-sides}
 
 \input{Chapter6}
 
-\chapter{UCGLE for Linear Systems with Multiple Right-hand-sides}
+\chapter{UCGLE for Linear Systems with Multiple Right-hand-sides} \label{UCGLE for Linear Systems with Multiple Right-hand-sides}
 
 \input{Chapter7}
 
-\chapter{Parameters Autotuning}
+\chapter{Parameters Autotuning}  \label{Parameters Autotuning}
 
 \input{Chapter8}
 
-\chapter{YML and XMP Multi-level Parallelism Programming Paradigm}
+\chapter{YML and XMP Multi-level Parallelism Programming Paradigm} \label{YML and XMP Multi-level Parallelism Programming Paradigm}
 
 \input{Chapter9}
 
-\chapter*{Conclusion and Pespectives}
-\addcontentsline{toc}{chapter}{Conclusion and Pespectives}
+\chapter{Conclusion and Pespectives} \label{Conclusion and Pespectives}
 
 \input{Conclusion}
 

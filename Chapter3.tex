@@ -2,7 +2,7 @@
 	\textsf{An important application on supercomputers is to solve the linear systems and eigenvalue problems. The chapter gives an overview of the relevant iterative methods to solve large-scale non-Hermitian linear systems and eigenvalue problems. Many applications in science and engineering fields can be formulated as such problems with large dimensions.  Large matrices that arise in most applications are almost always sparse. That is, the vast majority of their entries are zero. In numerical linear algebra, these systems are often solved by iterative methods. An iterative method is a mathematical procedure that uses an initial guess to generate a sequence of improving approximate solutions for a class of problems, in which the $n$-th approximation is derived from the previous ones. Krylov subspace methods are very useful and popular iterative methods to solve large-scale sparse systems since their simplicity and generality. In this chapter, firstly we give a summary on the existing stationery and non-stationary iterative methods, especially the Krylov subspace methods. Then, the mathematical definition of GMRES to solve non-Hermitian linear systems and Arnoldi methods to solve non-Hermitian eigenvalue problems are given in details. For some applications, the convergence of conventional Krylov subspace methods cannot always be guaranteed. Thus various kinds of preconditioners to accelerate the convergence are introduced. In the end, this chapter gives a survey on the parallel implementation on distributed memory platforms, and also the related challenges on the upcoming exascale supercomputers. The material covered in this chapter will be helpful in establishing the mathematical base of this dissertation. Additionally, a large part of consistent efforts in this field are reviewed in this chapter, even some of them have less connection with the motivation of this thesis.}
 \end{displayquote}
 
-\vspace{1in}
+\vspace{0.6in}
 
 \section{Linear Systems and Eigenvalue Problems}
 
@@ -515,18 +515,42 @@ M_{SSOR} =  (D-\omega E)D^{-1}(D-\omega F).
 
 In numerical linear algebra, an incomplete LU factorization (abbreviated as ILU) of a matrix is a sparse approximation of the LU factorization often used as a preconditioner.
 
-For a linear system $Ax=b$, it is often solved by computing the factorization $A=LU$, with $L$ a lower triangular and $U$ upper triangular. One then solves efficiently $Ly=b$ and $Ux=y$ in sequence since $U$, and $L$ are all triangular.
+For a linear system $Ax=b$, it is often solved by computing the factorization $A=LU$, with $L$ a lower triangular and $U$ upper triangular. One then solves efficiently $Ly=b$ and $Ux=y$ in sequence since $U$, and $L$ are all triangular.  It is well known that usually in the factorization procedure, the matrices L and U have more non zero entries then A. These extra entries are called fill-in entries.
+
+An incomplete factorization \cite{saad1994ilut,sertel2000incomplete, lee2003incomplete,malas2007incomplete} instead seeks triangular matrices $L$ and $U$ such that 
+\[A \approx LU.\]
 
 For a typical sparse matrix, the LU factors can be much less sparse than the original matrix - a phenomenon called fill-in. The memory requirements for using a direct solver can then become a bottleneck in solving linear systems. One can combat this problem by using fill-reducing reorderings of the matrix's unknowns, such as the Cuthill-McKee ordering. 
 
-An incomplete factorization \cite{saad1994ilut,sertel2000incomplete, lee2003incomplete,malas2007incomplete} instead seeks triangular matrices $L$ and $U$ such that 
-\[A \approx LU\]
+\begin{algorithm}[htbp]
+	\caption{Incomplete LU Factorization Algorithm}
+	\label{alg:ilu}
+	\begin{algorithmic}[1]
+		\For{$i=2,\cdots,n$}
+			\For {$k = 1, \cdots, i-1$}
+				\If {$(i,k) \notin P$}
+					\State $a_{i,k} = a_{i,k}/a_{k,k}$
+					\For{$j = k+1, \cdots, n$}
+						\If{$(i,j) \notin P$}
+							\State $a_{i,j} = a_{i,j}-a_{i,k}a_{k,j}$
+						\EndIf
+					\EndFor
+				\EndIf
+			\EndFor
+		\EndFor
+	\end{algorithmic}
+\end{algorithm}
+
+Let $S$ be a subset of all positions of the original matrix generally including the main diagonal, and $\forall (i, j)$ such as $a_{i,j} \neq 0$. An incomplete LU factorization of $A$ only allows fill-in positions which are in $S$, which is designated by the elements to drop at each step. $S$ has to be specified in advance in a static way by defining a zero pattern which must exclude the main diagonal. Therefore, for any zero pattern $P$, such that
+
+\begin{equation}
+	P \subset \{ (i,j) | i \neq j; 1 \leq i,j\leq n\}
+\end{equation}
+
 
 Solving for $LUx=b$ can be done quickly but does not hield the exact solution to the given problem. So a matrix is \[M_{LU} = LU\]
 
-often used as a preconditioner for another iterative method such as GMRES.
-
-
+often used as a preconditioner for another iterative method such as GMRES. For an incomplete factorization with no-fill, named ILU(0), we define the pattern P as the zero pattern of A. However, more accurate factorization can be obtained by allowing some fill-in, denoted by ILU(p) where p stands for the desired level of fill. This class of preconditioner has some difficulties to converge in a reasonably number of iterations on ill-conditioned systems.
 
 \subsubsection{Preconditioning by Multigrid solvers}
 
@@ -943,9 +967,19 @@ x_d &=x_0+P_d(A)r_0 \\ &=x_0+\sum_{i=1}^{d-1}\eta_i\omega_i.
 \end{algorithm}
 
 
-\section{GMRES Convergence Analysis and Spectrum}
+\section{GMRES Convergence Analysis}
 
-\subsection{Normal Matrix}
+Many things have been proposed over the years to explain GMRES convergence:
+
+\begin{itemize}
+	\item Eiegenvalues of $A$;
+	\item Pseudo-eigenvalues;
+	\item Polynomial numerical hull.
+\end{itemize}
+
+This section summarize these discussions.
+ 
+\subsection{Convergence Analysis by Eigenvalues}
 
 \textcolor{red}{TO DO}
 
@@ -953,12 +987,47 @@ G\'erard MEURANT completely describes GMRES convergence for normal matrices. Con
 
 When $A$ is normal, GMRES convergence depends on the eigenvalues and eigenvectors of $A$. 
 
-
-\subsection{Non Normal Matrix}
-
 \textcolor{red}{TO DO}
 
 GMRES convergence is governed by the distribution of the eigenvalues of $V^TW$ on the unit circle (and also the weights $\omega_i$).  When $A$ is non-normal, GMRES convergence depends on the eigenvalues and eigenvectors of $Q=V^TW$.
+
+\begin{theorem}
+	Denote $x_m$ be the approximate solution obtained from the $m$-th step of GMRES, and the related residual is $r_m=b-Ax_m$. Then, $x_m$ is of the form:
+	
+	\begin{equation}
+		x_m = x_0 + q_m(A)r_0
+	\end{equation}
+	
+	and 
+	\begin{equation}
+		||r_m||_2=||(I-Aq_m(A))r_0||_2=\min_{q \in \mathbb{P}_{m-1}}||(I-Aq(A))r_0||_2
+	\end{equation}
+\end{theorem}
+
+\begin{theorem}
+	If $A$ is a $n \times n$ diagonalizable matrix and let $A=P\Lambda P^{-1}$ with $\Lambda=diag{\lambda_1, \lambda_2, \cdots, \lambda_n}$ is the diagonal matrix of eigenvalues. Then the residual norm achieved by the $m$-th step of GMRES satisfies the inequality
+	
+	\begin{equation}
+		||r_m||_2 \leq c_2(P)\epsilon^{(m)}||r_0||_2.
+	\end{equation}
+\end{theorem}
+
+where $\epsilon^{(m)}=\min_{p \in \mathbb{P}_m, p(0)=1} \max_{\lambda \in \sigma(A)i=1,\cdots,n}|p(\lambda_i)|$, and $c_2(P)=||P||_2||P^{-1}||_2$.
+
+The exact proof can be found in \cite{saad2003iterative}.
+
+\subsection{Convergence Analysis by Pseudo-eigenvalues}
+
+\subsection{Convergence Analysis by Polynomial Numerical Hull}
+
+
+\begin{corollary}
+	If $A$ is a $n \times n$ diagonalizable matrix and let $A=P\Lambda P^{-1}$ with $\Lambda=diag{\lambda_1, \lambda_2, \cdots, \lambda_n}$ is the diagonal matrix of eigenvalues. Assume that all the eigenvalues of $A$ are located in the ellipse $E(c,d,a)$ which excludes the origin. The residual norm achieved at the $m$-th step of GMRES satisfies the inequality.
+	
+	\begin{equation}
+	||r_m||_2 \leq c_2(P)\frac{C_m(\frac{a}{d})}{|C_m\frac{c}{d}|}||r_0||_2.
+	\end{equation}
+\end{corollary}
 
 \section{Parallel Krylov methods on Large-scale Supercomputers}
 

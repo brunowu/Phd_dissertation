@@ -2,7 +2,7 @@
 	\textsf{After the validation of the numerical and parallel performance of $m$-UCGLE, a major difficulty to profit from UC methods including $m$-UCGLE is to implement the manager engine which can well handle their fault tolerance, load balance, asynchronous communication of signals, arrays and vectors, the management of different computing units such as GPUs, etc. In the last chapter, we tried to give a naive implementation of the engine to support the management tasks on the homogeneous platforms based on MPI\_SPAWN and MPI non-blocking sending and receiving functionalities. The stability of this implementation of the engine cannot always be guaranteed. Thus we are also thinking about to select the suitable workflow/task based environments to manage all these aspects in the UC approach. YML\footnote{http://yml.prism.uvsq.fr/} is a good candidate, which is a workflow environment to provide the definition of the parallel application independently from the underlying middleware used. The special middleware and workflow scheduler provided by YML allows defining the dependencies of tasks and data on the supercomputers \cite{delannoyyml}. YML, including its interfaces and compiler to various programming languages and libraries, will facilitate the implementation of UC based methods with different numerical components. In this chapter, firstly we summarize the YML framework, and then analyze the limitations of existing YML implementation for UC approach. In the end, we propose the solution.}
 \end{displayquote}
 
-\vspace{1in}
+\vspace{0.6in}
 
 
 \section{YML Framework}
@@ -303,9 +303,9 @@ and we may ask in the asbtract component:
 MUST\footnote{https://tu-dresden.de/zih/forschung/projekte/must} detects usage errors of the Message Passing Interface (MPI) and reports them to the user. As MPI calls are complex and usage errors common, this functionality is extremely helpful for application developers that want to develop correct MPI applications. This includes errors that already manifest - segmentation faults or incorrect results - as well as many errors that are not visible to the application developer or do not manifest on a certain system or MPI implementation.
 
 To detect errors, MUST intercepts the MPI calls that are issued by the target application and evaluates their arguments. The two main usage scenarios for MUST arise during application development and when porting an existing application to a new system. When a developer adds new MPI communication calls, MUST can detect newly introduced errors, especially also some that may not manifest in an application crash. Further, before porting an application to a new system, MUST can detect violations to the MPI standard that might manifest on the target system. MUST reports errors in a log file that can be investigated once the execution of the target executable finishes.
+
 \section{Conclusion}
 
 \clearemptydoublepage
-\backmatter
 
 \clearemptydoublepage

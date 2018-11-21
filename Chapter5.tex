@@ -3,7 +3,8 @@
 	\textsf{Facing the challenges of numerical linear algebra methods on a large-scale machine discussed in Section 3, the new programming model should be proposed with well-suited characteristics on modern architectures. These features include optimized communications, asynchronicity, diversity of natural parallelism and fault tolerance. In such numerical methods, the avoidance of operations involving synchronous communications is most important. Indeed, with a very large number of cores, the overall reductions or global synchronization are a bottleneck. Consequently, large scalar products and overall synchronization, and other operations involving communications between all cores have to be avoided. On the other hand, everywhere that is possible, asynchronicity of communications has to be promoted. Indeed, this kind of communications could allow their overlapping with computation operations inside a task and between the tasks constituting theses methods. The communication avoiding techniques could also be integrated allowing a general reduction of communications in the algorithm. The diversity of natural parallelism existing in such methods can be exploited by taking advantage of heterogeneity of targeted architectures. Fault tolerance and the ability to load balancing should be integral parts of these methods. These characteristics allow the improvement of the performance of applications built on the basis of these methods. Moreover, based on these properties, auto/smart-tuned versions of algorithms can be proposed. In this chapter, we present an asynchronous distributed and parallel Unite and Conquer GMRES/LS-ERAM (UCGLE) method to solve sparse non-Hermitian systems on large platforms. The key feature of UCGLE comparing with the classical hybrid methods using LS polynomial preconditioner \cite{essai1999heterogeneous,he2006hybrid} is its distributed and parallel asynchronous communication and the manager engine implementation among three components, which are specified for the extreme-scale supercomputing platforms. We summarize the UC approach in Section 5.1. The theoretical parts of UCGLE are given in Section 5.2. In Section 5.3, we present the distributed and parallel implementation of UCGLE, including the computing components, the manager engine, and the distributed and parallel asynchronous communications. The experimental results on different supercomputers which evaluate the convergence, the parameters, the scalability, and the fault tolerance are shown in Section 5.5.}
 \end{displayquote}
 
-\vspace{1in}
+\vspace{0.6in}
+
 \section{Unite and Conquer approach}
 
 In general, Unite and Conquer approach is to make collaborate several iterative methods in order to accelerate the convergence of one of them. It is important to recall that the hybrid methods defined according to this approach are particularly interesting when underlying computing platforms are constituted by parallel and/or distributed heterogeneous components. This approach is a model for the design of numerical methods by combining different computation components together to work for the same objective, with asynchronous communication among them. Unite implies the combination of different calculation components, and conquer represents different components work together to solve one problem. Different independent components with asynchronous communication can be deployed on various platforms such as P2P, cloud and the supercomputer systems. The idea of unite and conquer approach came from the article of Saad \cite{saad1984chebyshev} in 1984, where he suggested using Chebyshev polynomial to accelerate the convergence of Explicitly Restarted Arnoldi Method (ERAM) to solve eigenvalue problems. Brezinski \cite{brezinski1994hybrid} proposed in 1994 an approach for solving a system of linear equations which takes a combination of two arbitrary approximate solutions of two methods. In 2005, Emad \cite{emad2005multiple} proposed a hybrid approach based on a combination of multiple ERAMs, which showed significant improvement in solving different eigenvalue problems. In 2016, Fender \cite{fender2016leveraging} studied a variant of multiple IRAMs and generated multiple subspaces in a nested fashion in order to dynamically pick the best one inside each restart cycle.
@@ -145,7 +146,7 @@ Fig. \ref{ls-component} gives the workflow of ERAM Component. LS Component won't
 \end{breakablealgorithm}
 
 
-\subsection{Parameters Analysis} \label{workflow}
+\subsection{Parameters Analysis} \label{parameter analysis}
 
 UCGLE method is a combination of three different methods, there are a number of parameters, which have impacts on its convergence rate. We summarize these different related ones, and classify them according to their relations with different components.
 
@@ -307,51 +308,27 @@ We test its convergence acceleration, fault tolerance and scalability on the lar
 
 \subsubsection{Experiments}
 
+In order to highlight the impacts of different parameters inside UCGLE, we conducted several sets of experiments, which varies one parameter mentioned above, and keeps the other parameters fixed. In this section, we will present the results of these experiments, and then analysis the effect of each parameter on the preconditioning, thus the acceleration of convergence. We study the parameters including the Krylov subspace size of GMRES $m_g$, the times of LS preconditioning applied on the GMRES $lsa$, the frequence of LS precondtioning applied $freq$, the number of eigenvalues approximated by ERAM Component $n_{eigen}$, and the degree of LS polynomial $l$.
+
 \textbf{Krylov subspace size: }
 
-\iffalse
+The parameter $m_g$, which means the restarted subspace size of GMRES, has important influence on the convergence of UCGLE.  This effect is similiar with the case on the conventional GMRES without preconditioning. For the experiments of UCGLE, we vary $m_g$ from $50$ to $180$, and keep $l=10$, $lsa=10$, $freq=10$. Moverover, we evaluate also the classic GMRES with $m_g$ to be $100$ and $150$. The results are given in Fig. \ref{fig:krylovsubspace}. First of all, we can conclude that in the case that $m_g$ is too small (see UCGLE($m_g=50$) in  Fig. \ref{fig:krylovsubspace}), even the LS preconditioning is applied, the convergence can not be achieved. With the augmentation of $m_g$, UCGLE is able to converge with less iteration steps. Secondly, with the preconditioning of LS polynomial, UCGLE can converge with $m_g=100$, but the classic GMRES cannot converge with the same value of this parameter.
+
+In conclusion, the Krylov subspace size of GMRES Component is a very important parameter of UCGLE. If this parameter is too small, it is difficult to get the convergence even with the LS polynomial preconditioning. It is not practical to use very large $m_g$ since the limitation of memory. Thus, it is essential to determine a good value of $m_g$ which is able to able to accelerate the convergence by LS polynomial.
+
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=6.2in]{fig/conv2.eps}
-	\caption{Convergence comparison of UCGLE method vs classic GMRES.}
+	\includegraphics[width=6.2in]{fig/conv_ksp_gmres.eps}
+	\caption{Evaluation of GMRES subspace size $m_g$ varying from $50$ to $180$. $l=10$, $lsa=10$, $freq=10$.}
 	\label{fig:krylovsubspace}
 \end{figure}
-\fi
 
-\textbf{LS applied times: }
-
-\iffalse
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=6.2in]{fig/conv2.eps}
-	\caption{Convergence comparison of UCGLE method vs classic GMRES.}
-	\label{fig:Lsappliedtime}
-\end{figure}
-\fi
-
-\textbf{LS Frequence:}
-
-\iffalse
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=6.2in]{fig/conv2.eps}
-	\caption{Convergence comparison of UCGLE method vs classic GMRES.}
-	\label{fig:Lsfreq}
-\end{figure}
-\fi
-
-\textbf{Number of eigenvalues: }
-
-\iffalse
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=6.2in]{fig/conv2.eps}
-	\caption{Convergence comparison of UCGLE method vs classic GMRES.}
-	\label{fig:vals}
-\end{figure}
-\fi
 
 \textbf{LS polynomial degree: }
+
+The parameter LS applied times $lsa$ means the number of times the LS parameters will be applied to the temporary solution of GMRES Component before its restart after $m_g$ iterations. In the experiments, $lsa$ ranges from $1$ to $25$, and the parameters $m_g$, $l$, and $freq$ are respectively fixed as $100$, $10$ and $1$. Fig. \ref{fig:Lsappliedtime} shows the convergence curves of all the tests. Firstly, it is obvious that $lsa$ has the effect on the peaks for each time LS preconditioning. The greater it is, the bigger the peak will be. As talked in Section \ref{parameter analysis}, these peaks means the Euclidien norm of restart vector produced by LS polynomial. By comparing the curves in  the Fig. \ref{fig:Lsappliedtime}, we can conclude that the augmentation of $lsa$ wil accelerate the convergence of UCGLE. But, this parameter cannot be too large, this might lead to a too large norm of the residual of the restarted vector generated by LS polynomial preconditioning processus, and finally damage the convergence.
+
+To conclude on the effect of this parameter, it is necessary to select the best value with considering the selection of the parameter of LS polynomial power $l$. In fact, the two parameters seem particularly intricate together and the choice of one will depend on the choice of the other. In the pratical implementation, this parameter implies a series of SpMV and AXPY operations in parallel. The larger $l$ is, the more operations will be executed, thus the more time will be occupied. The good selection of this parameter should make a balance between the reduction of iteration steps of GMRES components and additional time caused by these SpMV and AXPY operations.
 
 \begin{figure}[htbp]
 	\centering
@@ -360,9 +337,61 @@ We test its convergence acceleration, fault tolerance and scalability on the lar
 	\label{fig:lsdegree}
 \end{figure}
 
+\textbf{LS applied times: }
+
+The parameter LS applied times $lsa$ means the number of times the LS parameters will be applied to the temporary solution of GMRES Component before its restart after $m_g$ iterations. In the experiments, $lsa$ ranges from $1$ to $25$, and the parameters $m_g$, $l$, and $freq$ are respectively fixed as $100$, $10$ and $1$. Fig. \ref{fig:Lsappliedtime} shows the convergence curves of all the tests. Firstly, it is obvious that $lsa$ has the effect on the peaks for each time LS preconditioning. The greater it is, the bigger the peak will be. As talked in Section \ref{parameter analysis}, these peaks means the Euclidien norm of restart vector produced by LS polynomial. By comparing the curves in  the Fig. \ref{fig:Lsappliedtime}, we can conclude that the augmentation of $lsa$ wil accelerate the convergence of UCGLE. But, this parameter cannot be too large, this might lead to a too large norm of the residual of the restarted vector generated by LS polynomial preconditioning processus, and finally damage the convergence.
+
+To conclude on the effect of this parameter, it is necessary to select the best value with considering the selection of the parameter of LS polynomial power $l$. In fact, the two parameters seem particularly intricate together and the choice of one will depend on the choice of the other. In the pratical implementation, this parameter implies a series of SpMV and AXPY operations in parallel. The larger $l$ is, the more operations will be executed, thus the more time will be occupied. The good selection of this parameter should make a balance between the reduction of iteration steps of GMRES components and additional time caused by these SpMV and AXPY operations.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=6.2in]{fig/conv_lsappied.eps}
+	\caption{Evaluation of LS applied times $lsa$ varying from $1$ to $25$, and $m_g=100$, $l=10$, $freq=1$. }
+	\label{fig:Lsappliedtime}
+\end{figure}
+
+
+\textbf{LS Frequence:}
+
+The preconditioning latency represents the number of restarts between which a GMRES preconditioning phase will take place, ie the application of the polynomial to the temporary solution of the resolution method. Also, we noticed previously that after each preconditioning phase corresponded the appearance of a peak of convergence before each acceleration of this one.
+
+In order to characterize the latency parameter (identified by cof in Figures 5.20, 5.21 and 5.22) we conducted a series of tests. These tests were designed to evaluate the number of completed iterations for different latencies, for different subspace sizes.
+
+The results we obtained allowed us to observe several things. The first is that the subspace size is decisive in the preconditioning of the problem. Indeed, if the subspace size is too small then it appears that the preconditioning is not interesting to use. Thus, in the case of too small subspace sizes, preconditioning degrades convergence.  Moreover, in the case where the subspace size GMRES is sufficiently large, then the latency parameter loses its importance. This is something we observe in figure 5.22 where the curves corresponding to the resolutions without preconditioning tend to aggregate together.
+
+Ultimately the latency parameter must be chosen to allow sufficient consideration of the preconditioning in the successive cycles at this stage while not being too important so that the convergence can continue to benefit from its effect at a satisfactory pace.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=6.2in]{fig/conv_lsfreq.eps}
+	\caption{Evaluation of LS applied times $freq$.}
+	\label{fig:Lsfreq}
+\end{figure}
+
+
+\textbf{Number of eigenvalues: }
+
+The parameter $m_g$, which means the restarted subspace size of GMRES, has important influence on the convergence of UCGLE.  This effect is similiar with the case on the conventional GMRES without preconditioning. For the experiments of UCGLE, we vary $m_g$ from $50$ to $180$, and keep $l=10$, $lsa=10$, $freq=10$. Moverover, we evaluate also the classic GMRES with $m_g$ to be $100$ and $150$. The results are given in Fig. \ref{fig:krylovsubspace}. First of all, we can conclude that in the case that $m_g$ is too small (see UCGLE($m_g=50$) in  Fig. \ref{fig:krylovsubspace}), even the LS preconditioning is applied, the convergence can not be achieved. With the augmentation of $m_g$, UCGLE is able to converge with less iteration steps. Secondly, with the preconditioning of LS polynomial, UCGLE can converge with $m_g=100$, but the classic GMRES cannot converge with the same value of this parameter.
+The subspace size is a parameter that can be considered as one of the most important in the case of the hybrid method. Too small it does not allow to take into account the preconditioning, too big, it will probably not allow it. Influencing both the effect of preconditioning and the convergence of the method, the subspace size must be dimensioned properly to allow the method to converge and precondition to cause the acceleration of the resolution.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=6.2in]{fig/conv_eigenvalues.eps}
+	\caption{Evaluation of eigenvalue number $n_{eigen}$.}
+	\label{fig:vals}
+\end{figure}
+
 \subsection{Convergence Evaluation}
 
 We have selected four test matrices generated by SMG2S using different given spectra to evaluate the convergence speedup of UCGLE method. The first test matrix $MEG1$ and the second matrix $MEG2$ are all generated randomly inside an annulus with different scale which is symmetric to the real axis in complex plane. The size of $MEG1$ is \num[round-precision=2,round-mode=figures]{18000000}, and the size of $MEG2$ is \num[round-precision=4,round-mode=figures]{10240000}. The convergence of UCGLE is compared with 1) the restarted GMRES without preconditioning, 2) restarted GMRES with Jacobi preconditioner, 3) restarted GMRES with SOR preconditioner. We select the Jacobi and SOR preconditioners for the experimentations because they are well implemented in parallel by PETSc. The GMRES restarted parameter for $MEG1$, $MEG2$, $MEG3$ and $MEG4$ are respectively 250, 280, 30 and 40.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=4.2in]{fig/matrix_generator.pdf}
+	\caption{Two strategies of large and sparse matrix generator by a original matrix utm300 of Matrix Market.}
+	\label{fig:matrix}
+\end{figure}
+
 
 \begin{table}[!t]
 	\renewcommand{\arraystretch}{1.2}

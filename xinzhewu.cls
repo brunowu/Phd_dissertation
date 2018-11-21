@@ -45,28 +45,29 @@
 \makeatletter
 \def\thickhrulefill{\leavevmode \leaders \hrule height 1ex \hfill \kern \z@}
 \def\@makechapterhead#1{%
-  \vspace*{-30\p@}%
-  {\parindent \z@ \raggedleft \reset@font
-            \scshape \@chapapp{} \thechapter
+  \vspace*{30\p@}%
+  {\parindent \z@ \raggedright \reset@font
+            \scshape \Huge \@chapapp{} \thechapter
+            \vspace*{10\p@}
         \par\nobreak
         \interlinepenalty\@M
-    \Huge \bfseries #1\par\nobreak
+    \huge \bfseries #1\par\nobreak
     %\vspace*{1\p@}%
     \hrulefill
     \par\nobreak
-    \vskip 50\p@
+    \vskip 40\p@
   }}
 \def\@makeschapterhead#1{%
- \vspace*{-50\p@}%
-  {\parindent \z@ \raggedleft \reset@font
+ \vspace*{0\p@}%
+  {\parindent \z@ \raggedright \reset@font
             \scshape \vphantom{\@chapapp{} \thechapter}
         \par\nobreak
         \interlinepenalty\@M
-    \Huge \bfseries #1 \par\nobreak
+    \huge \bfseries #1 \par\nobreak
     %\vspace*{1\p@}%
     \hrulefill
     \par\nobreak
-    \vskip 30\p@
+    \vskip 60\p@
   }}
 
 

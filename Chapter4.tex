@@ -2,7 +2,7 @@
 	\textsf{In Chapter 3, we have discussed the convergence of iterative methods and its relation with spectral distribution of linear systems. Indeed, algorithms and applications from diverse fields can be formulated as an eigenvalue problem. The eigenvalues are also extremely important for the preconditioners of solving linear systems. In machine learning and pattern recognition, it is often demanded to solve the eigenvalue problems for both supervised and unsupervised learning algorithms, such as principal component analysis (PCA) \cite{croux2000principal}, Fisher discriminant analysis (FDA) \cite{berkes2005handwritten}, and clustering \cite{fender2017parallel}, etc. An insufficient accuracy and a failure of eigenvalue solvers and linear solvers usually result in, respectively, a poor approximation to original discrete problems and a failure of entire algorithms.  A good selection of solvers becomes especially essential. Thus it is crucial to have the test matrices to benchmark the numerical performance and parallel efficiency of different methods. In this section, we present the Scalable Matrix Generator with Given Spectra (SMG2S), including its parallel implementation and optimization of both CPU and GPU clusters, the verification mechanism, and the release of open source package.}
 \end{displayquote}
 
-\vspace{1in}
+\vspace{0.6in}
 
 \section{Demand of Large Matrices with Given Spectrum}
 
@@ -29,7 +29,7 @@ It's rare but there are already several efforts to supply test matrix collection
 
 In this Section, we give a summary of the theorem and related proof based on the preliminary theoretical research of H. Gachlier et al. \cite{galichergenerate}.
 
-\newtheorem{theorem}{Theorem}
+
 \begin{theorem}
 	\label{theo1}
 	Let's consider the matrices $A \in \mathbb{C}^{n \times n}$, $M_0  \in \mathbb{C}^{n \times n}$, $n \in \mathbb{N}^*$. If M verifies: 
