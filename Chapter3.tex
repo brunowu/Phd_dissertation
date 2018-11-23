@@ -13,16 +13,16 @@ Given a matrix $A$ $\in \mathbb{C}^{n \times n}$ and a $n$-vector $b$ $\in \math
 Ax=b.
 \end{equation}
 
-This problem is a \textit{linear system}, $A$ is the coefficient matrix, $b$ is the \textit{right hand side (RHS)}, and $x$ is the \textit{vector of unknowns}.
+This problem is a \textit{linear system}, $A$ is the coefficient matrix, $b$ is the \textit{right hand side (RHS)}, and $x$ is the \textit{vector of unknowns}. In most cases, the linear systems are formatted by solving complex Partial Differential Equations (PDEs) systems. In general, the discretization of these PDEs into a cell-centered Finite Volume scheme in space and an Euler implicit method in time, leads to a nonlinear system which can be solved with a Newton’s method. For each Newton step by time, the system is linearized then solved using a linear solver.
 
-\textit{Eigenvalue problems} occur in many areas of science and engineering, such as structural analysis, and $eigenvalues$ are also important in analyzing numerical methods. The standard eigenvalue problem can be defined as: given a matrix $A$ $\in \mathbb{C}^{n \times n}$, find scalar $\lambda \in \mathbb{C}$ and nonzero vector $v \in \mathbb{C}$ such that:
+\textit{Eigenvalue problems} occur in many areas of science and engineering, such as structural analysis and electromagnetic applications, and $eigenvalues$ are also important in analyzing numerical methods. The standard eigenvalue problem can be defined as: given a matrix $A$ $\in \mathbb{C}^{n \times n}$, find scalar $\lambda \in \mathbb{C}$ and nonzero vector $v \in \mathbb{C}$ such that:
 
 \begin{equation}
 \label{av=lv}
 Av=\lambda v.
 \end{equation}
 
-In this formula, $\lambda$ is an \textit{eigenvalue} of $A$, and $v$ is its corresponding \textit{eigenvector}, $\lambda$ may be complex even if $A$ is real. The \textit{spectrum} of $A$ is the set of all eigenvalues of $A$, denoted it as $\lambda(A)$, and the \textit{Spectral radius} of $A$ $\rho(A)$ is $\max\{|\lambda|: \lambda \in \lambda(A)\}$.
+In this formula, $\lambda$ is an \textit{eigenvalue} of $A$, and $v$ is its corresponding \textit{eigenvector}, $\lambda$ may be complex even if $A$ is real. The \textit{spectrum} of $A$ is the set of all eigenvalues of $A$, denoted it as $\lambda(A)$, and the \textit{Spectral radius} of $A$ $\rho(A)$ is $\max\{|\lambda|: \lambda \in \lambda(A)\}$. 
 
 \section{Iterative Methods}
 
@@ -36,7 +36,7 @@ The iterate of stationnary methods to solve Equation (\ref{ax=b1}) can be expres
 x_k = Bx_{k-1}+c
 \end{equation}
 
-where neither $B$ nor $c$ depends upon the iteration count $k$. The four well-known stationary methods are the \textit{Jacobi method} \cite{yang2014acceleration}, \textit{Gauss-Seidel method} \cite{yoon1988lower}, \textit{successive overrelaxation method (SOR)} \cite{adams1982multi}, and \textit{symmetric successive overrelaxation method (SSOR)} \cite{axelsson1972generalized}. Beginning with an initial guess vector, these methods modify one or a few components of the approximation at each iterative step, until the convergence is reached. These medications are called relaxation steps. Theoretically, the stationary methods are applicable for all linear systems, but they are more efficient only for the applications arise from the finite difference discretization of Ellipse Partial Differential Equations. Though the inefficiency of stationary methods for most linear problems, they are often used to combine with the more efficient methods described in later sections of this chapter.
+where neither $B$ nor $c$ depends upon the iteration count $k$. The four well-known stationary methods are the \textit{Jacobi method} (\cite{yang2014acceleration}), \textit{Gauss-Seidel method} (\cite{yoon1988lower}), \textit{successive overrelaxation method (SOR)} (\cite{adams1982multi}), and \textit{symmetric successive overrelaxation method (SSOR)} (\cite{axelsson1972generalized}). Beginning with an initial guess vector, these methods modify one or a few components of the approximation at each iterative step, until the convergence is reached. These medications are called relaxation steps. Theoretically, the stationary methods are applicable for all linear systems, but they are more efficient only for the applications arise from the finite difference discretization of Ellipse Partial Differential Equations. Though the inefficiency of stationary methods for most linear problems, they are often used by combining with the more efficient methods described in later sections of this chapter.
 
 For \textbf{Jacobi method}, the Formula (\ref{stationary}) is extended as:
 
@@ -67,7 +67,7 @@ Where the matrices $D$, $-L$, and $-U$ represent the diagonal, strictly lower tr
 
 Finally, \textbf{SSOR method} is useful as a preconditioner for other methods. However, it has no advantage over the SOR method as a stand-alone iterative method.
 
-In general, many stationary methods have the smoothing property, where oscillatory modes with short wave-length of the errors of linear systems can be eliminated effectively, but the smooth modes with long wave-length are damped very slowly. Thus \textbf{multigrid (MG) methods} \cite{hutchinson1986multigrid, hiptmair1998multigrid, bank1988hierarchical} are introduced for solving differential equations using a hierarchy of discretizations. The main idea of MG methods is to accelerate the convergence of stationary iterative methods (known as relaxation process) by a global correction on the approximative solution of the fine grid from time to time. This global correction is achieved by solving a coarse problem. The coarse grids can be used to compute an improved initial guess for the fine-grid processes. The reason for the coarse grid are:
+In general, many stationary methods have the smoothing property, where oscillatory modes with short wave-length of the errors of linear systems can be eliminated effectively, but the smooth modes with long wave-length are damped very slowly. Thus \textbf{multigrid (MG) methods} (\cite{hutchinson1986multigrid, hiptmair1998multigrid, bank1988hierarchical}) are introduced for solving differential equations using a hierarchy of discretizations. The main idea of MG methods is to accelerate the convergence of stationary iterative methods (known as relaxation process) by a global correction on the approximative solution of the fine grid from time to time. This global correction is achieved by solving a coarse problem. The coarse grids can be used to compute an improved initial guess for the fine-grid processes. The reason for the coarse grid are:
 
 \begin{enumerate}
 	\item Relaxation on the coarse-grid is much cheaper;
@@ -96,7 +96,7 @@ The steps $2-4$ in Algorithm \ref{alg:v-cycle} is the kernel of multigrid method
 \end{algorithm}
 
 
-One extension of multigrid method is the \textbf{algebraic multigrid methods (AMG)} \cite{ruge1987algebraic, vanvek1996algebraic, brandt1986algebraic,brezina2001algebraic}. AMG construct their restriction, interpolation, and coarse grid matrices directly from the matrix of a linear system. AMG is regarded as advantageous when geometric multigrid is too difficult to apply, e.g., unstructured meshes, graph problem, etc.  Fig. \ref{multilevel-amg} gives an example of hierarchical multi-level AMG.
+One extension of multigrid method is the \textbf{algebraic multigrid methods (AMG)} (\cite{ruge1987algebraic, vanvek1996algebraic, brandt1986algebraic,brezina2001algebraic}). AMG construct their restriction, interpolation, and coarse grid matrices directly from the matrix of a linear system. AMG is regarded as advantageous when geometric multigrid is too difficult to apply, e.g., unstructured meshes, graph problem, etc.  Fig. \ref{multilevel-amg} gives an example of hierarchical multi-level AMG.
 
 \begin{figure}[htbp]
 	\centering
@@ -114,10 +114,10 @@ In practice, the stationary methods talked in the last section cannot always get
 This section presents the Krylov Subspace projection and the basic Arnoldi reduction in the Krylov subspace.
 
 \subsection{Krylov Subspaces}
-In linear algebra, the $m$-order Krylov subspace \cite{saad1981krylov} generated by a $n\times n$ matrix $A$ and a vector $b$ of dimension $n$ is the linear subspace spanned by the images of $b$ under the first $m$ powers of $A$, that is 
+In linear algebra, the $m$-order Krylov subspace (\cite{saad1981krylov}) generated by a $n\times n$ matrix $A$ and a vector $b$ of dimension $n$ is the linear subspace spanned by the images of $b$ under the first $m$ powers of $A$, that is 
 \[K_m(A,b)=span (b, Ab, A^2b,\cdots, A^{m-1}b).\] 
 
-The Krylov subspace provides the ability to extract the approximations from an m-dimensional subspace $K_m$. Since $K_m$ is the subspace of all vectors in $\mathcal{R}^n$, it can be written as $x=p(A)b$, with $p$ a polynomial of degree not exceeding $m-1$.
+The Krylov subspace provides the ability to extract the approximations from an m-dimensional subspace $K_m$. Since $K_m$ is the subspace of all vectors in $\mathbb{R}^n$, it can be written as $x=p(A)b$, with $p$ a polynomial of degree not exceeding $m-1$.
 
 \subsection{Basic Arnoldi Reduction}
 
@@ -141,7 +141,7 @@ The Krylov subspace provides the ability to extract the approximations from an m
 	\end{algorithmic}  
 \end{algorithm}
 
-Arnoldi procedure is well used to build an orthogonal basis of the Krylov subspace $K_m$. One variant of basic Arnoldi reduction algorithm is given In Algorithm \ref{alg:arnoldi-reduction}. In this algorithm, at each step of Arnoldi reduction, the algorithm times the previous Arnoldi vector $\omega_j$ by matrix $A$, and get an orthogonal vector $\omega_j$ against all previous $\omega_i$ by a stand Gram-Schmit procedure. It will stop if the vector computed in line $5$ is zero. Then the vectors $\omega_1, \omega_2. \cdots, \omega_m$ form an orthonormal basis of the Krylov Subspace. 
+Arnoldi procedure is well used to build an orthogonal basis of the Krylov subspace $K_m$. One variant of basic Arnoldi reduction algorithm is given in Algorithm \ref{alg:arnoldi-reduction}. In this algorithm, at each step of Arnoldi reduction, the algorithm times the previous Arnoldi vector $\omega_j$ by matrix $A$, and get an orthogonal vector $\omega_j$ against all previous $\omega_i$ by a stand Gram-Schmit procedure. It will stop if the vector computed in line $5$ is zero. Then the vectors $\omega_1, \omega_2. \cdots, \omega_m$ form an orthonormal basis of the Krylov Subspace. 
 
 \begin{figure}[htbp]
 	\centering
@@ -150,7 +150,7 @@ Arnoldi procedure is well used to build an orthogonal basis of the Krylov subspa
 	\label{arnoldi}
 \end{figure}
 
-Denote by $V_m$, the $n \times m$ matrix with column vectors $\omega_1, \omega_2. \cdots, \omega_m$, by $\overline{H}_m$, the $(m+1) \times m$ Hessemberg matrix whose nonzero entries $h_{i,j}$ are defined by  Algorithm \ref{alg:arnoldi-reduction}, then note $H_m$ as the matrix obtained from  $\overline{H}_m$ by deleting its last row. The following relations are given:
+Denote by $V_m$, the $n \times m$ matrix with column vectors $\omega_1, \omega_2. \cdots, \omega_m$, by $\overline{H}_m$, the $(m+1) \times m$ Hessemberg matrix whose nonzero entries $h_{i,j}$ are defined by  Algorithm \ref{alg:arnoldi-reduction}, then note $H_m$ as the matrix obtained from  $\overline{H}_m$ by deleting its last row (shown as Fig. \ref{arnoldi}). The following relations are given:
 \begin{equation}
 AV_m = V_m H_m + \omega_me_m^T = V_{m+1}\bar{H}_m.
 \end{equation}
@@ -165,7 +165,14 @@ In case that the norm of $\omega_j$ in line $5$ of  Algorithm \ref{alg:arnoldi-r
 \subsection{Orthogonalization}
 There are different orthogonalization schemes to construct the orthogonal basis of Krylov subspace, in this section, we list four variants.
 
-\begin{algorithm}[htbp]{}
+\begin{enumerate}
+	\item \textbf{Classic Gram-Schmit Orthogonalization (CGS)}: Algorithm \ref{alg:arnoldi-reduction} gives an example of Arnoldi reduction using the CGS to create a basis vector by vector. The benefit of CGS is the parallelism in computing $h_{i,j}$ and $\omega_j$ in step 5 and 7.
+	\item \textbf{Modified Gram-Schmit Orthogonalization (MGS)}: An alternative (See Algorithm \ref{alg:arnoldi-reduction-md}), in which the number of subtractions is reduced, resulting in a less chance of cancellations. Though MGS is more stable than CGS, it is less parallel than CGS. In CGS, the orthogonalization process from line 5 to line 7 can be overlapped, while the same process of MGS has a data dependency. Thus the parallel implementation of Arnoldi reduction still prefers CGS, and a preconditioner or a reorthogonalization process can compensate its deficiency of numerical stability.
+	\item \textbf{Householder Orthogonalization}: the  Arnoldi reduction can also be operated by the householder orthogonalization, which is more numerically robust than the Gram-Schmit orthogonalization.
+	\item \textbf{Incomplete Orthogonalization}: This orthogonalization process in Arnoldi is expensive because each vector accumulated in the basis is orthogonalized against all previous ones. Thereby, the orthogonalization process number of iterations $k$ is bounded to the Krylov subspace size, thus higher values of $m$ will imply More computations and memory space in order to create the Krylov orthonormalized vector basis. With the aim to reduce the cost induced by the Arnoldi orthogonalization process, it is possible to truncate it by orthogonalizing each vector against a subset of the basis vectors, i.e. the $q$ precedent basis vectors (Algorithm \ref{alg:arnoldi-incomplete-reduction}). In this case, the resulting upper Hessenberg matrix $H_m$ is not fully orthogonalized and has the propriety to be banded of bandwidth $q$. Incomplete orthogonalization can speed up the construction of Krylov subspace basis, with the loose of numerical accuracy.
+\end{enumerate}
+
+\begin{algorithm}[t]{}
 	\caption{Arnoldi Reduction with Modified Gram-Schmidt process}   
 	\label{alg:arnoldi-reduction-md}   
 	\begin{algorithmic}[1]
@@ -185,14 +192,7 @@ There are different orthogonalization schemes to construct the orthogonal basis 
 	\end{algorithmic}  
 \end{algorithm}
 
-\begin{enumerate}
-	\item \textbf{Classic Gram-Schmit Orthogonalization (CGS)}: Algorithm \ref{alg:arnoldi-reduction} gives an example of Arnoldi reduction using the CGS to create a basis vector by vector. The benefit of CGS is the parallelism in computing $h_{i,j}$ and $\omega_j$ in step 5 and 7.
-	\item \textbf{Modified Gram-Schmit Orthogonalization (MGS)}: An alternative (See Algorithm \ref{alg:arnoldi-reduction-md}), in which the number of subtractions is reduced, resulting in a less chance of cancellations. Though MGS is more stable than CGS, it is less parallel than CGS. In CGS, the orthogonalization process from line 5 to line 7 can be overlapped, while the same process of MGS has a data dependency. Thus the parallel implementation of Arnoldi reduction still prefers CGS, and a preconditioner or a reorthogonalization process can compensate its deficiency of numerical stability.
-	\item \textbf{Householder Orthogonalization}: the  Arnoldi reduction can also be operated by the householder orthogonalization, which is more numerically robust than the Gram-Schmit orthogonalization.
-	\item \textbf{Incomplete Orthogonalization}: This orthogonalization process in Arnoldi is expensive because each vector accumulated in the basis is orthogonalized against all previous ones. Thereby, the orthogonalization process number of iterations $k$ is bounded to the Krylov subspace size, thus higher values of $m$ will imply More computations and memory space in order to create the Krylov orthonormalized vector basis. With the aim to reduce the cost induced by the Arnoldi orthogonalization process, it is possible to truncate it by orthogonalizing each vector against a subset of the basis vectors, i.e. the q precedent basis vectors (Algorithm \ref{alg:arnoldi-incomplete-reduction}). In this case, the resulting upper Hessenberg matrix $H_m$ is not fully orthogonalized and has the propriety to be banded of bandwidth $q$. Incomplete orthogonalization can speed up the construction of Krylov subspace basis, with the loose of numerical accuracy.
-\end{enumerate}
-
-\begin{algorithm}[htbp]{}
+\begin{algorithm}[t]{}
 	\caption{Arnoldi Reduction with Incomplete Orthogonalization process}   
 	\label{alg:arnoldi-incomplete-reduction}   
 	\begin{algorithmic}[1]
@@ -214,7 +214,7 @@ There are different orthogonalization schemes to construct the orthogonal basis 
 
 \subsection{Krylov Subspace Methods}
 
-The best known Krylov subspace methods are the Arnoldi \cite{voss2004arnoldi}, Lanczos \cite{widlund1978lanczos}, Conjugate gradient \cite{lasdon1967conjugate}, IDR(s) (Induced dimension reduction) \cite{van2015induced}, GMRES (generalized minimum residual), BiCGSTAB (biconjugate gradient stabilized) \cite{sleijpen1993bicgstab}, QMR (quasi minimal residual) \cite{freund1991qmr}, TFQMR (transpose-free QMR) \cite{basermann1996qmr}, and MINRES (minimal residual) \cite{paige1975solution} methods. This dissertation concentrates on GMRES which is used to solve non-Hermitian linear systems.
+The best known Krylov subspace methods are the Arnoldi (\cite{voss2004arnoldi}), Lanczos (\cite{widlund1978lanczos}), Conjugate gradient (\cite{lasdon1967conjugate}), IDR(s) (Induced dimension reduction) (\cite{van2015induced}), GMRES (generalized minimum residual), BiCGSTAB (biconjugate gradient stabilized) (\cite{sleijpen1993bicgstab}), QMR (quasi minimal residual) (\cite{freund1991qmr}), TFQMR (transpose-free QMR) (\cite{basermann1996qmr}), and MINRES (minimal residual) (\cite{paige1975solution}) methods. This dissertation concentrates on GMRES which is used to solve non-Hermitian linear systems.
 
 \section{GMRES for Non-Hermitian Linear Systems}
 
@@ -222,7 +222,7 @@ GMRES is a well-known Krylov iterative method to solve non-Hermitian linear syst
 
 \subsection{Basic GMRES Method}
 
-GMRES (Algorithm \ref{alg:basicgmres}) is a kind of projection method which extracts an approximated solution $x_m$ of given problem in a well-selected $m$-dimensional Krylov subspace \(K_m(A,v)\) from a given initial guess vector $x_0$.  GMRES method was introduced by Youssef Saad and Martin H. Schultz in 1986 \cite{saad1986gmres}.
+GMRES (Algorithm \ref{alg:basicgmres}) is a kind of projection method which extracts an approximated solution $x_m$ of given problem in a well-selected $m$-dimensional Krylov subspace \(K_m(A,v)\) from a given initial guess vector $x_0$.  GMRES method was introduced by Youssef Saad and Martin H. Schultz in 1986 (\cite{saad1986gmres}).
 
 \begin{algorithm}[htbp]
 	\caption{Basic GMRES method}
@@ -274,15 +274,15 @@ If $m$ is very large, GMRES can be restarted after a number of iterations, to av
 Several variants of GMRES are proposed, such as:
 
 \begin{enumerate}
-	\item \textbf{Restarted GMRES \cite{morgan1995restarted}}: The cost of the iterations grow as $\mathcal{O}(n^2)$, where $n$ is the iteration number. Therefore, the method is sometimes restarted after a number, say $k$, of iterations, with $x_k$ as an initial guess. The resulting method is called Restarted GMRES. This method suffers from stagnation in convergence as the restarted subspace is often close to the earlier subspace.
+	\item \textbf{Restarted GMRES (\cite{morgan1995restarted})}: the cost of the iterations grow as $\mathcal{O}(n^2)$, where $n$ is the iteration number. Therefore, the method is sometimes restarted after a number, say $k$, of iterations, with $x_k$ as an initial guess. The resulting method is called Restarted GMRES. This method suffers from stagnation in convergence as the restarted subspace is often close to the earlier subspace.
 	
-	\item \textbf{Truncated GMRES \cite{de1999truncation}}: a version of GMRES with incomplete orthogonalization, which reduces the computing and memory requirement of the Arnoldi process in GMRES with the cost of the accuracy of orthogonalization.
+	\item \textbf{Truncated GMRES (\cite{de1999truncation})}: a version of GMRES with incomplete orthogonalization, which reduces the computing and memory requirement of the Arnoldi process in GMRES with the cost of the accuracy of orthogonalization.
 	
-	\item \textbf{GMRES-DR \cite{erhel1996restarted}}: Restarted GMRES with deflation. As we have just seen, restarting results in a loss of useful information, thus a slowing of convergence after a restart. To overcome this problem, GMRES with deflated restarting (GMRES-DR) was introduced. The deflation in GMRES-DR makes restarted GMRES more robust and makes it converge much faster for tough problems with small eigenvalues.
+	\item \textbf{GMRES-DR (\cite{erhel1996restarted})}: Restarted GMRES with deflation. As we have just seen, restarting results in a loss of useful information, thus a slowing of convergence after a restart. To overcome this problem, GMRES with deflated restarting (GMRES-DR) was introduced. The deflation in GMRES-DR makes restarted GMRES more robust and makes it converge much faster for tough problems with small eigenvalues.
 	
-	\item \textbf{Pipelined GMRES \cite{ghysels2014hiding}}: A particular variant of GMRES which hides the global communication latency for parallel implementation.
+	\item \textbf{Pipelined GMRES (\cite{ghysels2014hiding})}: A particular variant of GMRES which hides the global communication latency for parallel implementation.
 	
-	\item \textbf{FGMRES \cite{fraysse2008algorithm}}: Flexible GMRES presented by Saad is a variant of GMRES with the advantage of being able to switch preconditioners on the fly according to specific heuristics in the GMRES process without any additional computation. This method is interesting because it allows developing robust and easily parallelizable methods. FGMRES is developed based on the right-preconditioner which will be presented later in this chapter.
+	\item \textbf{FGMRES (\cite{fraysse2008algorithm})}: Flexible GMRES presented by Saad is a variant of GMRES with the advantage of being able to switch preconditioners on the fly according to specific heuristics in the GMRES process without any additional computation. This method is interesting because it allows developing robust and easily parallelizable methods. FGMRES is developed based on the right-preconditioner which will be presented later in Section \ref{Left, Right and Split Preconditioning}.
 	
 \end{enumerate}
 
@@ -292,9 +292,9 @@ Several variants of GMRES are proposed, such as:
 The dominant eigenvalues of a non-Hermitian eigenvalue problem can be approximated by the Arnoldi method. In the section, we present the basic algorithm of the Arnoldi method and its variants.
 
 \subsection{Basic Arnoldi Methods}
-Arnoldi algorithm \cite{arnoldi1951principle} is widely used to approximate the eigenvalues of large sparse matrices. The kernel of Arnoldi algorithm is the Arnoldi reduction, which gives an orthonormal basis \(\Omega_m = (\omega_1,\omega_2,\cdots,\omega_m)\) of Krylov subspace \(K_m(A,v)\), by the Gram-Schmidt orthogonalization, where \(A\) is  \(n \times n\) matrix, and $\nu$ is a \(n\)-dimensional vector. As shown Arnoldi reduction can transfer a matrix \(A\) to be an upper Hessenberg matrix \(H_m\) with relation $V_m^T A V_m = H_m$, the eigenvalues of \(H_m\) are the approximated ones of \(A\), which are called the Ritz values of \(A\). With the Arnoldi reduction, the $r$ desired Ritz values $\Lambda_r=(\lambda_1,\lambda_2,\cdots,\lambda_r)$, and the corresponding Ritz vectors $U_r=(u_1,u_2,\cdots,u_r)$ can be calculated by Basic Arnoldi method.
+Arnoldi algorithm (\cite{arnoldi1951principle}) is widely used to approximate the eigenvalues of large sparse matrices. The kernel of Arnoldi algorithm is the Arnoldi reduction, which gives an orthonormal basis \(\Omega_m = (\omega_1,\omega_2,\cdots,\omega_m)\) of Krylov subspace \(K_m(A,v)\), by the Gram-Schmidt orthogonalization, where \(A\) is  \(n \times n\) matrix, and $\nu$ is a \(n\)-dimensional vector. As shown Arnoldi reduction can transfer a matrix \(A\) to be an upper Hessenberg matrix \(H_m\) with relation $V_m^T A V_m = H_m$, the eigenvalues of \(H_m\) are the approximated ones of \(A\), which are called the Ritz values of \(A\). With the Arnoldi reduction, the $r$ desired Ritz values $\Lambda_r=(\lambda_1,\lambda_2,\cdots,\lambda_r)$, and the corresponding Ritz vectors $U_r=(u_1,u_2,\cdots,u_r)$ can be calculated by Basic Arnoldi method.
 
-The numerical accuracy of the computed eigenpairs of basic Arnoldi method depends highly on the size of the Krylov subspace and the orthogonality of $\Omega_m$. Generally, the larger the subspace is, the better the eigenpairs approximation is. The problem is that firstly the orthogonality of the computed $\Omega_m$ tends to degrade with each basis extension. Also, the larger the subspace size is, the larger the $\Omega_m$ matrix gets. Hence available memory may also limit the subspace size, and so the achievable accuracy of the Arnoldi process. To overcome this, Saad \cite{saad2011numerical} proposed to restart the Arnoldi process, which is the ERAM. Inside ERAM, the subspace size is fixed as $m$, and only the starting vector will vary. After one restart of the Arnoldi process, the starting vector will be initialized by using information from the computed Ritz vectors. In this way, the vector will be forced to be in the desired invariant subspace. The Arnoldi process and this iterative scheme will be executed until a satisfactory solution is computed. The Algorithm of ERAM is given by Algorithm \ref{alg:arnoldi}, where $\epsilon_a$ is a tolerance value, $r$ is desired eigenvalues number and the function $g$ defines the stopping criterion of iterations.
+The numerical accuracy of the computed eigenpairs of basic Arnoldi method depends highly on the size of the Krylov subspace and the orthogonality of $\Omega_m$. Generally, the larger the subspace is, the better the eigenpairs approximation is. The problem is that firstly the orthogonality of the computed $\Omega_m$ tends to degrade with each basis extension. Also, the larger the subspace size is, the larger the $\Omega_m$ matrix gets. Hence available memory may also limit the subspace size, and so the achievable accuracy of the Arnoldi process. To overcome this, Saad (\cite{saad2011numerical}) proposed to restart the Arnoldi process, which is the ERAM. Inside ERAM, the subspace size is fixed as $m$, and only the starting vector will vary. After one restart of the Arnoldi process, the starting vector will be initialized by using information from the computed Ritz vectors. In this way, the vector will be forced to be in the desired invariant subspace. The Arnoldi process and this iterative scheme will be executed until a satisfactory solution is computed. The Algorithm of ERAM is given by Algorithm \ref{alg:arnoldi}, where $\epsilon_a$ is a tolerance value, $r$ is desired eigenvalues number and the function $g$ defines the stopping criterion of iterations.
 
 \begin{algorithm}[htbp]{}
 	\caption{Explicitly Restarted Arnoldi Method}   
@@ -319,15 +319,15 @@ The numerical accuracy of the computed eigenpairs of basic Arnoldi method depend
 There are various strategies to restart the basic Arnoldi method and to accelerate the convergence by the deflation of unwanted eigenvalues. This section lists three variants:
 
 \begin{enumerate}
-	\item \textbf{Explicitly Restarted Arnoldi Method (ERAM) \cite{morgan1996restarting}}: Arnoldi algorithm restarted explicitly by the combination of Ritz values and vectors.
+	\item \textbf{Explicitly Restarted Arnoldi Method (ERAM) (\cite{morgan1996restarting})}: Arnoldi algorithm restarted explicitly by the combination of Ritz values and vectors.
 	
-	\item \textbf{Implicitly Restarted Arnoldi Method (IRAM) \cite{sorensen1997implicitly}}: IRAM is a variant of Arnoldi algorithm with deflation of unwanted eigenvalues. It can shift the unwanted eigenvalues of matrix implicitly without the explicit construction of filter polynomial during the process of Arnoldi reduction. The Algorithm \ref{alg:impli-arnoldi} illustrates this method. The shift of unwanted values of matrix $A$ can be transferred to be a shifted QR factorization of Hessemberg matrix $H_m$. IRAM can operate in parallel to solve the large problem without extra memory space.
+	\item \textbf{Implicitly Restarted Arnoldi Method (IRAM) (\cite{sorensen1997implicitly})}: IRAM is a variant of Arnoldi algorithm with deflation of unwanted eigenvalues. It can shift the unwanted eigenvalues of matrix implicitly without the explicit construction of filter polynomial during the process of Arnoldi reduction. The Algorithm \ref{alg:impli-arnoldi} illustrates this method. The shift of unwanted values of matrix $A$ can be transferred to be a shifted QR factorization of Hessemberg matrix $H_m$. IRAM can operate in parallel to solve the large problem without extra memory space.
 	
-	\item \textbf{Krylov-Schur Method \cite{stewart2002krylov}}: It is another implementation of Arnoldi algorithm with deflation of unwanted eigenvalues. Krylov-Schur method is mathematically equal to IRAM. Its two advantages over IRAM: 1) it is easier to deflate converged Ritz vectors; 2) it avoids the potential forward instability of the QR algorithm. The Algorithm \ref{alg:krylov-schur} gives this method. During the Arnoldi reduction procedure, the Hessemberg matrix $H_m$ is decomposed by the Schur deposition as $H_m=S_m*T_mS_m$ with unitary matrix $S_m$ and upper triangular matrix $T_m$. The upper triangular form of $T_m$ eases the analysis of Ritz pairs. The wanted and unwanted Ritz values in $T_m$ can be reordered into two separate parts as $T_{m-k}$ and $T_k$. $T_{m-k}$ can be extended to $m$-dimension without unwanted values through further $k$ steps of Krylov subspace projection. 
+	\item \textbf{Krylov-Schur Method (\cite{stewart2002krylov})}: It is another implementation of Arnoldi algorithm with deflation of unwanted eigenvalues. Krylov-Schur method is mathematically equal to IRAM. Its two advantages over IRAM: 1) it is easier to deflate converged Ritz vectors; 2) it avoids the potential forward instability of the QR algorithm. The Algorithm \ref{alg:krylov-schur} gives this method. During the Arnoldi reduction procedure, the Hessemberg matrix $H_m$ is decomposed by the Schur deposition as $H_m=S_m*T_mS_m$ with unitary matrix $S_m$ and upper triangular matrix $T_m$. The upper triangular form of $T_m$ eases the analysis of Ritz pairs. The wanted and unwanted Ritz values in $T_m$ can be reordered into two separate parts as $T_{m-k}$ and $T_k$. $T_{m-k}$ can be extended to $m$-dimension without unwanted values through further $k$ steps of Krylov subspace projection. 
 	
 \end{enumerate}
 
-\begin{algorithm}[htbp]{}
+\begin{algorithm}[t]{}
 	\caption{Implicitly Restarted Arnoldi Method}   
 	\label{alg:impli-arnoldi}   
 	\begin{algorithmic}[1]
@@ -369,7 +369,7 @@ In practice, one weakness of GMRES discussed in the previous section is the lack
 
 The first alternative is to use the preconditioning matrix $M$. This $M$ can be defined in many different ways, and it makes it is much easier to solve linear systems $Mx=b$ compared with the original linear systems $Ax=b$. After the selection of $M$, there are two ways to apply this preconditioning matrix $M$ to the original systems: the left, right and split preconditioning.
 
-\subsubsection{Left, Right and Split Preconditioning}
+\subsubsection{Left, Right and Split Preconditioning}\label{Left, Right and Split Preconditioning}
 
 The \textbf{left preconditioning} of matrix on the original linear can be defined as:
 
@@ -517,7 +517,7 @@ In numerical linear algebra, an incomplete LU factorization (abbreviated as ILU)
 
 For a linear system $Ax=b$, it is often solved by computing the factorization $A=LU$, with $L$ a lower triangular and $U$ upper triangular. One then solves efficiently $Ly=b$ and $Ux=y$ in sequence since $U$, and $L$ are all triangular.  It is well known that usually in the factorization procedure, the matrices L and U have more non zero entries then A. These extra entries are called fill-in entries.
 
-An incomplete factorization \cite{saad1994ilut,sertel2000incomplete, lee2003incomplete,malas2007incomplete} instead seeks triangular matrices $L$ and $U$ such that 
+An incomplete factorization (\cite{saad1994ilut,sertel2000incomplete, lee2003incomplete,malas2007incomplete}) instead seeks triangular matrices $L$ and $U$ such that 
 \[A \approx LU.\]
 
 For a typical sparse matrix, the LU factors can be much less sparse than the original matrix - a phenomenon called fill-in. The memory requirements for using a direct solver can then become a bottleneck in solving linear systems. One can combat this problem by using fill-reducing reorderings of the matrix's unknowns, such as the Cuthill-McKee ordering. 
@@ -550,13 +550,13 @@ Let $S$ be a subset of all positions of the original matrix generally including 
 
 Solving for $LUx=b$ can be done quickly but does not hield the exact solution to the given problem. So a matrix is \[M_{LU} = LU\]
 
-often used as a preconditioner for another iterative method such as GMRES. For an incomplete factorization with no-fill, named ILU(0), we define the pattern P as the zero pattern of A. However, more accurate factorization can be obtained by allowing some fill-in, denoted by ILU(p) where p stands for the desired level of fill. This class of preconditioner has some difficulties to converge in a reasonably number of iterations on ill-conditioned systems.
+often used as a preconditioner for another iterative method such as GMRES. For an incomplete factorization with no-fill, named ILU(0), we define the pattern $P$ as the zero pattern of A. However, more accurate factorization can be obtained by allowing some fill-in, denoted by ILU($p$) where $p$ stands for the desired level of fill. This class of preconditioner has some difficulties to converge in a reasonably number of iterations on ill-conditioned systems.
 
 \subsubsection{Preconditioning by Multigrid solvers}
 
 Multigrid methods, including GMG and AMG, are the most complex preconditioners. The MG methods speed up the convergence of stationary iterative methods by smoothing the low-frequency modes of the errors of linear systems with the construction of a series of coarse representations. The main difference between the GMG and AMG is the strategy to construct the restriction, and coarsing matrices. AMG preconditioners need an amount of time for the pre-processing, but they can accelerate convergence much more significantly.
 
-When AMG is applied as a preconditioner \cite{plank2007algebraic,leem2004algebraic,yang2002boomeramg,mifune2003new}, the setup phase of restriction matrix $R_h^{2h}$ and the interpolation matrix $I_h^{2h}$ need to be complex as the standalone AMG solvers. The creation of a given number of sub-domains, and each domain representing by only one value at the coarse level is enough. After dividing the nodes of mesh into groups, the projection matrix can be defined as $W$. $W$ is used to build the coarse-system matrix $A_{2h}$ of an original matrix $A$:
+When AMG is applied as a preconditioner (e.g. \cite{plank2007algebraic,leem2004algebraic,yang2002boomeramg,mifune2003new}), the setup phase of restriction matrix $R_h^{2h}$ and the interpolation matrix $I_h^{2h}$ need to be complex as the standalone AMG solvers. The creation of a given number of sub-domains, and each domain representing by only one value at the coarse level is enough. After dividing the nodes of mesh into groups, the projection matrix can be defined as $W$. $W$ is used to build the coarse-system matrix $A_{2h}$ of an original matrix $A$:
 
 \begin{equation}
 A_{2h}=W^{T}AW.
@@ -770,7 +770,7 @@ The three terms recurrence of Chebyshev polynomial induces an elegant algorithm 
 
 \subsubsection{Least Squares Polynomial Method}
 
-Based on the normalized Chebyshev polynomial, the Least Squares polynomials methods are introduced. In fact, the spectrum of A is discret, it is possible to introduce one or more polygonal regions without the origin, which has a relatively small number of edges instead of ellipses \cite{smolarski1982optimum}. The problem tends to find a polynomial \(P_n\) on the boundary of \(H\) which we note as \(\partial H\), that maxmimizes the modulus of \(|1-\lambda P_n(\lambda)|\). And then we get the least square problem with respect to some weight \(w(\lambda)\) on the boundary of \(H\) and the constraint \(R_n(0)=1\).
+Based on the normalized Chebyshev polynomial, the Least Squares polynomials methods are introduced. In fact, the spectrum of A is discret, it is possible to introduce one or more polygonal regions without the origin, which has a relatively small number of edges instead of ellipses (\cite{smolarski1982optimum}). The problem tends to find a polynomial \(P_n\) on the boundary of \(H\) which we note as \(\partial H\), that maxmimizes the modulus of \(|1-\lambda P_n(\lambda)|\). And then we get the least square problem with respect to some weight \(w(\lambda)\) on the boundary of \(H\) and the constraint \(R_n(0)=1\).
 
 \begin{figure}[htbp]
 	\centering
@@ -892,7 +892,7 @@ In order to resolve the minimum-maximum problem, a well known method is to use t
 R_d(\lambda)=\frac{T_d(\frac{c-\lambda}{d})}{T_d (\frac{c}{d})}
 \end{equation}
 
-The three terms recurrence of Chebyshev polynomial introduces an elegant algorithm for generating the approximation \(x_d\) that uses only three vectors of storage. The choice of ellipses as enclosing regions in Chebyshev acceleration maybe overly restrictive and ineffective if the shape of the convex hull of the unwanted eigenvalues bears little resemblance to an ellipse. There are several reseach to find the acceleration polynomial to minimize its $L_2$-norm on the boundary of the convex hull of the unwanted eigenvalues with respect to some suitable weight function $\omega$. An algorithm based on the modified moments  for computing the least square polynomial was proposed by Youcef Saad \cite{saad1987least}. The problem tends to find a polynomial \(P_d\) on the boundary of \(H_k\) which we note as \(\partial H_k\), that maxmimizes the modulus of \(|1-\lambda P_d(\lambda)|\). And then we get the least square problem with respect to some weight \(w(\lambda)\) on the boundary of \(H_k\) and the constraint \(R_d(0)=1\).
+The three terms recurrence of Chebyshev polynomial introduces an elegant algorithm for generating the approximation \(x_d\) that uses only three vectors of storage. The choice of ellipses as enclosing regions in Chebyshev acceleration maybe overly restrictive and ineffective if the shape of the convex hull of the unwanted eigenvalues bears little resemblance to an ellipse. There are several reseach to find the acceleration polynomial to minimize its $L_2$-norm on the boundary of the convex hull of the unwanted eigenvalues with respect to some suitable weight function $\omega$. An algorithm based on the modified moments  for computing the least square polynomial was proposed by Youcef Saad (\cite{saad1987least}). The problem tends to find a polynomial \(P_d\) on the boundary of \(H_k\) which we note as \(\partial H_k\), that maxmimizes the modulus of \(|1-\lambda P_d(\lambda)|\). And then we get the least square problem with respect to some weight \(w(\lambda)\) on the boundary of \(H_k\) and the constraint \(R_d(0)=1\).
 
 The iteration form of Least Square is \(x_d=x_0+P_d(A)r_0\) with \(P_d\) the least square polynomial of degree \(d-1\) under the Formula (\ref{pd}). The polynomial basis \(t_i\) meet the three terms recurrence relation (\ref{threeterms}). 
 \begin{equation}
@@ -1014,7 +1014,7 @@ GMRES convergence is governed by the distribution of the eigenvalues of $V^TW$ o
 
 where $\epsilon^{(m)}=\min_{p \in \mathbb{P}_m, p(0)=1} \max_{\lambda \in \sigma(A)i=1,\cdots,n}|p(\lambda_i)|$, and $c_2(P)=||P||_2||P^{-1}||_2$.
 
-The exact proof can be found in \cite{saad2003iterative}.
+The exact proof can be found in (\cite{saad2003iterative}).
 
 \subsection{Convergence Analysis by Pseudo-eigenvalues}
 
@@ -1033,16 +1033,18 @@ The exact proof can be found in \cite{saad2003iterative}.
 
 Krylov subspace methods are generally implemented in parallel on the supercomputers to solve very large linear systems and eigenvalue problems. This section discusses the scheme to implement Krylov methods in parallel.
 
-\subsection{Type of Operations in Krylov Methods}
+\subsection{Core Operations in Krylov Methods}
 
-It is necessary to identify the main operations in Krylov methods before the parallel implementation. Consider Algorithm 2, 5, 7. We distinguish four types of operations, which are:
+It is necessary to identify the main operations in Krylov methods before the parallel implementation. Consider Algorithm \ref{alg:arnoldi-reduction}, \ref{alg:basicgmres} and \ref{alg:arnoldi}. We distinguish four types of operations, which are:
 
 \begin{itemize}
-	\item Matrix-vector products;
-	\item AXPY operation;
-	\item Dot products;
-	\item Orthogonalization of vector.
+	\item Matrix-vector products in step $5$ of Algorithm \ref{alg:arnoldi-reduction};
+	\item AXPY operation in step $7$ of Algorithm \ref{alg:arnoldi-reduction};
+	\item Dot products in step $8$ of Algorithm \ref{alg:arnoldi-reduction};
+	\item Orthogonalization of vector for the loop from step $4$ to $6$ in of Algorithm \ref{alg:arnoldi-reduction}.
 \end{itemize}
+
+This section gives the parallel implementation of these four operations in details.
 
 \subsubsection{AXPY Operation}
 
@@ -1056,21 +1058,23 @@ With $x$ and $y$ two vectors, and $\alpha$ is a scalar. This operation is used t
 
 \subsubsection{Dot product and Global Reduction Operation}
 
-The dot product is the operation that use all the components of given vectors to compute a single floating-point scalar. In the Arnoldi reduction process, this scalar is always needed by all processors. 
+The dot product is the operation that use all the components of given vectors to compute a single floating-point scalar. In the Arnoldi reduction process, this scalar is always needed by all processors. Equation (\ref{dotproduct}) gives the formula of dot product operation.
+
 \begin{equation}
+\label{dotproduct}
 v\cdot w = \langle v_1, v_2, \cdots, v_n \rangle \cdot\langle w_1, w_2, \cdots, w_n\rangle = v_1w_1+v_2w_2+\cdots+v_nw_n.
 \end{equation}
-The distributed version of the dot-product is needed to compute the inner product of two vectors $x$ and $y$ and then distribute the result across all the processors.  This types of operations are termed the \textit{All Reduction Operations}, which can be seen as the combination \textit{Reduction Operations} and \textit{Broadcast Operations}. In Krylov subspace methods, the dot-product operation is typically needed to perform the vector update on each processor. If the number of processors is large, this kind of operations can introduce enormous communication costs. The computation of the Euclidean norm of distributed vectors is also a global reduction operation which is similar to the dot-product.
+The distributed version of the dot-product is needed to compute the inner product of two vectors $v$ and $w$ and then distribute the result across all the processors.  This types of operations are termed the \textit{All Reduction Operations}, which can be seen as the combination \textit{Reduction Operations} and \textit{Broadcast Operations}. In Krylov subspace methods, the dot-product operation is typically needed to perform the vector update on each processor. If the number of processors is large, this kind of operations can introduce enormous communication costs. The computation of the Euclidean norm of distributed vectors is also a global reduction operation which is similar to the dot-product.
 
 \subsubsection{Orthogonalization of Vector}
 
-In the Arnoldi reduction for non-Hermitian matrices, the vector $Av_i$ should be orthogonalized against all the previous vectors. In practice, the classic Gram-Schmidt process is preferred than the Modified Gram-Schmidt, even the presence of round-offs and cancellations within CGS diminish its numerical stability. In CGS, the orthogonalization process is overlapped, while the same process of MGS has a data dependency, which is not possible to get good parallel performance. A preconditioner or a reorthogonalization process can compensate the deficiency of numerical stability.
+In the Arnoldi reduction (as shown by Algorithm \ref{alg:arnoldi-reduction}) for non-Hermitian matrices, the vector $Av_i$ should be orthogonalized against all the previous vectors. In practice, the classic Gram-Schmidt process is preferred than the Modified Gram-Schmidt, even the presence of round-offs and cancellations within CGS diminish its numerical stability. In CGS, the orthogonalization process is overlapped, while the same process of MGS has a data dependency, which is not possible to get good parallel performance. A preconditioner or a reorthogonalization process can compensate the deficiency of numerical stability.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=4.8in]{fig/spmv.pdf}
 	\caption{Communication Scheme of SpMV.}
-	\label{spmv}
+	\label{fig:spmv}
 \end{figure}
 
 \subsubsection{Matrix-vector products}
@@ -1079,7 +1083,7 @@ In practice, the parallel version of Arnoldi orthogonalization is memory/communi
 
 The standard used sparse matrix storage format includes: COO (Coordinate lists) which stores respectively the row index, column index and values into three arrays; CSR (Compressed Sparse Row) which stores respectively the row offset, the column index and data values into three arrays; ELLPACK which stores the column index and values into two two-dimensional arrays according their row index; and DIA (Diagonal format) which store the diagonal offsets into one-dimensional array, and the values sorted by diagonal into a two-dimensional array.
 
-For the parallel implementation of SpMV on modern parallel systems, the matrix with selected storage format should be distributed across different processors with considering the load balance and reduction of communications.
+For the parallel implementation of SpMV on modern parallel systems, the matrix with selected storage format should be distributed across different processors with considering the load balance and reduction of communications. Fig. \ref{fig:spmv} gives the communication scheme of SpMV on distributed memory memory systems.
 
 \begin{figure}[h]
 	\centering
@@ -1094,22 +1098,23 @@ Fig. \ref{parallel_gmres} describes the parallel implementation of the Arnoldi r
 
 \subsection{Existing Softwares}
 
-Recent years, there are several efforts to provide the parallel Krylov methods on different computing architectures. This section gives a glance at two famous software of them.
+Recent years, there are several efforts to provide the parallel Krylov methods on different computing architectures. This section gives a glance at two famous ones of them.
 
-\subsubsection{PETSc} 
+\subsubsection{PETSc/SLEPc} 
 
-The \textbf{Portable, Extensible Toolkit for Scientific Computation (PETSc)} \cite{balay2001petsc}, is a suite of data structures and routines developed by Argonne National Laboratory for the scalable (parallel) solution of scientific applications modeled by partial differential equations. It employs the Message Passing Interface (MPI) standard for all message-passing communication. PETSc provides many of the mechanisms needed within parallel application code, such as simple parallel matrix and vector assembly routines that allow the overlap of communication and computation. PETSc provides the parallel implementation of Krylov methods and several preconditioners.
+The \textbf{Portable, Extensible Toolkit for Scientific Computation (PETSc)} (\cite{balay2001petsc}), is a suite of data structures and routines developed by Argonne National Laboratory for the scalable (parallel) solution of scientific applications modeled by partial differential equations. It employs the Message Passing Interface (MPI) standard for all message-passing communication. PETSc provides many of the mechanisms needed within parallel application code, such as simple parallel matrix and vector assembly routines that allow the overlap of communication and computation. PETSc provides the parallel implementation of Krylov methods and several preconditioners.
 
+The \textbf{Scalable Library for Eigenvalue Problem Computations (SLEPc)} (\cite{hernandez2005slepc}) is a software library for the parallel computation of eigenvalues and eigenvectors of large, sparse matrices. It can be seen as a module of PETSc that provides solvers for different types of eigenproblems, including linear (standard and generalized) and nonlinear (quadratic, polynomial and general), as well as the SVD. Recent versions also include support for matrix functions. It uses also the MPI standard for parallelization. Both real and complex arithmetic are supported, with single, double and quadruple precision. When using SLEPc, the application programmer can use any of the PETSc's data structures and solvers. Other PETSc features are incorporated into SLEPc as well. The module \textit{EPS} in SLEPc provides Krylov subspace methods such as Krylov-Schur, Arnoldi and Lanczos to solve sparse eigenvalue problems.
 
 \subsubsection{Trilinos} 
 
-\textbf{Trilinos} \cite{heroux2005overview} is a collection of open-source software libraries, intended to be used as building blocks for the development of scientific applications. The word "Trilinos" is Greek and conveys the idea of "a string of pearls," suggesting a number of software packages linked together by a common infrastructure. Trilinos was developed at Sandia National Laboratories from a core group of existing algorithms and utilizes the functionality of software interfaces such as the BLAS, LAPACK, and MPI (the message-passing interface for distributed-memory parallel programming). Fortunately, Trilinos supports many different packages which are defined to implement the iterative linear and eigen-solvers methods. There are some packages which are widely used as follows:
+\textbf{Trilinos} (\cite{heroux2005overview}) is a collection of open-source software libraries, intended to be used as building blocks for the development of scientific applications. The word "Trilinos" is Greek and conveys the idea of "a string of pearls," suggesting a number of software packages linked together by a common infrastructure. Trilinos was developed at Sandia National Laboratories from a core group of existing algorithms and utilizes the functionality of software interfaces such as the BLAS, LAPACK, and MPI (the message-passing interface for distributed-memory parallel programming). Fortunately, Trilinos supports many different packages which are defined to implement the iterative linear and eigen-solvers methods. There are some packages which are widely used as follows:
 
 \begin{itemize}
-	\item \textbf{Kokkos \cite{edwards2014kokkos}}: Kokkos Core implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms. For that purpose, it provides abstractions for both parallel executions of code and data management. Kokkos is designed to target complex node architectures with N-level memory hierarchies and multiple types of execution resources. It currently can use OpenMP, Pthreads, and CUDA as backend programming models.
-	\item \textbf{Epetra \cite{heroux2005epetra}}: Epetra provides the fundamental construction routines and services function that are required for serial and parallel linear algebra libraries. Epetra provides the underlying foundation for all Trilinos solvers.
+	\item \textbf{Kokkos (\cite{edwards2014kokkos})}: Kokkos Core implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms. For that purpose, it provides abstractions for both parallel executions of code and data management. Kokkos is designed to target complex node architectures with N-level memory hierarchies and multiple types of execution resources. It currently can use OpenMP, Pthreads, and CUDA as backend programming models.
+	\item \textbf{Epetra (\cite{heroux2005epetra})}: Epetra provides the fundamental construction routines and services function that are required for serial and parallel linear algebra libraries. Epetra provides the underlying foundation for all Trilinos solvers.
 	
-	\item \textbf{Tpetra \cite{baker2012tpetra}}: Tpetra is the next version of Epetra with better support for shared-memory parallelism. It implements linear algebra objects including sparse graphs, sparse matrices, and dense vectors.  Many Trilinos packages and applications produce, modify, or consume Tpetra’s linear algebra objects, or depend on Tpetra’s parallel data redistribution facilities. Tpetra is “hybrid parallel,” meaning that it uses at least two levels of parallelism: MPI  for distributed-memory parallelism and Any of various shared-memory parallel programming models within an MPI process, Tpetra uses the Kokkos package’s shared-memory parallel programming model for data structures and computational kernels.  Kokkos makes it easy to port Tpetra to new computer architectures and to extend its use of parallel computational kernels and thread-scalable data structures.  Kokkos supports several different parallel programming models, including OpenMP, POSIX Threads and Nvidia’s CUDA programming model for graphics processing units (GPUs). Tpetra has the following unique features:
+	\item \textbf{Tpetra (\cite{baker2012tpetra})}: Tpetra is the next version of Epetra with better support for shared-memory parallelism. It implements linear algebra objects including sparse graphs, sparse matrices, and dense vectors.  Many Trilinos packages and applications produce, modify, or consume Tpetra’s linear algebra objects, or depend on Tpetra’s parallel data redistribution facilities. Tpetra is “hybrid parallel,” meaning that it uses at least two levels of parallelism: MPI  for distributed-memory parallelism and Any of various shared-memory parallel programming models within an MPI process, Tpetra uses the Kokkos package’s shared-memory parallel programming model for data structures and computational kernels.  Kokkos makes it easy to port Tpetra to new computer architectures and to extend its use of parallel computational kernels and thread-scalable data structures.  Kokkos supports several different parallel programming models, including OpenMP, POSIX Threads and Nvidia’s CUDA programming model for graphics processing units (GPUs). Tpetra has the following unique features:
 	
 	\begin{itemize}
 		\item Native support for representing and solving very large graphs, matrices, and vectors.  “Very large” means over two billion unknowns or other entities;
@@ -1117,89 +1122,43 @@ The \textbf{Portable, Extensible Toolkit for Scientific Computation (PETSc)} \ci
 		\item Support for many different shared-memory parallel programming models based on Kokkos.
 	\end{itemize}
 	
-	\item \textbf{AztecOO \cite{heroux2004aztecoo}}: Preconditioners and Krylov subspace methods (conjugate gradient, GMRES, etc.), compatible with Epetra only.
-	\item \textbf{Belos \cite{bavier2012amesos2}}: Classical and block Krylov subspace methods (implementations of iterated classical Gram-Schmidt (ICGS), classical Gram-Schmidt with a DGKS correction step, implementations of conjugate gradient (CG), block CG, block GMRES, pseudo-block GMRES, block flexible GMRES, and GCRO-DR iterations). Belos is compatible with Epetra and Tpetra.
-	\item \textbf{Anasazi \cite{baker2009anasazi}}: Parallel eigensolvers, Anasazi is compatible with Epetra and Tpetra. It is a package within the Trilinos Project that uses ANSI C++ and modern software paradigms to implement algorithms for the numerical solution of large-scale eigenvalue problems.
-	\item \textbf{Komplex \cite{day2001solving}}: Complex-valued system solver, KOMPLEX is an add-on module to AztecOO that allows users to solve complex-valued linear systems. KOMPLEX solves a complex-valued linear system Ax=b by solving an equivalent real-valued system of twice the dimension.
+	\item \textbf{AztecOO (\cite{heroux2004aztecoo})}: Preconditioners and Krylov subspace methods (conjugate gradient, GMRES, etc.), compatible with Epetra only.
+	\item \textbf{Belos (\cite{bavier2012amesos2})}: Classical and block Krylov subspace methods (implementations of iterated classical Gram-Schmidt (ICGS), classical Gram-Schmidt with a DGKS correction step, implementations of conjugate gradient (CG), block CG, block GMRES, pseudo-block GMRES, block flexible GMRES, and GCRO-DR iterations). Belos is compatible with Epetra and Tpetra.
+	\item \textbf{Anasazi (\cite{baker2009anasazi})}: Parallel eigensolvers, Anasazi is compatible with Epetra and Tpetra. It is a package within the Trilinos Project that uses ANSI C++ and modern software paradigms to implement algorithms for the numerical solution of large-scale eigenvalue problems.
+	\item \textbf{Komplex (\cite{day2001solving})}: Complex-valued system solver, KOMPLEX is an add-on module to AztecOO that allows users to solve complex-valued linear systems. KOMPLEX solves a complex-valued linear system Ax=b by solving an equivalent real-valued system of twice the dimension.
 \end{itemize}
 
-\subsection{The challeges of Numerical Methods}
+\section{Toward Extreme Computing, Some Correlated Goals}
 %Global vs Local Communication, fault tolerance, multiple level parallellism, etc. 
 
-\textcolor{red}{TO DO}
+This section gives the challenges of numerical methods facing the development of HPC platforms. In Section \ref{Exascale Challenges of Supercomputers}, we discussed the tendance of future exascale supercomputing architectures and the related challenges of parallel programming to develop the applications to profit efficiently from these supercomputers. The main objective for the parallel implementation of numerical methods is to minimize the global computing time. The global computing time of an algorithm can be reduced by either accelerating the convergence or improve its parallel scaling performance using much more computing units. In section, we list in details the correlated goals of iterative methods toward the extreme computing below:
 
-\subsubsection{Toward Extreme Computing, Some Correlated Goals}
+\begin{enumerate}
+	
+	\item \textbf{Accelerate the convergence}:
+	
+	\item \textbf{Minimize the number of communications}: When solving very large problems on parallel architectures, the most significant concern becomes the cost per iteration of the method -- typically because of communication and synchronization overheads. In general, the complexity of algorithms (number of operations performed) is used to express their performance rather than the quantity of data movement and communications. In fact, on the exascale computers, the global communications accross millinos of cores are very expensive and the computing operations inside each core will be nearly free. To address the critical issue of communication costs, researchers need to investigate algorithms that minimize communication. Considering inside the Krylov iterative methods such as such as GMRES, CG, and Lanczos, the operations of loop inside Arnoldi reduction much more global communications. 
+	
+	When matrix $A$ in Krylov subspace methods is very sparse, the sparse matrix-vector multiplication (SpMV) invokes even more communications. Hence, strategies for reducing communication overheads in Arnoldi orthogonalization have been proposed to address this bottleneck. In order to reduce the global communication of SpMV for sparse matrices, the first approach is to select the best sparse matrix storage format, which can produces less communications (e.g. \cite{montagne2004optimal, liu2015csr5,stathis2003hierarchical,merrill2016merge,bell2008efficient, bell2009implementing,kreutzer2014unified,ashari2014efficient}). Another approach is to use the Hypergraph Partitioning Models to optimize the SpMV scheme on parallel computers, e.g. in 1999, Catalyurek et al. proposed two computational hypergraph models which avoid this crucial deficiency of the graph model for SpMV (\cite{catalyurek1999hypergraph}); Vastenhouw et al. tried to reduce the communication volume of SpMV through a recursive bipartitioning of the sparse matrix (\cite{vastenhouw2005two}); Chen et al. proposed a communication optimization scheme based on the hypergraph for basis computation of krylov subspace methods on multi-GPUs (\cite{chen2014communication}); a Locality-aware parallel sparse matrix-vector and matrix-transpose-vector multiplication on many-core processors is introduced by Karsavuran et al. (\cite{karsavuran2016locality}); and spatiotemporal graph and hypergraph partitioning models for SpMV on manycore architectures is presented by Abubaker et al. with better scaling performance through enhancing data locality in the operations \cite{abubaker2018spatiotemporal}, etc.
+	
+	\item \textbf{Promote the asynchronisity and reduce the synchronization}: One alogrithm often must do the synchronize operations during the computation. The global data synchronization across amount of cores in the distributed memory systems is expensive especially for a hybrid platform with accelerators. Inside Krylov subspace methods, dot product is a good example which needs the global synchronization after its \textit{global reduction}. For the extreme-scale platforms, synchronizations become bottlenecks. Hence, the algorithm should be designed with as few synchronization points as possible.
+	
+	Attempts have been made to restructure existing algorithms for the exascale computing so that the number of synchronizations is reduced. Communication-avoiding and pipelined variants of Krylov solvers are critical for the scalability of linear system solvers on future exascale architectures. Firstly, the impact of global communication latency at extreme scales on Krylov methods are analyzed by Ashby et al. (\cite{ashby2012impact}). The strategy of hiding global synchronization latency in GMRES and the preconditioned CG was presented by Ghysels (\cite{ghysels2013hiding,ghysels2014hiding}); Fujino et al. evaluated performance of parallel computing of revised BiCGSafe and BiCGStar-plus method, and made clear that the revised single synchronized BiCGSafe method outperforms other methods from the view points of elapsed time and speedup on parallel computer with distributed memory (\cite{fujino2015estimation}); Rupp et al. implemented pipelined iterative solvers with kernel fusion for GPUs \cite{rupp2016pipelined}; Sanan et al. presented variants of CG, CR, GMRES which both piplined and flexible (\cite{sanan2016pipelined}); Yamazaki et al. proposed to improving the performance of GMRES by reducing communication and pipelining global collectives (\cite{yamazaki2017improving}); Swirydowicz et al. presented low synchronization variants of iterated classical (CGS) and modified Gram-Schmidt (MGS) algorithms that require one and two global reduction communication steps; the reduction operations are overlapped with computations and pipelined to optimize performance (\cite{swirydowicz2018low}), etc. Moreover, on important considerationin for the restructuring an algorithm to reduce synchronization and communication is their numerical stability.
+	
+	\item \textbf{Memory and cache optimization for the heterogeneity and scale}: Extracting the desired performance from environments that offer massive parallelism, especially where additional constraints (e.g., limits on memory bandwidth and energy) are in play, requires more sophisticated scheduling and memory management techniques than have heretofore been applied to linear algebra libraries. Confronting the limits of domain-decomposition in the face of massive, explicit parallelism introduces another form of heterogeneity. Feed-forward pipeline parallelism can be used to extract additional parallelism without forcing additional domain-decomposition, but it exposes the user to dataflow hazards. Ideas relating to a data-flow-like model, where parallelism is expressed explicitly in DAGs, allows for dynamic scheduling of tasks, support of massive parallelism, and application of common optimization techniques to increase throughput. Approaches for isolating side-effects include explicit approaches that annotate the input arguments to explicitly identify their scope of reference and implicit methods, such as using language semantics or strongly typed elements to render code easier to analyze for side-effects by compiler technology. New primitives for memory management techniques are needed that enable diverse memory management systems to be managed efficiently and in coordination with the execution schedule.
+	
+	\item \textbf{Mixed arithmetic}: Algorithms and applications are becoming increasingly adaptive, and we have seen that various adaptivity requirements have become an essential, key component of their roadmap to exascale computing. Another aspect of this quest to adaptivity is related to the development of libraries that recognize and exploit the presence of mixed-precision mathematics. A motivation comes from the fact that, on modern architectures, the performance of 32-bit operations is often at least twice as fast as the performance of 64-bit operations. Moreover, by using a combination of 32-bit and 64-bit floating-point arithmetic, the performance of many linear algebra algorithms can be significantly enhanced while maintaining the 64-bit accuracy of the resulting solution. This approach can be applied not only to conventional processors but also to other technologies, such as GPUs, and thus can spur the creation of mixed-precision algorithms that more effectively utilize heterogeneous hardware. Mixed-precision algorithms can easily provide substantial speedup with little coding effort mainly by taking into account existing hardware properties. Earlier work has shown how to derive mixed-precision versions for various architectures and for a variety of algorithms for solving general sparse or dense linear systems of equations. Typically, a direct method is first applied in single precision in order to achieve a significant speedup compared with using double precision. Then an iterative refinement procedure aims at retrieving the lost digits. Iterative refinement can also be applied for eigenvalue and singular value computations. Of current interest is to extend and incorporate this approach in applications that do not nec- essarily originate from linear algebra and to study the robustness of mixed-precision algorithms on large-scale platforms. Indeed, the convergence of the mixed-precision iterative refinement solvers strongly depends on the condition number of the matrix at hand. The conditioning can be deter- mined at run time, and proper precision can be selected. Ideally, the user could specify the required precision for the result, and the algorithm would choose the best combination of precision on the local hardware in order to achieve it. The actual mechanics would be hidden from the user.
+	
+	\item \textbf{Minimize energy consumption}: Emerging constraints on energy consumption are expected to have pervasive effects on HPC; power and energy consumption must now be added to the traditional goals of algorithm design, namely, correctness and performance. The emerging metric of merit is performance per watt. Consequently, it may be essential to build power and energy awareness, control, and efficiency into the foundations of our numerical libraries. In order to accomplish such a goal, first and foremost, standardized interfaces and APIs for collecting energy consumption data should be developed, just as PAPI has done for hardware performance counter data. Accurate and fine-grained measurement of power consumption underpins all tools that seek to improve such metrics; anything that cannot be measured cannot be improved. Second, these tools must be used to better understand the effects that energy saving hardware features have on the performance of linear algebra codes. Third, parameters and alternative execution strategies must be identified for each numerical library that can be tuned for energy efficient executions, and to enhance schedulers for better low-energy execution.
+	
+	\item \textbf{Multi-level Parallelism}: 
+	
+	\item \textbf{Adaptive response to load imbalance}: As we move to architectures with billions of threads, even naturally load-balanced algorithms on homogeneous hardware will present many of the same load-balancing problems that are observed in current adaptive codes. For example, software-based recovery mechanisms for fault tolerance or energy-management features will create substantial load imbalances as tasks are delayed by rollback to a previous state or correction of detected errors. Dynamic scheduling based on directed acyclic graphs (DAGs) has been identified as a path forward, but this approach will require new approaches to optimize for resource utilization without compromising spatial locality.
+	
+	\item \textbf{Autotuning}: Numerical algorithms and libraries need the ability to adapt to the possibly heterogeneous environment in which they operate. Such adaptation must deal with the complexity of discovering and applying the best algorithm for diverse and rapidly evolving ar- chitectures. An automated process would be best, both for productivity and for correctness, where productivity refers both to the development time of the implementation and to the user’s time to solution. The objective is to provide a consistent library interface that, independent of scale and processor heterogeneity, can achieve good performance and efficiency by binding to different under- lying code, depending on the configuration. The diversity and rapid evolution of today’s platforms mean that autotuning of libraries such as the BLAS will be indispensable to achieving good perfor- mance, energy efficiency, and load balancing across the range of systems. In addition, autotuning has to be extended to frameworks that go beyond libraries, such as optimizing data layout (e.g., blocking strategies for sparse matrix/SpMV kernels), stencil autotuners (since stencils kernels are diverse and not amenable to library calls), and even tuning of the optimization strategy for multigrid solvers (optimizing the transition between the multigrid coarsening cycle and bottom-solver to minimize runtime). Adding heuristic search techniques and combining these with traditional compiler techniques will enhance the ability to address generic problems extending beyond linear algebra.
+	
+	\item \textbf{Fault tolerance, resilience}: Computing an incorrect answer quickly is of no use to a scientist. Yet computing with exascale hardware poses several challenges in assessing and assuring the correctness of numerical simulation results. Resilience to faults has been identified as a critical need for future HPC systems [57]; the thousandfold increase in computational capabilities expected over the next decade, along with incorporation of techniques for reducing energy consumption, is predicted to increase the error rate of the largest systems. DOE has several critical mission deliverables, including annual stockpile certification and safety assurance for the NNSA and future energy generation technologies for the Office of Science. Computer simulations are key to meeting these deliverables and must be resilient enough to complete in time and correctly, in order to meet the respective critical mission need. In many cases, these simulations can take days, weeks, or even months to complete, which increases the computation’s exposure to faults. Both hard and soft faults are expected to occur with much greater frequency than on previous hardware. Uncorrected soft faults have the potential to corrupt computed solutions. Hard faults will need to be handled on the fly; halting and restarting an entire application because of the loss of a node, for instance, will be prohibitively expensive at the exascale. Dynamically recovering from either type of fault will introduce nondeterministic variability in resource usage, as will dynamic scheduling of tasks. Because of the nonassociativity of floating-point arithmetic, such nondetermin- ism will make bitwise reproducibility difficult at best and will complicate code correctness testing procedures, including code verification, where reproducible execution behavior is assumed. Preventing all faults during exascale simulation will be impossible, and nondeterministic execu- tion is likewise unavoidable without potentially severe performance penalties. Fault management will require developments in hardware, programming environments, runtime systems, and pro- gramming models; but mathematics will play an important role as well. The issue of correctness is ultimately a mathematical one and will require mathematics-informed solutions. Research will be required in order to devise efficient application-level fault-tolerance mechanisms and new procedures to verify code correctness at scale.
 
-\begin{itemize}
-	\item \textbf{Minimize the global computing time};
-	\item \textbf{Acclelerate the convergence};
-	\item Minimize the number of communications;
-	\item \textbf{Minimize the number of longer size dot products and \textit{Reduction} operations};
-	\item Minimize the memory space, cache optimization;
-	\item Select the best sparse matrix compressed format;
-	\item Mixed arithmetic;
-	\item Minimize enery consumption;
-	\item \textbf{Fault tolerance, resilience}.
-\end{itemize}
-\subsubsection{Reduce Global Communication}
-
-\begin{itemize}
-	\item \textbf{Analysis:} Global data synchronization is expensive in distributed memory systems, especially for a hybrid platform with accelerators. When matrix A in KSMs is very sparse, the sparse matrix-vector multiplication (SpMV) invokes even more communications. Hence, strategies for reducing communication overheads in Arnoldi orthogonalization have been proposed to address this bottleneck.
-	\item \textbf{Relatd works: } Sparse Matrix Storage Format \cite{montagne2004optimal, liu2015csr5,stathis2003hierarchical} and hypergraph SpMV \cite{bell2008efficient, bell2009implementing,merrill2016merge,merrill2016merge,kreutzer2014unified,ashari2014efficient,abubaker2018spatiotemporal,azad2016exploiting}, etc.
-\end{itemize}
-
-\subsubsection{Reduce Synchronization Points}
-
-\begin{itemize}
-	\item \textbf{Analysis:}
-	\item \textbf{Relatd works: } Piplined GMRES \cite{ghysels2014hiding,ghysels2013hiding,rupp2016pipelined,yamazaki2017improving,ashby2012impact,sanan2016pipelined}, TSQR \cite{demmel2008communication,anderson2011communication,carson2011avoiding,chen2015tsqr} etc.
-\end{itemize}
-
-\begin{algorithm}[htbp]
-	\caption{Piplined GMRES method}
-	\label{alg:piplined-gmres}
-	\begin{algorithmic}[1]
-		\State $r_0=b-A x_0, \beta=||r_0||_2$, and $\nu_1=r_0/\beta$
-		\For{$i=0,\cdots,m-1$}
-		\State $z \leftarrow A\nu_i$
-		\State $h_{j,i} \leftarrow \langle z,\nu_j\rangle$, $j=1,\cdots,i$
-		\State \textcolor{blue}{$h_{i+1,i} \leftarrow \sqrt{||z||^2-\sum_{j=1}^{i}h^2_{j,i}}$}
-		\If{$h_{i+1,i} == 0$}
-		\State stop
-		\Else
-		\State \textcolor{blue}{$\nu_{i+1} \leftarrow (z-\sum_{j=1}^{i}h_{j,i}\nu_j)/h_{i+1,i}$}
-		\EndIf
-		\EndFor
-		\State Compute $y_m$ which minimizes $||\beta e_1-H_m y||_2$ 
-		\State $x_m=x_0+\Omega_my_m$
-	\end{algorithmic}
-\end{algorithm}
-
-
-
-\iffalse
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=5.2in]{fig/hy-spmv.png}
-	\caption{Hypergraph model for SMPV.}
-	\label{hp-spmv}
-\end{figure}
-\fi
-
-\subsubsection{Multi-level Parallellism}
-
-\begin{itemize}
-	\item \textbf{Analysis:}
-	\item \textbf{Relatd works: }
-\end{itemize}
-\subsubsection{Fault Tolerance}
-
-\begin{itemize}
-	\item \textbf{Analysis:}
-	\item \textbf{Relatd works: }
-\end{itemize}
-
-
-\section{Conclusion}
+\end{enumerate}
 
 \clearemptydoublepage

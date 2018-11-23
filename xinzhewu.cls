@@ -266,7 +266,7 @@
 		\@jury
 	\end{small}
 	\begin{flushright}
-		\textbf{Date de soutenance :} \@date
+		\textbf{Th\`ese pr\'ent\'ee et soutenue \`a} \@date
 	\end{flushright}
 }
 };
@@ -348,7 +348,7 @@
 			\@jury
 			\end{small}
 			\begin{flushright}
-			\textbf{Date de soutenance :} \@date
+			\textbf{Th\`ese pr\'ent\'ee et soutenue \`a} \@date
 			\end{flushright}
 		}
 	};
