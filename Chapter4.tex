@@ -1,5 +1,5 @@
 \begin{displayquote}
-	\textsf{In Chapter 3, we have discussed the convergence of iterative methods and its relation with spectral distribution of linear systems. Indeed, algorithms and applications from diverse fields can be formulated as an eigenvalue problem. The eigenvalues are also extremely important for the preconditioners of solving linear systems. In machine learning and pattern recognition, it is often demanded to solve the eigenvalue problems for both supervised and unsupervised learning algorithms, such as principal component analysis (PCA) \cite{croux2000principal}, Fisher discriminant analysis (FDA) \cite{berkes2005handwritten}, and clustering \cite{fender2017parallel}, etc. An insufficient accuracy and a failure of eigenvalue solvers and linear solvers usually result in, respectively, a poor approximation to original discrete problems and a failure of entire algorithms.  A good selection of solvers becomes especially essential. Thus it is crucial to have the test matrices to benchmark the numerical performance and parallel efficiency of different methods. In this section, we present the Scalable Matrix Generator with Given Spectra (SMG2S), including its parallel implementation and optimization of both CPU and GPU clusters, the verification mechanism, and the release of open source package.}
+	\textsf{In Chapter 3, we have discussed the convergence of iterative methods and its relation with spectral distribution of linear systems. Indeed, algorithms and applications from diverse fields can be formulated as an eigenvalue problem. The eigenvalues are also extremely important for the preconditioners of solving linear systems. In machine learning and pattern recognition, it is often demanded to solve the eigenvalue problems for both supervised and unsupervised learning algorithms, such as principal component analysis (PCA) (\cite{croux2000principal}), Fisher discriminant analysis (FDA) (\cite{berkes2005handwritten}), and clustering (\cite{fender2017parallel}), etc. An insufficient accuracy and a failure of eigenvalue solvers and linear solvers usually result in, respectively, a poor approximation to original discrete problems and a failure of entire algorithms.  A good selection of solvers becomes especially essential. Thus it is crucial to have the test matrices to benchmark the numerical performance and parallel efficiency of different methods. In this section, we present the Scalable Matrix Generator with Given Spectra (SMG2S), including its parallel implementation and optimization of both CPU and GPU clusters, the verification mechanism, and the release of open source package.}
 \end{displayquote}
 
 \vspace{0.6in}
@@ -23,11 +23,11 @@ In this chapter, we present a Scalable Matrix Generator from Given Spectra (SMG2
 
 \section{The Existing Collections} \label{Existing Collections}
 
-It's rare but there are already several efforts to supply test matrix collections for linear problems. SPARSEKIT \cite{saad1994sparsekit} implemented by Y. Saad contains various simple matrix generation subroutines. Z. Bai et al. \cite{bai1996test} presented a collection of test matrices for the development of numerical algorithms for solving nonsymmetric eigenvalue problems. There are also two widely spread matrix providers, the Tim Davis collection \cite{davis2011university} and Matrix Market \cite{boisvert1997matrix}. They all contain many matrices with various mathematical properties coming from different scientific fields. However, the spectra of matrices in these collections are fixed, and that cannot be whatever we want. A test matrix generation suite with given spectra was already introduced by J. Demmel et al.  \cite{demmel1989test} in 1989 for the benchmark of LAPACK\footnote{Linear Algebra PACKage}. They proposed the method to transfer the diagonal matrix with given spectra into a dense matrix with same spectra using the orthogonal matrices, and then reduce them to unsymmetric band ones by the Householder transformation. This method requires $\mathcal{O}(n^3)$ time and $\mathcal{O}(n^2)$ storage even for generating a small bandwidth matrix. Moreover, this method was implemented for the shared memory systems, not for larger distributed memory systems, thus it is difficult to generate large-scale test matrices customized for the tests on extreme scale clusters. That is the motivation for us to propose SMG2S which can generate large-scale non-Hermitian matrices with given spectra on modern parallel platforms with much less time and storage, and easily be implemented in distributed memory systems.
+It's rare but there are already several efforts to supply test matrix collections for linear problems. SPARSEKIT (\cite{saad1994sparsekit}) implemented by Y. Saad contains various simple matrix generation subroutines. Z. Bai et al. (\cite{bai1996test}) presented a collection of test matrices for the development of numerical algorithms for solving nonsymmetric eigenvalue problems. There are also two widely spread matrix providers, the Tim Davis collection (\cite{davis2011university}) and Matrix Market (\cite{boisvert1997matrix}). They all contain many matrices with various mathematical properties coming from different scientific fields. However, the spectra of matrices in these collections are fixed, and that cannot be whatever we want. A test matrix generation suite with given spectra was already introduced by J. Demmel et al. (\cite{demmel1989test}) in 1989 for the benchmark of LAPACK\footnote{Linear Algebra PACKage}. They proposed the method to transfer the diagonal matrix with given spectra into a dense matrix with same spectra using the orthogonal matrices, and then reduce them to unsymmetric band ones by the Householder transformation. This method requires $\mathcal{O}(n^3)$ time and $\mathcal{O}(n^2)$ storage even for generating a small bandwidth matrix. Moreover, this method was implemented for the shared memory systems, not for larger distributed memory systems, thus it is difficult to generate large-scale test matrices customized for the tests on extreme scale clusters. That is the motivation for us to propose SMG2S which can generate large-scale non-Hermitian matrices with given spectra on modern parallel platforms with much less time and storage, and easily be implemented in distributed memory systems.
 
 \section{Mathematical Framework}
 
-In this Section, we give a summary of the theorem and related proof based on the preliminary theoretical research of H. Gachlier et al. \cite{galichergenerate}.
+In this Section, we give a summary of the theorem and related proof based on the preliminary theoretical research of H. Gachlier et al. (\cite{galichergenerate}).
 
 
 \begin{theorem}
@@ -169,7 +169,7 @@ If $p=1$, with $d \in \mathbb{N^*}$, or $p=2$ with $d \in \mathbb{N^*}$ to be ev
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=2.8in]{fig/nilpotent_matrix.pdf}
+	\includegraphics[width=3.0in]{fig/nilpotent_matrix.pdf}
 	\caption{Nilpotent Matrix. $p$ off-diagonal offset, $d$ number of continuous $1$, and $n$ matrix dimension.}
 	\label{fig:nilpotent}
 \end{figure}
@@ -197,9 +197,9 @@ As shown in Algorithm \ref{alg:matgen}, the procedure of SMG2S is simple. Firstl
 
 For $M_t$, if $M_0$ is a lower triangular matrix having $h$ non zero diagonals, it will be a band diagonal matrix, whose number of new diagonals in the upper triangular zone will be at most $2pd-1$. Thus the maximal number of the bandwidth of matrix $M_t$ is: $width = h + 2pd-1$, as in Fig. \ref{fig:matgen}. In general, researchers use these matrices to test the iterative methods of sparse linear systems. Thus after the generation of band matrix, it can be transferred to be sparse with the help of permutation matrices. Fig. \ref{fig:matgene} gives an example showing the pattern of the generated matrix by SMG2S. In general, researchers use these matrices to test the iterative methods for sparse linear systems. The $h$ lower diagonals of the initial matrix can set to be sparse, which ensures the sparsity of the final generated matrix, as shown in Fig. \ref{fig:matgene}. Moreover, the permutation matrix can also be applied to change the sparsity of the generated matrix further.
 
-\begin{figure}[htbp]
+\begin{figure}[t]
 	\centering
-	\includegraphics[width=5.6in]{fig/matgen.pdf}
+	\includegraphics[width=5.8in]{fig/matgen.pdf}
 	\caption{Matrix Generation. The left is the initial matrix $M_0$ with given spectrum on the diagonal, and the $h$ lower diagonals with random values; the right is the generated matrix $M_t$ with nilpotency matrix determined by the parameters $d$ and $p$.}
 	\label{fig:matgen}
 \end{figure}
@@ -217,9 +217,9 @@ C\approx 2(2d^2+(4h-2)d-(h+5))n-h(h+1)(h+4d-4).
 In Equation (\ref{eq:serial time}), the complexity of SMG2S is $max(\mathcal{O}(hdn),\mathcal{O}(d^2n))$. The worst case would be an $\mathcal{O}(n^3)$ problem for operations with large $d$ and $h$, and it would require $\mathcal{O}(n^2)$ memory storage. But if we want to generate a band matrix with small bandwidth which means $d \ll n$ and $h \ll n$, it turns to be a $\mathcal{O}(n)$ problem with good potential scalability and to consume $\mathcal{O}(n)$ memory storage.
 
 
-\begin{figure}[htbp]
+\begin{figure}[t]
 	\centering
-	\includegraphics[width=4.6in]{fig/matgen/matgen.eps}
+	\includegraphics[width=5.2in]{fig/matgen/matgen.eps}
 	\caption{Matrix Generation Pattern Example.}
 	\label{fig:matgene}
 \end{figure}
@@ -230,7 +230,7 @@ In this section, we present the parallel implementation of SMG2S for homogeneous
 
 \subsection{Basic Implementation on CPUs}
 
-For the initial CPU implementation, we chose PETSc instead of ScaLAPACK because we would like to evaluate the solvers for sparse linear systems. As shown in Algorithm \ref{alg:matgen}, the kernel of generation is the sparse matrix-matrix multiplication (SpGEMM) of $AM$ and $MA$, and the matrix-matrix addition (AYPX operation) as $AM-MA$. All the sparse matrices during the generation procedure are stored by the block diagonal Compressed Sparse Row (CSR) format which is provided in default by PETSc. We use the matrix operations supported by PETSc to facilitate the implementation. The block diagonal parallel matrix based on MPI are partitioned and stored into several submatrices. For example, if there are three MPI process: $proc1$, $proc2$ and $proc3$, the matrix can be divided into blocks as the Formula (\ref{parallelmat}). The submatrix $A$, $B$ and $C$ is stored in $proc1$,  $D$, $E$ and $F$ in $proc2$, and $G$, $H$ and $I$ is stored in $proc3$. On each process, the diagonal part and the off-diagonal are separately stored into two sequence block matrices. The parallel SpGEMM and AXPY operations for CPUs are already supported by PETSc \cite{balay2016petsc}. We use these functions directly to facilitate the implementation.
+For the initial CPU implementation, we chose PETSc instead of ScaLAPACK because we would like to evaluate the solvers for sparse linear systems. As shown in Algorithm \ref{alg:matgen}, the kernel of generation is the sparse matrix-matrix multiplication (SpGEMM) of $AM$ and $MA$, and the matrix-matrix addition (AYPX operation) as $AM-MA$. All the sparse matrices during the generation procedure are stored by the block diagonal Compressed Sparse Row (CSR) format which is provided in default by PETSc. We use the matrix operations supported by PETSc to facilitate the implementation. The block diagonal parallel matrix based on MPI are partitioned and stored into several submatrices. For example, if there are three MPI process: $proc1$, $proc2$ and $proc3$, the matrix can be divided into blocks as the Formula (\ref{parallelmat}). The submatrix $A$, $B$ and $C$ is stored in $proc1$,  $D$, $E$ and $F$ in $proc2$, and $G$, $H$ and $I$ is stored in $proc3$. On each process, the diagonal part and the off-diagonal are separately stored into two sequence block matrices. The parallel SpGEMM and AXPY operations for CPUs are already supported by PETSc (\cite{balay2016petsc}). We use these functions directly to facilitate the implementation.
 
 
 \begin{equation}
@@ -247,7 +247,7 @@ G & H & I
 
 \subsection{Implementation on Multi-GPU}
 
-\begin{figure}[htbp]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=5.in]{fig/spgemm2.pdf}
 	\caption{The structure of a CPU-GPU implementation of SpGEMM, where each GPU is attached to a CPU. The GPU is in charge of the computation, while the CPU handles the MPI communication among processes.}
@@ -407,9 +407,9 @@ In conclusion, SMG2S always has good strong scalability when $d$ and $h$ are muc
 
 \section{Verification Method}
 
-In the last section, we show the good parallel performance of SMG2S, and then it is necessary to verify if the generated matrices are able to keep the given spectra with enough accuracy. Generally, the iterative eigenvalue solvers such as the Arnoldi or other Krylov methods \cite{petiton1992parallel} are applied to approximate the dominant eigenvalues. However, the accuracy verification is an opposite case. Now there exists a value, and we want to check if it is an eigenvalue of a given matrix. These iterative methods cannot directly and efficiently deal with this kind of verification. In this section, we present a method for accuracy verification using the Shifted Inverse Power method, which was easily implemented in parallel.
+In the last section, we show the good parallel performance of SMG2S, and then it is necessary to verify if the generated matrices are able to keep the given spectra with enough accuracy. Generally, the iterative eigenvalue solvers such as the Arnoldi or other Krylov methods (\cite{petiton1992parallel}) are applied to approximate the dominant eigenvalues. However, the accuracy verification is an opposite case. Now there exists a value, and we want to check if it is an eigenvalue of a given matrix. These iterative methods cannot directly and efficiently deal with this kind of verification. In this section, we present a method for accuracy verification using the Shifted Inverse Power method, which was easily implemented in parallel.
 
-The Power method is an algorithm to approximate the greatest eigenvalue. Meanwhile, the Inverse Power method is a similar iterative algorithm to find the smallest eigenvalue. The middle eigenvalues can be obtained by the Shifted Inverse Power method \cite{hernandez2005single}.  This method is given in Algorithm \ref{alg:inversePower}. Its operation complexity is $\mathcal{O}(n^3)$. The Shifted Inverse Power method is used to compute the eigenvalue which is the nearest one to a given value in a few steps of iterations. The related eigenvector can be easily calculated by its definition and used to check if this given value is an eigenvalue of the matrix.
+The Power method is an algorithm to approximate the greatest eigenvalue. Meanwhile, the Inverse Power method is a similar iterative algorithm to find the smallest eigenvalue. The middle eigenvalues can be obtained by the Shifted Inverse Power method (\cite{hernandez2005single}).  This method is given in Algorithm \ref{alg:inversePower}. Its operation complexity is $\mathcal{O}(n^3)$. The Shifted Inverse Power method is used to compute the eigenvalue which is the nearest one to a given value in a few steps of iterations. The related eigenvector can be easily calculated by its definition and used to check if this given value is an eigenvalue of the matrix.
 
 \begin{algorithm}[htbp]{}
 	\caption{ Shifted Inverse Power method}   
@@ -497,11 +497,11 @@ This acceptance for cases of Fig. \ref{fig_1_case}, Fig. \ref{fig_2_case}, Fig. 
 
 \subsection{Arithmetic Precision Analysis}
 
-Any floating operations will introduce rounding errors, which cannot be ignored for the generation of large matrices. Regarding the non-Hermitian matrix, its eigenvalues may be extremely sensitive to perturbation. This sensibility is bounded by $bound(\lambda) \leq ||E||_2Cond(\lambda)$, with $Cond(\lambda)$ the condition number of related eigenvalue $\lambda$ and $||E||_2$ the Euclidean norm of errors \cite{saad2011numerical}. $Cond(\lambda)=1$ for the Hermitian matrices, but for the non-Hermitian ones, it can be excessively high. There are two solutions facing this problem. The first one is to ensure the eigenvalue to be well-conditioned. The second is to use the integer value for the matrix generation, since only integers and the operations $+$, $-$, and $\times$ on the microprocessor can make absolutely exact computations. As shown in Algorithm \ref{alg:matgen}, most of the operations in SMG2S are $+$, $-$ and $\times$, except the step 8 with a division operation. Without step 8, we could introduce a special SMG2S fully using integers to avoid the risks of rounding errors. The spectra of the generated matrix will be $(2d)!$ times of the given one. Moreover, the upper band's width of generated depends on the parameter $d$. The factorial of $2d$ can easily reach the limit of integer, even with unsigned long long type. Thus a special factorial function using multiple integers should be implemented in order to enlarge the upper band's width.
+Any floating operations will introduce rounding errors, which cannot be ignored for the generation of large matrices. Regarding the non-Hermitian matrix, its eigenvalues may be extremely sensitive to perturbation. This sensibility is bounded by $bound(\lambda) \leq ||E||_2Cond(\lambda)$, with $Cond(\lambda)$ the condition number of related eigenvalue $\lambda$ and $||E||_2$ the Euclidean norm of errors (\cite{saad2011numerical}). $Cond(\lambda)=1$ for the Hermitian matrices, but for the non-Hermitian ones, it can be excessively high. There are two solutions facing this problem. The first one is to ensure the eigenvalue to be well-conditioned. The second is to use the integer value for the matrix generation, since only integers and the operations $+$, $-$, and $\times$ on the microprocessor can make absolutely exact computations. As shown in Algorithm \ref{alg:matgen}, most of the operations in SMG2S are $+$, $-$ and $\times$, except the step 8 with a division operation. Without step 8, we could introduce a special SMG2S fully using integers to avoid the risks of rounding errors. The spectra of the generated matrix will be $(2d)!$ times of the given one. Moreover, the upper band's width of generated depends on the parameter $d$. The factorial of $2d$ can easily reach the limit of integer, even with unsigned long long type. Thus a special factorial function using multiple integers should be implemented in order to enlarge the upper band's width.
 
 \section{Package, Interface and Application}
 
-SMG2S is packaged and released as an open source software based on MPI and C++. In this section, we present firstly the package information of SMG2S and its interface to various programming languages and scientific computational libraries. More details of package can be found in the related manual \cite{wu2018smg2s}.Then, we give an example which uses SMG2S to evaluate different Krylov solvers. 
+SMG2S is packaged and released as an open source software based on MPI and C++. In this section, we present firstly the package information of SMG2S and its interface to various programming languages and scientific computational libraries. More details of package can be found in the related manual (\cite{wu2018smg2s}).Then, we give an example which uses SMG2S to evaluate different Krylov solvers. 
 
 \subsection{Package}
 
