@@ -15,7 +15,7 @@ Ax=b.
 
 This problem is a \textit{linear system}, $A$ is the coefficient matrix, $b$ is the \textit{right hand side (RHS)}, and $x$ is the \textit{vector of unknowns}. In most cases, the linear systems are formatted by solving complex Partial Differential Equations (PDEs) systems. In general, the discretization of these PDEs into a cell-centered Finite Volume scheme in space and an Euler implicit method in time, leads to a nonlinear system which can be solved with a Newton’s method. For each Newton step by time, the system is linearized then solved using a linear solver.
 
-\textit{Eigenvalue problems} occur in many areas of science and engineering, such as structural analysis and electromagnetic applications, and $eigenvalues$ are also important in analyzing numerical methods. The standard eigenvalue problem can be defined as: given a matrix $A$ $\in \mathbb{C}^{n \times n}$, find scalar $\lambda \in \mathbb{C}$ and nonzero vector $v \in \mathbb{C}$ such that:
+\textit{Eigenvalue problems} occur in many areas of science and engineering, such as structural analysis, wave modes simulations (\cite{liu2018highly}) and electromagnetic applications, and $eigenvalues$ are also important in analyzing numerical methods. The standard eigenvalue problem can be defined as: given a matrix $A$ $\in \mathbb{C}^{n \times n}$, find scalar $\lambda \in \mathbb{C}$ and nonzero vector $v \in \mathbb{C}$ such that: 
 
 \begin{equation}
 \label{av=lv}
@@ -612,7 +612,7 @@ Thus, $W$ is the restriction operation $R_h^{2h}$ , and $W^{T}$ is the interpola
 		\EndFor
 		\State Compute $y_m$ which minimizes $||\beta e_1-H_m y||_2$ 
 		\State $x_m=x_0+V_my_m$
-		\State Compute the $k$ smallest eigenpairs $(\lambda_k, g_K)$ of $Hm+\beta H_m^{-T}e_me_m^T$
+		\State Compute the $k$ smallest eigenpairs $(\lambda_k, g_K)$ of $H_m+\beta H_m^{-T}e_me_m^T$
 		\State Set $Q_{k+1}$ from $G_k=[g_1,g_2,\cdots,g_k]$
 		\State Set $V_{k+1}^{new} = V_{k+1}Q_{k+1}$ and $\bar{H_{k}}^{new} = Q_{k+1}^H \bar{H_m}$ with Arnoldi reduction
 		\If{$||r_m|| < tol $}

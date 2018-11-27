@@ -39,13 +39,7 @@ As shown in Chapter \ref{Krylov Subspace Methods}, the convergence of linear sol
 	\item by the selected polynomials.
 \end{enumerate}
 
-For the first type solver, which is preconditioned by selected matrix, It is difficult to separate the linear solver and preconditioning matrix into two independant computing components with asynchronous communications. When thinking about to construct a linear solver based on the \textit{Unite and Conquer approach} by combining several methods with asynchronous communications, the deflation and the polynomial preconditioning are the good candidates. 
-
-\begin{itemize}
-	\item Linear solver;
-	\item Eigen-Information;
-	\item Preconditioning.
-\end{itemize}
+For the first type solver, which is preconditioned by selected matrix, it is difficult to divide the linear solver and preconditioning matrix into two independant computing components with asynchronous communications. As shown by Algorithm \ref{alg:rp-gmres} and \ref{alg:lp-gmres} in Chapter \ref{Krylov Subspace Methods}, the preconditioned matrix $M$ should be left or right multiplied with the operator matrix $A$ for each time projection inside the Arnoldi reduction process, which cannot be explicitly seperated. On the other hand, it is much easier to divide explicitly the deflation and the polynomial preconditioned linear solvers into seperate components. 
 
 \begin{figure}[htbp]
 	\centering
@@ -54,9 +48,31 @@ For the first type solver, which is preconditioned by selected matrix, It is dif
 	\label{fig:cyclic}
 \end{figure}
 
+Algorithm \ref{alg:gmres-dr} in \ref{Krylov Subspace Methods} gives an example of deflation preconditioned restarted GMRES. Denote the restart Krylov suspace of this algorithm is $m$, the first cyle of GMRES-DR is the standard Arnoldi reduction which generates $V_{m+1}$ and $\overline{H}_m$. Then the $k$ smallest eigenpairs of $Hm+\beta H_m^{-T}e_me_m^T$ can be approximated, and these eigenpairs are used to construct new $H$ and $V$ with the deflation of these smallest eigenvalues. This solver can be divided into two parts, the first part is a basic restarted GMRES, and the second part is a deflation operations which use the eigenpairs to generate new $H$ and $V$. It is similiar for the hybrid linear solvers preconditioned by the selected polynomial. As shown by Algorithm \ref{alg:hybrid-gmres} which gives a general prototype for the polynomial GMRES. The cycle step of polynomial preconditioned GMRES is also a standard Arnoldi reduction which construct a Hessemberg matrix $H_m$, then selected number of dominant eigenvalues are approximated from $H_m$. The preconditioning step is to refine a polygon from these eigenvalues and get best polynomial $p_k$, $p_k$ is used to generate a new $x_m$ which is used as a new restart vector for the next restarting of GMRES. By analyzing the deflation and polynomial preconditioned linear solvers, it is clear the information used to accelerate are the eigenpairs: for the former, the eigenvalues and eigenvectors of a dense matrix of dimension $m$ related to $H_m$, and then generated new $H$ and $V$; for the latter, the dominant eigenvalues approximated from $H_m$ are used to generate a new restarted vector. In summary, the important information for the preconditioning are the eigenpairs related to $H_m$.  When the solving part and preconditioning part of linear solvers are divided into two computing components, a third computing component should also be provided which is able to generate the eigenpairs. In summary, a new programming paradigm for solving linear systems can be proposed with three kinds of computing components:
+
+\begin{itemize}
+	\item \textit{Linear Solver Component} to solve linear systems by standard iterative methods;
+	\item \textit{Eigen-Information Component} to generate eigenpairs for the preconditioning process;
+	\item \textit{Preconditioning Component} to generate the preconditioned parameters for the Linear Solver Component.
+\end{itemize}
+
+Fig. \ref{fig:cyclic} gives a cyclic relation of \textit{Linear Solver Component}, \textit{Eigen-Information Component} and \textit{Preconditioning Component} for the proposed new multi-level programming paradiagm for the deflation and the polynomial preconditioning based on the \textit{Unite and Conquer approach}.
+
+This proposed paradigm is able to accelerate the convergence by the Least Squares polynomial preconditioning, to minimize the number of communications, promote the asynchronisity and reduce the synchronize points by seperation of the preconditioning part and solving part.
+
+This linear solvers based on this novel paradigm are the distributed parallel methods which can profit both shared memory and distributed memory of computational architectures. This new paradigm has two levels of parallelism for distributed memory:
+
+\begin{enumerate}
+	\item Coarse Grain/Component level: this paradigm allows the distribution of different numerical components, including the preconditioning part (LS and ERAM) and the solving part (GMRES) on different platforms or processors;
+	\item Medium Grain/Intra-component level: the linear solver and Eigen-Information components both deployed in parallel on distributed memory systems;
+	\item Fine/Thread level for shared memory: the OpenMP thread level parallelism in CPU, or the accelerator level parallelism if GPUs or other accelerators are available. 
+\end{enumerate} 
+
+The reusability of linear solvers based on this new paradigm can be improved, since the preconditioning and solving parts are separated, and the information used for the preconditioning can be saved into local files and reused to solve the subsequent linear systems with the same operator matrix and different RHSs. The fault tolerance of these methods can be also controlled with the implementation of an engine which manage the asynchronous communications of vectors, signals and arrays among different computing components. The exact implementation this manager engine will be presented later in Section \ref{Distributed and Parallel Manager Engine Implementation}.
+
 \subsection{UCGLE Method} \label{UCGLE}
 
-It is difficult to separate the linear solver and preconditioning matrix with asynchronous communications. Thus, we select the hybrid method which is preconditioned by the least squares polynomial to construct our new model. In the conventional implementation of this method, the eigenvalues used to construct the least squares polynomials are computed by the Hessemberg matrix $H_m$ after each time restart of GMRES. In UCGLE, the linear solver, the approximation of eigenvalues and the construction of least squares polynomials are separated into three different parts. These three computing components work independently with each other and they share the necessary information by the asynchronous communications.
+We select the hyrid method preconditioned by the Least Squares polynomial to construct a distributed and parallel linear solver based our new programming model, that is the UCGLE method. In the conventional implementation of this hybrid method, the eigenvalues used to construct the least squares polynomials are computed by the Hessemberg matrix $H_m$ after each time Arnoldi reduction cycle of GMRES. In UCGLE, the linear solver, the approximation of eigenvalues and the construction of least squares polynomials are separated into three different parts. These three computing components work independently with each other and they share the necessary information by the asynchronous communications.
 
 UCGLE method comprises mainly two parts: the first part uses the restarted GMRES method to solve the linear systems; in the second part, it computes a specific number of approximated eigenvalues, and then applies them to the Least Squares method and gets a new preconditioned residual, as a new initial vector for restarted GMRES. 
 
@@ -215,24 +231,18 @@ The first part of this residual is minimized by the Least Square polynomial meth
 
 The Algorithm \ref{alg:gmres/ls-a} shows the implementation of UCGLE's three components and their asynchronous communication in detail. 
 
+\subsection{Distributed and Parallel Manager Engine Implementation}\label{Distributed and Parallel Manager Engine Implementation}
 
-\subsection{Multi-level Parallelism in UCGLE}
+The GMRES method has been implemented by PETSc, and the ERAM method is provided by SLEPc. Additional functions have been added to the GMRES and ERAM provided by PETSc and SLEPc in order to include the sending and receiving functions of different types of data. For the implementation of LS Component, it computes the convex hull and the ellipse encircling the Ritz values of matrix $A$, which allows generating a novel Gram matrix $M$ of selected Chebyshev polynomial basis. This matrix should be factorized into $LL^T$ by the Cholesky algorithm. The Cholesky method is ensured by PETSc as a preconditioner but can be used as a factorization method. The implementation based on these libraries allows the recompilation of the UCGLE codes to adapt to both CPU and GPU architectures. The experimentation of this paper does not consider the OpenMP thread level of parallelism since the implementation of PETSc and SLEPc is not thread-safe due to their complicated data structures. The data structures of PETSc and SLEPc makes it more difficult to partition the data among the threads to prevent conflict and to achieve good performance (\cite{petsc-user-ref}).
 
-UCGLE method is a distributed parallel method which can profit both shared memory and distributed memory of computational architectures. As shown in Figure \ref{fig:glsa_mpi}, it has two levels of parallelism for distributed memory: 1) Coarse Grain/Component level: UCGLE allows the distribution of different numerical components, including the preconditioning part (LS and ERAM) and the solving part (GMRES) on different platforms or processors; 2) Medium Grain/Intra-component level, GMRES and ERAM components are both deployed in parallel; the third level for shared memory is the Fine Grain/Thread parallelism: the OpenMP thread level parallelism in CPU, or the accelerator level parallelism if GPUs or other accelerators are available. 
+\subsubsection{Implementation of the Inter-component Communication Network}
 
-\begin{figure}
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=5.2in]{fig/GLSA_MPI.pdf}
 	\caption{Communication and different levels parallelism of UCGLE method}
 	\label{fig:glsa_mpi}
 \end{figure}
-
-The GMRES method has been implemented by PETSc, and the ERAM method is provided by SLEPc. Additional functions have been added to the GMRES and ERAM provided by PETSc and SLEPc in order to include the sending and receiving functions of different types of data. For the implementation of LS Component, it computes the convex hull and the ellipse encircling the Ritz values of matrix $A$, which allows generating a novel Gram matrix $M$ of selected Chebyshev polynomial basis. This matrix should be factorized into $LL^T$ by the Cholesky algorithm. The Cholesky method is ensured by PETSc as a preconditioner but can be used as a factorization method. The implementation based on these libraries allows the recompilation of the UCGLE codes to adapt to both CPU and GPU architectures. The experimentation of this paper does not consider the OpenMP thread level of parallelism since the implementation of PETSc and SLEPc is not thread-safe due to their complicated data structures. The data structures of PETSc and SLEPc makes it more difficult to partition the data among the threads to prevent conflict and to achieve good performance (\cite{petsc-user-ref}).
-
-
-\subsection{Distributed and Parallel Manager Engine Implementation}
-
-\subsubsection{Implementation of the Inter-component Communication Network}
 
 From a view of asynchronous communication, the implementation of UCGLE is to establish several communicators inside of $MPI\_COMM\_WORLD$ and their inter-communication. The topology of communication among these groups is a circle shown in Figure \ref{fig:glsa_mpi}. The total number of computing units supplied by the user is thus divided into four groups according to the following distribution: $P_t$ is the total number of processes, then $P_t = P_g + P_a + P_l + P_m$, where $P_g$ is the number of processes assigned to GMRES Component, $P_a$ the number of processes to ERAM component, $P_l$ the number of processes allocated to LS Component and $P_f$ the number of processes allocated to $Manager Process$ proxy. $P_g$ and $P_a$ are greater than or equal to $1$, $P_l$ and $P_m$ are both exactly equal to $1$. LS Component is a serial component because the Least Squares polynomial method cannot be parallelized.
 
@@ -243,14 +253,13 @@ From a view of asynchronous communication, the implementation of UCGLE is to est
 	\label{fig:ucgle_comm_world}
 \end{figure}
 
-
 $P_t$ is thus divided into several MPI groups according to a color code. The minimum number of processes that our program requires is $4$. We utilize the mechanism of MPI standard to support the communication of our application fully. The communication layer that does not depend on the application, this allows the replacement and scalability of various components provided.
 
 \subsubsection{Asynchronous Communication Mechanism}
 
-The main characteristic of UCGLE method is its asynchronous communication. But the synchronous communication takes place inside of GMRES and ERAM components. Distributed and parallel communication involves different types of exchange data, such as vectors, scalar tables, and signals among different components. When the data are sent and received in a distributed way, it is essential to ensure the consistency of data. In our case, we choose to introduce an intermediate node as a proxy to carry out only several types of exchanges and thus facilitate the implementation of asynchronous communication. This proxy is called \textit{Manager Process} as in Figure \ref{fig:glsa_mpi}. One process can fulfill all the data exchanges.
+As shown in Figure \ref{fig:glsa_mpi}, UCGLE has three levels of parallelism which is suitable for the modern supercomputers. In fact, the main characteristic of UCGLE method is its asynchronous communication. But the synchronous communication takes place inside of GMRES and ERAM components. Distributed and parallel communication involves different types of exchange data, such as vectors, scalar tables, and signals among different components. When the data are sent and received in a distributed way, it is essential to ensure the consistency of data. In our case, we choose to introduce an intermediate node as a proxy to carry out only several types of exchanges and thus facilitate the implementation of asynchronous communication. This proxy is called \textit{Manager Process} as in Figure \ref{fig:glsa_mpi}. One process can fulfill all the data exchanges.
 
-\begin{figure}
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=6.2in]{fig/send.pdf}
 	\caption{Data Sending Scheme from one group of process to the other.}
@@ -264,7 +273,7 @@ Asynchronous communication allows each computation component to conduct independ
 
 This last function is asynchronous in the sense that the data sent with this function will only be effective when the recipient (s) decide to receive them. In practice, it may be interesting to know that this is not entirely true. Indeed, the actual sending of data only occurs when the receiver or receivers are available, but also during a subsequent call to the MPI library whatever it is. Thus it may be that the sending cannot be done because the communicating nodes do not find the time to communicate. 
 
-\begin{figure}
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=6.2in]{fig/recv.pdf}
 	\caption{Data Receiving Scheme from one group of process to the other.}
