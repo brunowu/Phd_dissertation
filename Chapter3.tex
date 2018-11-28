@@ -594,15 +594,29 @@ Thus, $W$ is the restriction operation $R_h^{2h}$ , and $W^{T}$ is the interpola
 
 \subsection{Preconditioning by Deflation}
 
-\textcolor{red}{TO DO}
+It is not always true, but the convergence of Krylov subspace methods for most linear systems, depends to the distribution of eigenvalues. The removing or deflation of the small eigenvalues might greatly improve the convergence performance. In fact, if the dimension of Krylov subspace is large enough, some deflation occurs automatically. But for the restarted GMRES, the limitation of dimension of Krylov subsapce is not enough for these deflation, and convergence cannot be achieved accordingly. Thus deflation schemes should be constructed for each cycle of restart, and this technique is called the deflated preconditioners. Kharchenko et al. (\cite{kharchenko1995eigenvalue}) built a deflation preconditioner using the approximate eigenvectors. In (\cite{erhel1996restarted}), Erhel et al. developed a deflation technique based on an invriant subspace approach; Burrage et al.  (\cite{burrage1998deflation}) improved this deflation technique by considering the eigenpairs outside the Krylov subsapce of GMRES. Both Chapman et al. (\cite{chapman1997deflated}) and Gaul et al. (\cite{gaul2013framework}) presented the deflated and augemented Krylov subspace techniques. Giraud et al. (\cite{giraud2010flexible}) proposed a novel algorithm that attempts to combine the numerical features of deflated GMRES, and the flexibility of FGMRES. Kutsukake et al. (\cite{kutsukake2015deflated}) developped a new deflated Flexible GMERS which uses an approximate inverse preconditioner. 
 
-\begin{algorithm}[htbp]
+In this section, we given a example of deflated GMRES($m,k$) (denoted as GMRES-DR($m,k$)) developed by Morgan et al. (\cite{morgan2002gmres}). GMRES-DR is a deflation preconditioned GMRES uses the thick restarting itea. It has two parameters $m$ and $k$, where $m$ is the restart size of GMRES, and $k$ is the number of eigenvectors used for the deflation during the restart. The first cycle is the same as GMRES($m$), which is able to generate $V_m$ and $H_m$. The $k$ smallest eigenpairs $(\lambda_k, g_k)$ of matrix $H_m+\beta H_m^{-T}e_me_m^T$ can be calculated. Then a matrix $G_k$ can be formulated as:
+
+\begin{equation}
+	 G_k=[g_1,g_2,\cdots,g_k]
+\end{equation}
+
+and then $G_{k+1}$ can be generated as:
+
+\begin{equation}
+	G_{k+1}= ((G_k), c-\bar{H}_my)
+\end{equation}
+
+$Q_{k+1}$ can be gotten from $G_{k+1}$, hence $V_{k+1}$ and $H_k$ are generated, where $V_{k+1}$ is a $n \times (k+1)$ matrix and $H_k$ is a $k \times k$ matrix. Therefore, it becomes necessary to extend $V_{k+1}$ and $H_k$ to $V_m$ and $H_m$ by the Arnoldi method that starts at the $k+1$-th iteration. This method is shown in Algorithm \ref{alg:gmres-dr}. GMRES-DR is efficient and numerical stable for deflating the small eigenvalues and accelerate the convergence.
+
+\begin{algorithm}[t]
 	\caption{GMRES-DR($A, m,k,x_0$)}
 	\label{alg:gmres-dr}
 	\begin{algorithmic}[1]
 		\State $r_0=b-A x_0, \beta=||r_0||_2$, and $\nu_1=r_0/\beta$
 		\For{$i=0,\cdots,m-1$}
-		\State $z \leftarrow M^{-1}A\nu_i$
+		\State $z \leftarrow A\nu_i$
 		\State $h_{j,i} \leftarrow \langle z,\nu_j\rangle$, $z = z- h_{j,i}\nu_j$ $j=1,\cdots,i$
 		\If{$h_{j+1,j} == 0$}
 		\State stop
@@ -611,13 +625,19 @@ Thus, $W$ is the restriction operation $R_h^{2h}$ , and $W^{T}$ is the interpola
 		\EndIf
 		\EndFor
 		\State Compute $y_m$ which minimizes $||\beta e_1-H_m y||_2$ 
-		\State $x_m=x_0+V_my_m$
-		\State Compute the $k$ smallest eigenpairs $(\lambda_k, g_K)$ of $H_m+\beta H_m^{-T}e_me_m^T$
-		\State Set $Q_{k+1}$ from $G_k=[g_1,g_2,\cdots,g_k]$
-		\State Set $V_{k+1}^{new} = V_{k+1}Q_{k+1}$ and $\bar{H_{k}}^{new} = Q_{k+1}^H \bar{H_m}$ with Arnoldi reduction
+		\State Compute the $k$ smallest eigenpairs $(\lambda_k, g_k)$ of $H_m+\beta H_m^{-T}e_me_m^T$
+		\State Set $G_k=[g_1,g_2,\cdots,g_k]$
+		\State Orthonormalize $G_k$ into $Q_{k}$ which is a $n \times k$ matrix
+		\State Extend $Q_k$ to length $m+1$ by appending a zero entry to each. Then orthonormalize the vector $c-\bar{H}_m d$ against them to form $q_{k+1}$. Note $c-\bar{H}_m d$ is a vector of length $m+1$, $Q_{k+1}$ can be formulated by combining $Q_k$ and $q_{k+1}$
+		\State Set $V_{k+1}^{new} = V_{k+1}Q_{k+1}$ and $\bar{H_{k}}^{new} = Q_{k+1}^H \bar{H_m}$
+		\State Reorthogonalize $v_{k+1}$ against the earlier columns of $V_{k+1}^{new}$
+		\State Apply the Arnoldi iteration from this point to form the rest of $V_{m+1}$ and $\bar{H}_m$, with $\beta=h_{m+1,m}$
+		\State Set $c=V_{m+1}^Tr_0$ and solve $\min||c-\bar{H}_md||_2$ for $d$
+		\State Set $x_m=x_0+V_md$, $r_m=b-Ax_m=V_{m+1}(c-\bar{H}_md)$
 		\If{$||r_m|| < tol $}
 		\State Stop
 		\EndIf
+		\State  Compute the $k$ smallest eigenpairs $(\lambda_k, g_k)$ of $H_m+\beta H_m^{-T}e_me_m^T$
 		\State set $x_0 = x_m$ and Go to Step $1$
 	\end{algorithmic}
 \end{algorithm}
