@@ -35,7 +35,7 @@ Different architectures of computing units are designed to build the supercomput
 
 \subsection{CPU Architectures and Memory Access}
 
-The development of modern CPUs is based on the \textit{Von Neumann architecture}. This proposition of this computer architecture is based on the description by the mathematician and physicist \textit{John von Neumann} and others in the \textit{First Draft of a Report on the EDVAC} (\cite{von1945first}). All the modern computing units are all envolved from this concept, which consists of five parts:
+The development of modern CPUs is based on the \textit{Von Neumann architecture}. This proposition of this computer architecture is based on the description by the mathematician and physicist \textit{John von Neumann} and others in the \textit{First Draft of a Report on the EDVAC} \cite{von1945first}. All the modern computing units are all envolved from this concept, which consists of five parts:
 
 \begin{itemize}
 	\item A \textit{processing unit} that contains an arithmetic logic unit and processor registers;
@@ -138,7 +138,7 @@ standard OS. These second generation chips could be used as a standalone CPU, ra
 
 A reduced instruction set computer, or RISC  is such a computer has a small set of simple and general instructions, rather than a large set of complex and specialized instructions. A type of well-known RISC-based computing units are the ARM architecture processors. In the 21st century, the use of in smartphones and tablet computers such as the iPad and Android devices provided a wide user base for RISC-based systems. Since the introduction of Sunway TaihuLight\footnote{http://www.nsccwx.cn/}, RISC processors are also used in supercomputers. RISC based supercomputers enable low energy consumption per core, less silicon and cheaper chips, since they do not contain complex instruction sets. In this section, we list two types of RISC based processors used on the supercomputers.
 
-The first type of processor is sw26010, which is a 260-core manycore processor (\cite{fu2016sunway}) designed by the National High-Performance Integrated Circuit Design Center in Shanghai. It implements the Sunway architecture, a 64-bit RISC architecture designed by China. As shown in Fig. \ref{fig:sw26010}, the sw26010 has four clusters of 64 Compute-Processing Elements (CPEs) which are arranged in an eight-by-eight array. The CPEs support SIMD instructions and are capable of performing eight double-precision floating-point operations per cycle. Each cluster is accompanied by a more conventional general-purpose core called the Management Processing Element (MPE) that provides supervisory functions. Each cluster has its own dedicated DDR3 SDRAM controller and a memory bank with its own address space. The processor runs at a clock speed of 1.45.
+The first type of processor is sw26010, which is a 260-core manycore processor \cite{fu2016sunway} designed by the National High-Performance Integrated Circuit Design Center in Shanghai. It implements the Sunway architecture, a 64-bit RISC architecture designed by China. As shown in Fig. \ref{fig:sw26010}, the sw26010 has four clusters of 64 Compute-Processing Elements (CPEs) which are arranged in an eight-by-eight array. The CPEs support SIMD instructions and are capable of performing eight double-precision floating-point operations per cycle. Each cluster is accompanied by a more conventional general-purpose core called the Management Processing Element (MPE) that provides supervisory functions. Each cluster has its own dedicated DDR3 SDRAM controller and a memory bank with its own address space. The processor runs at a clock speed of 1.45.
 
 \begin{figure}[htbp]
 	\centering
@@ -147,7 +147,7 @@ The first type of processor is sw26010, which is a 260-core manycore processor (
 	\label{fig:sw26010}
 \end{figure}
 
-Matrix-2000 (\cite{matrix-2000}) is a 64-bit 128-core many-core processor designed by NUDT and introduced in 2017. This chip was designed exclusively as an accelerator for China's Tianhe-2A supercomputer jnstalled in the National Supercomputing Center in Guangzhou\footnote{http://www.nscc-gz.cn} in order to upgrade and replace the aging Intel's Knights Corner accelerators. The Matrix-2000 features 128 RISC cores operating at 1.2 GHz achieving 2.46/4.92 TFLOPS (DP/SP) with a peak power dissipation of 240W. The Matrix-2000 consists of 128 cores, eight DDR4 memory channels, and x16 PCIe lanes. The chip consists of four supernodes (SN) consisting of 32 cores each operating at 1.2 GHz with a peak power dissipation of 240 Watts.
+Matrix-2000 \cite{matrix-2000} is a 64-bit 128-core many-core processor designed by NUDT and introduced in 2017. This chip was designed exclusively as an accelerator for China's Tianhe-2A supercomputer jnstalled in the National Supercomputing Center in Guangzhou\footnote{http://www.nscc-gz.cn} in order to upgrade and replace the aging Intel's Knights Corner accelerators. The Matrix-2000 features 128 RISC cores operating at 1.2 GHz achieving 2.46/4.92 TFLOPS (DP/SP) with a peak power dissipation of 240W. The Matrix-2000 consists of 128 cores, eight DDR4 memory channels, and x16 PCIe lanes. The chip consists of four supernodes (SN) consisting of 32 cores each operating at 1.2 GHz with a peak power dissipation of 240 Watts.
 
 \subsection{FPGA}
 
@@ -164,7 +164,7 @@ In this section, we introduce various runtimes developed to support the shared m
 
 \subsubsection{OpenMP}
 
-OpenMP (Open Multi-Processing) (\cite{dagum1998openmp}) is an application programming interface (API) that supports multi-platform shared memory parallel programming in C, C++, and Fortran. OpenMP supports most platforms, instruction set architectures, and operating systems. It consists of a set of compiler directives, library routines, and environment variables. OpenMP provides the capability to incrementally parallelize a serial program with by inserting the specific directives. These directives can be ignored by the compiler, and the application can be executed in a sequential way when target machines do not support OpenMP. OpenMP is designed for multi-processor/core, shared memory machines. The underlying architecture can be shared memory UMA or NUMA. OpenMP programs accomplish parallelism exclusively through the use of threads.
+OpenMP (Open Multi-Processing) \cite{dagum1998openmp} is an application programming interface (API) that supports multi-platform shared memory parallel programming in C, C++, and Fortran. OpenMP supports most platforms, instruction set architectures, and operating systems. It consists of a set of compiler directives, library routines, and environment variables. OpenMP provides the capability to incrementally parallelize a serial program with by inserting the specific directives. These directives can be ignored by the compiler, and the application can be executed in a sequential way when target machines do not support OpenMP. OpenMP is designed for multi-processor/core, shared memory machines. The underlying architecture can be shared memory UMA or NUMA. OpenMP programs accomplish parallelism exclusively through the use of threads.
 
 \begin{figure}[htbp]
 	\centering
@@ -177,7 +177,7 @@ As shown in Fig. \ref{openmp_fork_join}, OpenMP uses the \textbf{fork-join} mode
 
 \subsubsection{CUDA}
 
-CUDA (Compute Unified Device Architecture) (\cite{nvidia2011nvidia}) is a parallel programming platform and application programming interface model created by Nvidia. It allows software developers and software engineers to use a CUDA-enabled GPU for general purpose processing. The CUDA software layer gives direct access to GPU's virtual instruction set de parallel computational elements, for the execution of compute kernels. The CUDA platform is designed to work with programming languages such as C, C++, and Fortran. This accessibility makes it easier for specialists in parallel programming to use GPU resources. Fig. \ref{cuda_flow} gives the four steps processing flow on CUDA:
+CUDA (Compute Unified Device Architecture) \cite{nvidia2011nvidia} is a parallel programming platform and application programming interface model created by Nvidia. It allows software developers and software engineers to use a CUDA-enabled GPU for general purpose processing. The CUDA software layer gives direct access to GPU's virtual instruction set de parallel computational elements, for the execution of compute kernels. The CUDA platform is designed to work with programming languages such as C, C++, and Fortran. This accessibility makes it easier for specialists in parallel programming to use GPU resources. Fig. \ref{cuda_flow} gives the four steps processing flow on CUDA:
 
 \begin{enumerate}
 	\item Copy the processing data from main memory to memory for GPU;
@@ -186,7 +186,7 @@ CUDA (Compute Unified Device Architecture) (\cite{nvidia2011nvidia}) is a parall
 	\item Copy back the results from memory for GPU to the main memory.
 \end{enumerate}
 
-CUDA supports programming frameworks such as OpenACC (\cite{wienke2012openacc}) and OpenCL  (\cite{munshi2009opencl}). 
+CUDA supports programming frameworks such as OpenACC \cite{wienke2012openacc} and OpenCL \cite{munshi2009opencl}. 
 
 \begin{figure}[htbp]
 	\centering
@@ -201,7 +201,7 @@ OpenCL (Open Computing Language) is a framework for writing programs that execut
 
 OpenACC (for open accelerators) is a programming standard for parallel computing developed by Cray, CAPS, Nvidia and PGI. The standard is designed to simplify parallel programming of heterogeneous CPU/GPU systems. As in OpenMP, the programmer can annotate C, C++ and Fortran source code to identify the areas that should be accelerated using compiler directives and additional functions. Like OpenMP 4.0 and newer, OpenACC can target both the CPU and GPU architectures and launch computational code on them.
 
-Kokkos (\cite{edwards2014kokkos}) core implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms. For that purpose, it provides abstractions for both parallel executions of code and data management. Kokkos is designed to target complex node architectures with N-level memory hierarchies and multiple types of execution resources. It currently can use OpenMP, Pthreads, and CUDA as backend programming models.
+Kokkos \cite{edwards2014kokkos} core implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms. For that purpose, it provides abstractions for both parallel executions of code and data management. Kokkos is designed to target complex node architectures with N-level memory hierarchies and multiple types of execution resources. It currently can use OpenMP, Pthreads, and CUDA as backend programming models.
 
 
 \subsection{Distributed Memory Level Parallelism}
@@ -210,7 +210,7 @@ In the distributed memory platforms, each processor owns a private memory which 
 
 \subsubsection{Message Passing Interface}
 
-MPI (Message Passing Interface) (\cite{gropp1999using}) is a standardized and portable message-passing standard designed by a group of researchers from academia and industry to support a wide variety of parallel computing architectures. MPI provides a simple-to-use portable interface for the basic user, yet one powerful enough to allow programmers to use the high-performance message passing operations available on advanced machines. Most MPI implementations consist of a specific set of routines directly callable from C, C++, Fortran and any language able to interface with such libraries. The MPI interface is meant to provide essential virtual topology, synchronization, and communication functionality between a set of processes (that have been mapped to nodes/servers/computer instances) in a language-independent way, with language-specific syntax (bindings), plus a few language-specific features. 
+MPI (Message Passing Interface) \cite{gropp1999using} is a standardized and portable message-passing standard designed by a group of researchers from academia and industry to support a wide variety of parallel computing architectures. MPI provides a simple-to-use portable interface for the basic user, yet one powerful enough to allow programmers to use the high-performance message passing operations available on advanced machines. Most MPI implementations consist of a specific set of routines directly callable from C, C++, Fortran and any language able to interface with such libraries. The MPI interface is meant to provide essential virtual topology, synchronization, and communication functionality between a set of processes (that have been mapped to nodes/servers/computer instances) in a language-independent way, with language-specific syntax (bindings), plus a few language-specific features. 
 
 \begin{figure}[htbp]
 	\centering
@@ -227,7 +227,7 @@ In computer science, a partitioned global address space (PGAS) is a parallel pro
 
 \subsubsection{XcalableMP}
 
-XcalableMP (\cite{lee2010implementation}) is a language extension of C and Fortran for parallel programming on distributed memory systems that help users to reduce those programming efforts. XcalableMP provides two programming models. The first one is the global view model, which supports typical parallelization based on the data and task parallel paradigm, and enables parallelizing the original sequential code using minimal modification with simple, OpenMP-like directives. The other one is the local view model, which allows using CAF-like expressions to describe inter-node communication. Users can even use MPI and OpenMP explicitly in the XMP language to optimize performance explicitly.
+XcalableMP \cite{lee2010implementation} is a language extension of C and Fortran for parallel programming on distributed memory systems that help users to reduce those programming efforts. XcalableMP provides two programming models. The first one is the global view model, which supports typical parallelization based on the data and task parallel paradigm, and enables parallelizing the original sequential code using minimal modification with simple, OpenMP-like directives. The other one is the local view model, which allows using CAF-like expressions to describe inter-node communication. Users can even use MPI and OpenMP explicitly in the XMP language to optimize performance explicitly.
 
 \subsection{Task/Graph Based Parallel Programming}
 
@@ -235,19 +235,19 @@ With the increase of the complexity of applications on the supercomputers, it is
 
 \subsubsection{YML}
 
-YML (\cite{delannoyyml}) allows you to transparently use one or more grid middleware to run an application. For this, the project is based on a dedicated language named YvetteML. YML can describe a complex parallel application regardless of the execution platform. The YvetteML language is used to express the task graph of the application. The nodes of the graph are the tasks described by components, and the edges correspond to dependencies or communications. The components are written in XML. Each component implementation can contain C ++, XMP-C, XMP-FORTRAN or other code. Each component implementation can be expressed with finer grain parallelism. YML will be disscussed in details in Chapter \ref{YML and XMP Multi-level Parallelism Programming Paradigm}.
+YML \cite{delannoyyml} allows you to transparently use one or more grid middleware to run an application. For this, the project is based on a dedicated language named YvetteML. YML can describe a complex parallel application regardless of the execution platform. The YvetteML language is used to express the task graph of the application. The nodes of the graph are the tasks described by components, and the edges correspond to dependencies or communications. The components are written in XML. Each component implementation can contain C ++, XMP-C, XMP-FORTRAN or other code. Each component implementation can be expressed with finer grain parallelism. YML will be disscussed in details in Chapter \ref{YML and XMP Multi-level Parallelism Programming Paradigm}.
 
 \subsubsection{StarPU}
 
-StarPU\footnote{http://starpu.gforge.inria.fr} (\cite{augonnet2011starpu}) is a task programming library for hybrid architectures. The application provides algorithms and constraints both the CPU/GPU implementations of tasks and the graphs of tasks, using either the StarPU's high-level GCC plugin pragmas, StarPU's rich C/C++ API, or OpenMP pragmas. StarPU handles run-time concerns: the task dependencies, the optimized heterogeneous scheduling, the optimized data transfers/replication between main memory and discrete memories and optimized cluster communications.
+StarPU\footnote{http://starpu.gforge.inria.fr} \cite{augonnet2011starpu} is a task programming library for hybrid architectures. The application provides algorithms and constraints both the CPU/GPU implementations of tasks and the graphs of tasks, using either the StarPU's high-level GCC plugin pragmas, StarPU's rich C/C++ API, or OpenMP pragmas. StarPU handles run-time concerns: the task dependencies, the optimized heterogeneous scheduling, the optimized data transfers/replication between main memory and discrete memories and optimized cluster communications.
 
 \subsubsection{Swift}
 
-Swift\footnote{http://swift-lang.org/main/index.php} (\cite{wilde2011swift}) is a data-flow oriented coarse-grained scripting language that supports dataset typing and mapping, dataset iteration, conditional branching, and procedural composition. Swift programs (or workflows) are written in a language called Swift. Swift scripts are primarily concerned with processing (possibly large) collections of data files, by invoking programs to do that processing. Swift handles execution of such programs on remote sites by choosing sites, handling the staging of input and output files to and from the chosen sites and remote execution of programs.
+Swift\footnote{http://swift-lang.org/main/index.php} \cite{wilde2011swift} is a data-flow oriented coarse-grained scripting language that supports dataset typing and mapping, dataset iteration, conditional branching, and procedural composition. Swift programs (or workflows) are written in a language called Swift. Swift scripts are primarily concerned with processing (possibly large) collections of data files, by invoking programs to do that processing. Swift handles execution of such programs on remote sites by choosing sites, handling the staging of input and output files to and from the chosen sites and remote execution of programs.
 
 \subsubsection{Legion}
 
-Legion\footnote{http://legion.stanford.edu} (\cite{grimshaw1994synopsis}) is a data-centric parallel programming system for writing portable high performance programs targeted at distributed heterogeneous architectures. Legion presents abstractions which allow programmers to describe properties of program data (e.g., independence, locality). By making the Legion programming system aware of the structure of program data, it can automate many of the tedious tasks programmers currently face, including correctly extracting task- and data-level parallelism and moving data around complex memory hierarchies. A novel mapping interface provides explicit programmer controlled placement of data in the memory hierarchy and assignment of tasks to processors in a way that is orthogonal to correctness, thereby enabling easy porting and tuning of Legion applications to new architectures.
+Legion\footnote{http://legion.stanford.edu} \cite{grimshaw1994synopsis} is a data-centric parallel programming system for writing portable high performance programs targeted at distributed heterogeneous architectures. Legion presents abstractions which allow programmers to describe properties of program data (e.g., independence, locality). By making the Legion programming system aware of the structure of program data, it can automate many of the tedious tasks programmers currently face, including correctly extracting task- and data-level parallelism and moving data around complex memory hierarchies. A novel mapping interface provides explicit programmer controlled placement of data in the memory hierarchy and assignment of tasks to processors in a way that is orthogonal to correctness, thereby enabling easy porting and tuning of Legion applications to new architectures.
 
 
 \section{Exascale Challenges of Supercomputers}\label{Exascale Challenges of Supercomputers}
@@ -256,7 +256,7 @@ The exscale computing era is computing, in this section, we analyze the trends o
 
 \subsection{Increase of Heterogeneity for Supercomputers} \label{Trends of Heterogeneity}
 
-Hardware architecutres have great impatcs on the evolution of supercomputers. At the early age, the processor performance improves mainly by increasing the number of transistors per integrated circuit, According to Moore's law, the number of transistors per integrated circuit doubles every $18$ months, which means that the size of the transistor is reduced to half, which allows achieving faster clock rate. Moore's law is found to be acceptable utils 2002. Since then, the overheating introduced by higher frequency reaches the limit of air cooling. This is the famous \textit{power wall}. Since then, the modern computing architectures with multiple processors on-chip, lower operating frequency and hierarchical architectures come, including the GPGPU, intel MIC, the many-core sw26010, and Matrix-2000 GPDSP. Moreover, Europe (Mont-Blanc (\cite{rajovic2016mont}), CEA and Atos (\cite{ceaarm})) and Japan (RIKEN and Fujitsu) (\cite{japanarm}) are now pushing the development of ARM supercomputers. Fig. \ref{top500-acc} shows the trends of supercomputers equiped with accelerators by year. According to the Top 500 list of November 2018, 137 systems out of 500 use accelerator or co-processor technology.
+Hardware architecutres have great impatcs on the evolution of supercomputers. At the early age, the processor performance improves mainly by increasing the number of transistors per integrated circuit, According to Moore's law, the number of transistors per integrated circuit doubles every $18$ months, which means that the size of the transistor is reduced to half, which allows achieving faster clock rate. Moore's law is found to be acceptable utils 2002. Since then, the overheating introduced by higher frequency reaches the limit of air cooling. This is the famous \textit{power wall}. Since then, the modern computing architectures with multiple processors on-chip, lower operating frequency and hierarchical architectures come, including the GPGPU, intel MIC, the many-core sw26010, and Matrix-2000 GPDSP. Moreover, Europe (Mont-Blanc \cite{rajovic2016mont}, CEA and Atos \cite{ceaarm}) and Japan (RIKEN and Fujitsu) \cite{japanarm} are now pushing the development of ARM supercomputers. Fig. \ref{top500-acc} shows the trends of supercomputers equiped with accelerators by year. According to the Top 500 list of November 2018, 137 systems out of 500 use accelerator or co-processor technology.
 
 \begin{figure}[htbp]
 	\centering
@@ -265,12 +265,26 @@ Hardware architecutres have great impatcs on the evolution of supercomputers. At
 	\label{top500-acc}
 \end{figure}
 
-Compared with the traditional computing architectures such as Intel, AMD CPUs which dedicate to multiple different purpose that result in bad energy efficiency in HPC, the introduction of low frequency and/or less complex architecture improve the energy efficiency. In the Green500 list\footnote{https://www.top500.org/green500/} of November 2016, 8 out of 10 the most efficient supercomputers are equiped with the Nvidia GPGPU, and the No.1 machine of Green500 list \textit{ZettaScaler-2.2} installed by RIKEN is powered by the intel low frequency processor (\textit{Xeon D-1571 16C 1.3GHz}).
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=5.6in]{fig/core_nb.pdf}
+	\caption{Core number of Supercomputers in Top 500 List.}
+	\label{core-nb}
+\end{figure}
 
+Compared with the traditional computing architectures such as Intel, AMD CPUs which dedicate to multiple different purpose that result in bad energy efficiency in HPC, the introduction of low frequency and/or less complex architecture improve the energy efficiency. In the Green500 list\footnote{https://www.top500.org/green500/} of November 2016, 8 out of 10 the most efficient supercomputers are equiped with the Nvidia GPGPU, and the No.1 machine of Green500 list \textit{ZettaScaler-2.2} installed by RIKEN is powered by the intel low frequency processor (\textit{Xeon D-1571 16C 1.3GHz}).
 
 \subsection{Potential Architecture of Exascale Supercomputer} \label{Potential Architecture of Exascale Supercomputer}
 
 This section tries to make a blueprint (shown as Fig. \ref{fig:supercomputer_arch}) for the coming exascale supercomputers based on the future architecture of Aurora Exscale system talked in \cite{TheNextPlatform}.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=6.2in]{fig/top500_hpcg.pdf}
+	\caption{Top10 HPCG list.}
+	\label{top500-hpxg}
+\end{figure}
+
 
 As shown in Fig. \ref{fig:supercomputer_arch}, the exascale supercomputers will be composed of more than 100,000 interconnected nodes (several millions cores). Each compute node is packed with the thin cores and fat cores. The fat cores refer to the intel, AMD X86 CPUs which dedicate to more complex operations. The thin cores can be the accelerators and co-processors (e.g. GPGPU, Matrix-2000, FPGA, etc.) with low frequence and/or less complex operations. A typical fat-thin mode is the Nvidia \textit{Host} and \textit{device} architecture. The fat cores are connected with RAM which has high capacity and low bandwidth, the thin cores are connected with the memory which has low capacity and high bandwidth.
 
