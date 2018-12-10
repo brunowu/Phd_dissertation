@@ -70,7 +70,7 @@ Then we define the $N\times n$ matrices
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=5.6in]{fig/block-hessemberg.pdf}
+	\includegraphics[width=4.2in]{fig/block-hessemberg.pdf}
 	\caption{Structure of block Hessemberg matrix.}
 	\label{fig:block-hessemberg}
 \end{figure}
@@ -188,9 +188,7 @@ The temporary solution $X_m$ in the $m$-dimensional block Krylov subspace is
 
 \subsection{Challenges of Exising Methods for Large-scale Platforms}
 
-However, nowadays, HPC cluster systems continue to scale up not only the number of compute nodes and central processing unit (CPU) cores but also the heterogeneity of components by introducing graphics processing units (GPUs) and many-core processors. This results in the tendency of transition to multi- and many cores within computing nodes, which communicate explicitly through faster interconnection networks. These hierarchical supercomputers can be seen as the intersection of distributed and parallel computing. Indeed, for a large number of cores, the communication of overall reduction operations and global synchronization of applications are the bottleneck. The seed and recycling methods talked above for solving a sequent of linear systems, introduce the special process (e.g., the image projection and sparse matrix-vector product) to accelerate the next time resolution, which has much more additional global communication operations and synchronization points. They will lose their advantages on the large-scale hierarchical platforms. When solving linear systems by block Krylov methods on large-scale distributed memory platforms, the cost of using BLAS3 operations to enlarge search space and reduce the memory requirement is apparent: the communication bound of SpGEMM in each step of Arnoldi projection damages heavily their performance, which cannot be compensated by the advantages of the block methods.
-
-Even using classic Krylov methods, such as GMRES (Generalized Minimal Residual method), to solve a large-scale problem on parallel clusters, the cost per iteration of them becomes the most significant concern, typically caused by communication and synchronization overheads. Consequently, large scalar products, overall synchronization, and other operations involving communication among all cores have to be avoided. The numerical applications should be optimized for more local communication, less global communication, and synchronization. That is the reason for the recent tendance to study the communication avoiding techniques for linear algebra operations \cite{demmel2008avoiding, hoemmen2010communication, carson2015communication} and different pipelined strategies for Krylov methods \cite{ghysels2013hiding, morgan2016stochastic, cools2017communication}. For benefiting the full computational power of such hierarchical systems, it is central to explore novel parallel methods and models for the solving of linear systems. These methods should accelerate not only the convergence but also have the abilities to adapt to multi-grain, multi-level memory, to improve the fault tolerance, reduce synchronization and promote asynchronization.
+However, nowadays, HPC cluster systems continue to scale up not only the number of compute nodes and central processing unit (CPU) cores but also the heterogeneity of components by introducing graphics processing units (GPUs) and many-core processors. This results in the tendency of transition to multi- and many cores within computing nodes, which communicate explicitly through faster interconnection networks. These hierarchical supercomputers can be seen as the intersection of distributed and parallel computing. Indeed, for a large number of cores, the communication of overall reduction operations and global synchronization of applications are the bottleneck. The seed and recycling methods talked above for solving a sequent of linear systems, introduce the special process (e.g., the image projection and sparse matrix-vector product) to accelerate the next time resolution, which has much more additional global communication operations and synchronization points. They will lose their advantages on the large-scale hierarchical platforms. When solving linear systems by block Krylov methods on large-scale distributed memory platforms, the cost of using BLAS3 operations to enlarge search space and reduce the memory requirement is apparent: the communication bound of SpGEMM in each step of Arnoldi projection damages heavily their performance, which cannot be compensated by the advantages of the block methods. Even using classic Krylov methods, such as GMRES (Generalized Minimal Residual method), to solve a large-scale problem on parallel clusters, the cost per iteration of them becomes the most significant concern, typically caused by communication and synchronization overheads. Consequently, large scalar products, overall synchronization, and other operations involving communication among all cores have to be avoided. 
 
 
 \section{$m$-UCGLE for Multiple Right-hand-sides}
@@ -337,6 +335,42 @@ $m$-UCGLE is a combination of different methods. Thus it has a large number of p
 \end{enumerate}
 
 \subsection{Manager Engine Implementation}\label{engineimpl}
+
+\subsubsection{Component Allocation}
+
+The computational components are allocated by the manager engine through MPI\_Comm\_Spawn. One process can fulfil the operations of this manager engine. Each component is identified with unique ID as long as its creation by the manager engine. All the data and messages on the manager engine are respectively stored according their ID, which faciliates the control of different components. An private MPI (Message Passing Interface) intra-communicator between the manager engine and each component is created, which conduct the asynchronous exchanges of data between them.
+
+\subsubsection{Asynchronous Communication}
+
+Distributed and parallel communication among components involves different types of data, such as vectors, arrays, and signals. The manager engine serves as a proxy to carry out these exchanges with asynchronous communications. Asynchronous communication allows each computing component to conduct independently the work assigned to it without waiting for the input data. The asynchronous data sending and receiving operations are implemented by the non-blocking communication of MPI . 
+
+\textbf{Asynchronous Sending:} Sending takes place after the sender has completed the task assigned to it. It will start by verifying if the previous sending operations are pending. If yes, they are canceled so as to avoid a state where several shipments with different data are in competition. In practice, we use the MPI\_Request to track the state of asynchronous requests. Once the verification is validated, then the data to be sent will be copied to a buffer to prevent them overwritten by other work operations. These data are sent to the different nodes of other components via the standard asynchronous sending function MPI\_Isend.
+
+\textbf{Asynchronous Receiving:} We have chosen to implement a test function before proceeding with asynchronous reception instead of using a purely MPI\_Irecv function, since the latter requires to know in advance the size of data  before receiving, which is not our case where components exchange arrays in different sizes. This test function is implemented via an asynchronous MPI\_Iprobe function and a synchronous MPI\_Recv function. In fact, it is not possible to predict the size of input buffer. In our implementation, this one is allocated by the information provided by the operation MPI\_Get\_count using structure MPI\_Status filled in by the function MPI\_Iprobe. Also, apart from this difference, our reception mechanism is similar to MPI\_Irecv in that it only receives data if it is available. If not, the component continues its task. 
+
+\subsubsection{Hetergeneous Platforms with GPUs}
+
+For the implementation on hetergenous platforms of iterative solvers based on the proposed paradigm, each component spawned by MPI, can automatically select the GPU devices binded to it. In practice, the solver and Precond-Information Generation components prefer to be implemented with multi-GPUs, and it is enough for the pretraitement component to use on MPI process, since it only performs the LAPACK operations with small matrices.
+
+\subsubsection{Multilevel Parallelism}
+
+The iterative solvers implemented based on the proposed programming paradigm is able to explore multilevel parallelism of the distributed memory computational architectures. The three level parallelism is listed below:
+
+\begin{enumerate}
+	\item \textit{Coarse Grain/Component level}: this paradigm allows the distribution of different numerical components on different platforms, processors or computing nodes;
+	\item \textit{Medium Grain/Intra-component level}: each computing component is able to be deployed in parallel with a collection of cores/nodes on distributed memory systems;
+	\item \textit{Fine/Thread level for shared memory}:  either the thread level parallelism in CPU, or accelerator level parallelism if GPUs or other accelerators are available. 
+\end{enumerate} 
+
+\subsubsection{Checkpoint, Fault Tolerance Mechanism and Reusability}
+
+The fault tolerance of the proposed paradigm can be guaranteed by the combination of a \textit{checkpoint function} and an \textit{error detection function}. 
+
+The \textit{checkpoint function} takes the screenshot of necessary informations and material of different components by the manager engine, e.g. the temporary solution vector of each cycle of linear solvers, the matrix $H_m$ and $V_m$ and the obtained Ritz values, etc. These data are stored and frequently updated on the manager engine. If some computation components are in fault, these data can be redistributed to new allocated components and recover the state before failures.
+
+The \textit{error detection function} is guranteed by the frequent message from the components to the manager engine, which can be seen as the \textit{push technique} introduced by Chen et al.\cite{chen2002quality}. For the manager engine, if there is no news updated from one component for a fixed time interval, this component will be marked as in fault. If it is a solver component, it will be recoverd using the computing units of Precond-Information Generation Component with checkpoint data saved on the manager engine. If the detected component is to generate the preconditioning information or parameters, it can still work using the checkpoint data from manager engine without the continuous improvement of preconditioning information.
+
+The \textit{reusability} of iterative solvers based on this new paradigm can be improved, since the preconditioning and solving parts are separated, and the information used for the preconditioning can be saved into local files and reused to solve the subsequent problems sharing the same operator. 
 
 As presented in Chapter 5, the former implementation of manager engine in \cite{wu2018distributed} based on MPI\_Split cannot meet the requirement of $m$-UCGLE. Thus, in order to extend UCGLE method to solve non-Hermitian linear systems and to reduce the global communication and synchronization points, we design and implement a new manager engine for $m$-UCGLE. As shown in Figure \ref{fig:ucmgle}, the new engine allows creating a number of different computing components at the same time. Suppose that we have allocated $n_g$ BGMRES Components, $n_k$ $s$-KS Components and $1$ B-LSP Component. The exact implementation for $s$-KS, B-LSP, BGMRES Components and manager process are respectively given in Algorithms 5, 6, 7 and 8. Denote the BGMRES Components as BGMRES[$k$] with $k \in 1, 2, \cdots, n_g$, and the $s$-KS Components as $s$-KS[$q$] with $q \in 1, 2, \cdots, n_a$.   The matrix $B$ in Equation (\ref{ax=b}) can be decomposed as:
 

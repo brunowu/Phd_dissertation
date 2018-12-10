@@ -6,15 +6,33 @@
 
 \section{Evaluation of HPC}
 
-The terms \textit{high-performance computing} and \textit{supercomputing} are sometimes used interchangeably. HPC technology is implemented in a wide range of computationally intensive applications in multidisciplinary areas including biosciences, geographical data, electronic design, climate research, neuroscience, quantum mechanics, molecular modeling, nuclear fusion, etc. Supercomputers were introduced in the 1960s, and the performance of a supercomputer is measured in floating-point operations per second (FLOPS). Since the first generation of supercomputers, the \textit{megascale} performance was reached in the 1970s, and the \textit{gigascale} performance was passed in less than ten years. Finally, the \textit{terascale} performance was achieved in the 1990s, and then the \textit{petascale} performance was crossed in 2008 with the installation IBM Roadrunner at Los Alamos National Laboratory in the United States. Fig. \ref{sc_evaluate} shows the Top 1 supercomputer's performance by year since 1960s.
-
-Since 1993, the TOP500 project\footnote{https://www.top500.org} ranks and details the 500 most powerful supercomputing systems in the world and publishes an updated list of the supercomputers twice a year. The project aims to provide a reliable basis for tracking and detecting trends in HPC and bases rankings on HPL, a portable implementation of the high-performance LINPACK benchmark written in Fortran for distributed-memory computers. According to the newest Top500 list of November 2018, the fastest supercomputer is the Summit of the United States, which has a LINPACK benchmark score of 122.3 PFLOPS. The Sunway TaihuLight, Sierra and Tianhe-2A follow closely the Summit, with the performance respectively 93 PFLOPS, 71.6 PFLOPS, and 61.4 PFLOPS. 
+The terms \textit{high-performance computing} and \textit{supercomputing} are sometimes used interchangeably. A supercomputer is a computing platform with a high level of performance, which is constructed by large numbers of computing units connected by a local high-speed computer bus. HPC technology is implemented in a wide range of computationally intensive applications in multidisciplinary areas including biosciences, geographical data, electronic design, climate research, neuroscience, quantum mechanics, molecular modeling, nuclear fusion, etc. Supercomputers were introduced in the 1960s, and the performance of a supercomputer is measured in floating-point operations per second (FLOPS). Since the first generation of supercomputers, the \textit{megascale} performance was reached in the 1970s, and the \textit{gigascale} performance was passed in less than ten years. Finally, the \textit{terascale} performance was achieved in the 1990s, and then the \textit{petascale} performance was crossed in 2008 with the installation IBM Roadrunner at Los Alamos National Laboratory in the United States. Fig. \ref{sc_evaluate} shows the Top 1 supercomputer's peak performance by year since 1960s.
 
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=6.3in]{fig/sc_evaluate.pdf}
 	\caption{Top 1 Supercomputers' Performance by Year.}
-		\label{sc_evaluate}
+	\label{sc_evaluate}
+\end{figure}
+
+
+Since 1993, the TOP500 project\footnote{https://www.top500.org} ranks and details the 500 most powerful supercomputing systems in the world and publishes an updated list of the supercomputers twice a year. The project aims to provide a reliable basis for tracking and detecting trends in HPC and bases rankings on HPL, a portable implementation of the high-performance LINPACK benchmark written in Fortran for distributed-memory computers. HPL is a software package that solves a (random) dense linear system in double precision (64 bits) arithmetic on distributed-memory computers. The algorithm used by HPL can be summarized by the following keywords: 
+\begin{itemize}
+	\item two-dimensional block-cyclic data distribution;
+	\item right-looking variant of the LU factorization with row partial pivoting featuring multiple look-ahead depths;
+	\item recursive panel factorization with pivot search and column broadcast combined;
+	\item various virtual panel broadcast topologies;
+	\item bandwidth reducing swap-broadcast algorithm;
+	\item backward substitution with look-ahead of depth 1.
+\end{itemize}
+
+According to the newest Top500 list of November 2018, the fastest supercomputer is the Summit of the United States, which has a LINPACK benchmark score of 122.3 PFLOPS. The Sunway TaihuLight, Sierra and Tianhe-2A follow closely the Summit, with the performance respectively 93 PFLOPS, 71.6 PFLOPS, and 61.4 PFLOPS. Fig. \ref{hpl_by_year} gives the No. 1 machine of HPL performance by year since 1993.
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=6.3in]{fig/top500_3.pdf}
+	\caption{HPL Performance by year.}
+	\label{hpl_by_year}
 \end{figure}
 
 The next barrier for the HPC community to overcome is the \textit{exascale} computing, which refers to the computing systems capable of at least one exaFLOPS ($10^{18}$ floating point operations per second). This capacity represents a thousandfold increase over the first petascale computer which came into operation in 2008. The world first exascale supercomputer will come around 2020. China's first exascale supercomputer will enter service by 2020. United States's first exascale computer is planned to be built by 2021 at Argonne National Laboratory. The post-K announced by Japan will start the public service around 2021, and the first exascale supercomputer in Europe will appear around 2022. Exascale computing would be considered as a significant achievement in computer engineering, for it is estimated to be the order of processing power of the human brain at the neural level.
@@ -80,7 +98,17 @@ The most common modification on \textit{modified Harvard architecture}  for mode
 
 \subsection{Parallel Computer Memory Architectures}
 
-The parallel computer memory architectures can be divided into shared and distributed memory types. The shared memory parallel computers vary widely, but generally have in common the ability for all processors to access all memory as global address space. Multiple processors can operate independently but share the same memory resources. Changes in a memory location effected by one processor are visible to all other processors. Historically, shared memory machines have been classified as \textit{Uniform Memory Access (UMA)} (shown as \ref{uma}) and \textit{Non-Uniform Memory Access (NUMA)} (shown as \ref{numa}), based upon memory access times. UMA is most commonly represented today by Symmetric Multiprocessor (SMP) machines with identical processors. These processors require equal access and access times to memory. NUMA often made by physically linking two or more SMPs, one SMP can directly access memory of another SMP. Not all processors have equal access time to all memories, memory access across link is slower. The advantages of shared memory architectures are: 1) Global address space provides a user-friendly programming perspective to memory; 2) Data sharing between tasks is both fast and uniform due to the proximity of memory to CPUs. The disadvantages are: 1) the lack of scalability between memory and CPUs, in fact, adding more CPUs can geometrically increases traffic on the shared memory-CPU path, and for cache coherent systems, geometrically increase traffic associated with cache/memory management; 2) Programmer responsibility for synchronization constructs that ensure "correct" access of global memory. There is no way we can reach the hundreds of thousands of CPU-cores we need for today’s multi-petaflop supercomputers.
+The parallel computer memory architectures can be divided into shared and distributed memory types. The shared memory parallel computers vary widely, but generally have in common the ability for all processors to access all memory as global address space. Multiple processors can operate independently but share the same memory resources. Changes in a memory location effected by one processor are visible to all other processors. Historically, shared memory machines have been classified as \textit{Uniform Memory Access (UMA)} (shown as \ref{uma}) and \textit{Non-Uniform Memory Access (NUMA)} (shown as \ref{numa}), based upon memory access times. UMA is most commonly represented today by Symmetric Multiprocessor (SMP) machines with identical processors. These processors require equal access and access times to memory. NUMA often made by physically linking two or more SMPs, one SMP can directly access memory of another SMP. Not all processors have equal access time to all memories, memory access across link is slower. The advantages of shared memory architectures are: 
+\begin{enumerate}
+	\item  global address space provides a user-friendly programming perspective to memory; 
+	\item  data sharing between tasks is both fast and uniform due to the proximity of memory to CPUs.
+\end{enumerate}
+
+The disadvantages are:
+\begin{enumerate}
+	\item lack of scalability between memory and CPUs, in fact, adding more CPUs can geometrically increases traffic on the shared memory-CPU path, and for cache coherent systems, geometrically increase traffic associated with cache/memory management; 
+	\item programmer responsibility for synchronization constructs that ensure "correct" access of global memory. There is no way we can reach the hundreds of thousands of CPU-cores we need for today’s multi-petaflop supercomputers.
+\end{enumerate}
 
 \begin{figure}[t]
 	\centering
@@ -99,7 +127,19 @@ The parallel computer memory architectures can be divided into shared and distri
 	\label{parallel-memory}
 \end{figure}
 
-Then the distributed-memory architecture is proposed, which takes many multicore computers and connects them together using a network, much like workers in different offices communicating by telephone. With a sufficiently fast network we can in principle extend this approach to millions of CPU-cores and beyond. As shown in Fig. \ref{distributed}, inside distributed memory system, processors have their own local memory. Memory addresses in one processor do not map to another processor, so there is no concept of global address space across all processors. Because each processor has its own local memory, it operates independently. Changes it makes to its local memory have no effect on the memory of other processors. Hence, the concept of cache coherency does not apply. When a processor needs access to data in another processor, it is usually the task of the programmer to explicitly define how and when data is communicated. Synchronization between tasks is likewise the programmer's responsibility. The advantages of distributed memory architecture are: 1) Memory is scalable with the number of processors. Increase the number of processors and the size of memory increases proportionately; 2) Each processor can rapidly access its own memory without interference and without the overhead incurred with trying to maintain global cache coherency; 3) Cost effectiveness. The disadvantages are: 1) the programmer is responsible for many of the details associated with data communication between processors; 2) It may be difficult to map existing data structures, based on global memory, to this memory organization; 3) Non-uniform memory access times - data residing on a remote node takes longer to access than node local data.
+Then the distributed-memory architecture is proposed, which takes many multicore computers and connects them together using a network, much like workers in different offices communicating by telephone. With a sufficiently fast network we can in principle extend this approach to millions of CPU-cores and beyond. As shown in Fig. \ref{distributed}, inside distributed memory system, processors have their own local memory. Memory addresses in one processor do not map to another processor, so there is no concept of global address space across all processors. Because each processor has its own local memory, it operates independently. Changes it makes to its local memory have no effect on the memory of other processors. Hence, the concept of cache coherency does not apply. When a processor needs access to data in another processor, it is usually the task of the programmer to explicitly define how and when data is communicated. Synchronization between tasks is likewise the programmer's responsibility. The advantages of distributed memory architecture are: 
+\begin{enumerate}
+	\item Memory is scalable with the number of processors. Increase the number of processors and the size of memory increases proportionately; 
+	\item Each processor can rapidly access its own memory without interference and without the overhead incurred with trying to maintain global cache coherency;
+	\item Cost effectiveness.
+\end{enumerate}
+
+The disadvantages are: 
+\begin{enumerate}
+	\item the programmer is responsible for many of the details associated with data communication between processors;
+	\item it may be difficult to map existing data structures, based on global memory, to this memory organization;
+	\item non-uniform memory access times - data residing on a remote node takes longer to access than node local data.
+\end{enumerate}
 
 Nowadays, the largest and fastest computers in the world employ both shared and distributed memory architectures (shown as Fig. \ref{hybrid}). The shared memory component can be a shared memory machine and/or graphics processing units (GPU). The distributed memory component is the networking of multiple shared memory/GPU machines, which know only about their own memory - not the memory on another machine. Therefore, network communications are required to move data from one machine to another. Current trends seem to indicate that this type of memory architecture will continue to prevail and increase at the high end of computing for the foreseeable future.
 
@@ -111,7 +151,7 @@ General-purpose computing on graphics processing units (GPGPU, rarely GPGP) is t
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=6.in]{fig/cpu_vs_gpu.png}
+	\includegraphics[width=6.3in]{fig/cpu_vs_gpu.png}
 	\caption{CPU vs GPU.}
 	\label{cpuvsgpu}
 \end{figure}
@@ -126,7 +166,7 @@ The performance improvement of processors comes from the increasing number of co
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=6.2in]{fig/KNL1.png}
+	\includegraphics[width=6.3in]{fig/KNL1.png}
 	\caption{The organization of a Knights Landing processor.}
 	\label{knl1}
 \end{figure}
@@ -140,9 +180,9 @@ A reduced instruction set computer, or RISC  is such a computer has a small set 
 
 The first type of processor is sw26010, which is a 260-core manycore processor \cite{fu2016sunway} designed by the National High-Performance Integrated Circuit Design Center in Shanghai. It implements the Sunway architecture, a 64-bit RISC architecture designed by China. As shown in Fig. \ref{fig:sw26010}, the sw26010 has four clusters of 64 Compute-Processing Elements (CPEs) which are arranged in an eight-by-eight array. The CPEs support SIMD instructions and are capable of performing eight double-precision floating-point operations per cycle. Each cluster is accompanied by a more conventional general-purpose core called the Management Processing Element (MPE) that provides supervisory functions. Each cluster has its own dedicated DDR3 SDRAM controller and a memory bank with its own address space. The processor runs at a clock speed of 1.45.
 
-\begin{figure}[htbp]
+\begin{figure}[t]
 	\centering
-	\includegraphics[width=4.6in]{fig/sw26010.png}
+	\includegraphics[width=5.6in]{fig/sw26010.png}
 	\caption{The organization of a SW26010 manycores processor.}
 	\label{fig:sw26010}
 \end{figure}
@@ -168,7 +208,7 @@ OpenMP (Open Multi-Processing) \cite{dagum1998openmp} is an application programm
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=6.3in]{fig/Fork_join.pdf}
+	\includegraphics[width=6.4in]{fig/Fork_join.pdf}
 	\caption{OpenMP \textbf{fork-join} Model.}
 	\label{openmp_fork_join}
 \end{figure}
@@ -190,16 +230,20 @@ CUDA supports programming frameworks such as OpenACC \cite{wienke2012openacc} an
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=4.2in]{fig/CUDA.png}
+	\includegraphics[width=4.2in]{fig/CUDA.pdf}
 	\caption{Processing flow on CUDA.}
 	\label{cuda_flow}
 \end{figure}
 
-\subsubsection{Others}
+\subsubsection{OpenCL}
 
 OpenCL (Open Computing Language) is a framework for writing programs that execute across heterogeneous platforms consisting of CPUs, GPUs, DSPs, FPGAs and other processors or hardware accelerators. OpenCL specifies programming languages (based on C99 and C++11) for programming these devices and application programming interfaces (APIs) to control the platform and execute programs on the compute devices. OpenCL provides a standard interface for parallel computing using task- and data-based parallelism.
 
+\subsubsection{OpenACC}
+
 OpenACC (for open accelerators) is a programming standard for parallel computing developed by Cray, CAPS, Nvidia and PGI. The standard is designed to simplify parallel programming of heterogeneous CPU/GPU systems. As in OpenMP, the programmer can annotate C, C++ and Fortran source code to identify the areas that should be accelerated using compiler directives and additional functions. Like OpenMP 4.0 and newer, OpenACC can target both the CPU and GPU architectures and launch computational code on them.
+
+\subsubsection{Kokkos}
 
 Kokkos \cite{edwards2014kokkos} core implements a programming model in C++ for writing performance portable applications targeting all major HPC platforms. For that purpose, it provides abstractions for both parallel executions of code and data management. Kokkos is designed to target complex node architectures with N-level memory hierarchies and multiple types of execution resources. It currently can use OpenMP, Pthreads, and CUDA as backend programming models.
 
@@ -210,28 +254,61 @@ In the distributed memory platforms, each processor owns a private memory which 
 
 \subsubsection{Message Passing Interface}
 
-MPI (Message Passing Interface) \cite{gropp1999using} is a standardized and portable message-passing standard designed by a group of researchers from academia and industry to support a wide variety of parallel computing architectures. MPI provides a simple-to-use portable interface for the basic user, yet one powerful enough to allow programmers to use the high-performance message passing operations available on advanced machines. Most MPI implementations consist of a specific set of routines directly callable from C, C++, Fortran and any language able to interface with such libraries. The MPI interface is meant to provide essential virtual topology, synchronization, and communication functionality between a set of processes (that have been mapped to nodes/servers/computer instances) in a language-independent way, with language-specific syntax (bindings), plus a few language-specific features. 
+MPI (Message Passing Interface) \cite{gropp1999using} is a standardized and portable message-passing standard designed by a group of researchers from academia and industry to support a wide variety of parallel computing architectures. MPI provides a simple-to-use portable interface for the basic user, yet one powerful enough to allow programmers to use the high-performance message passing operations available on advanced machines. Most MPI implementations consist of a specific set of routines directly callable from C, C++, Fortran and any language able to interface with such libraries. The MPI interface is meant to provide essential virtual topology, synchronization, and communication functionality between a set of processes (that have been mapped to nodes/servers/computer instances) in a language-independent way, with language-specific syntax (bindings), plus a few language-specific features. MPI library functions include, but are not limited to, basic point-to-point send/receive operations, collective functions involving communication among all processes, synchronizing nodes (barrier operation), the one-sided communication, dynamic process management, I/O and so on. 
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=5.4in]{fig/mpi_send_recv.jpg}
+	\includegraphics[width=5.4in]{fig/point-point.pdf}
 	\caption{MPI send and receive Model.}
 	\label{mpi_model}
 \end{figure}
 
-As As shown in Fig. \ref{mpi_model}, MPI library functions include, but are not limited to, basic point-to-point send/receive operations, collective functions involving communication among all processes, synchronizing nodes (barrier operation), the one-sided communication, dynamic process management, I/O and so on. Point-to-point operations support both the communication in both synchronous and asynchronous ways. In modern computing platform with multiple shared-memory nodes, the shared memory programming models such as OpenMP and message passing programming such as MPI can be considered as complementary programming approaches, and can occasionally be used together in a hybrid way.
+As shown in Fig. \ref{mpi_model}, \textit{Point-to-point operations} support both the communication in both synchronous and asynchronous ways.  A popular example is MPI\_Send, which allows one specified process to send a message to a second specified process. Point-to-point operations, as these are called, are particularly useful in patterned or irregular communication, for example, a data-parallel architecture in which each processor routinely swaps regions of data with specific other processors between calculation steps, or a master-slave architecture in which the master sends new task data to a slave whenever the prior task is completed. MPI supports mechanisms for both blocking and non-blocking point-to-point communication mechanisms, as well as the so-called 'ready-send' mechanism whereby a send request can be made only when the matching receive request has already been made.
+
+Collective functions involve communication among all processes in a process group (which can mean the entire process pool or a program-defined subset). A typical function is the MPI\_Bcast call (short for "broadcast"). This function takes data from one node and sends it to all processes in the process group. A reverse operation is the MPI\_Reduce call, which takes data from all processes in a group, performs an operation (such as summing), and stores the results on one node. MPI\_Reduce is often useful at the start or end of a large distributed calculation, where each processor operates on a part of the data and then combines it into a result. Fig. \ref{mpi_collective} gives six modes of collective communications, including: broadcast, scatter, gather, reduction, all gather and all reduction.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=6.in]{fig/collective.pdf}
+	\caption{Different modes of collective operations.}
+	\label{mpi_collective}
+\end{figure}
+
+In modern computing platform with multiple shared-memory nodes, the shared memory programming models such as OpenMP and message passing programming such as MPI can be considered as complementary programming approaches, and can occasionally be used together in a hybrid way.
 
 \subsection{Partitioned Global Address Space}
 
 In computer science, a partitioned global address space (PGAS) is a parallel programming model. It assumes a global memory address space that is logically partitioned and a portion of it is local to each process, thread, or processing element. The novelty of PGAS is that the portions of the shared memory space may have an affinity for a particular process, thereby exploiting locality of reference. There are different implementation based on PGAS model, such as Unified Parallel C, Coarray Fortran, Split-C, Chapel, X10, UPC++, DASH, XcalableMP, etc. PGAS attempts to combine the advantages of an SPMD programming style for distributed memory systems (as employed by MPI) with the data referencing semantics of shared memory systems. This is more realistic than the traditional shared memory approach of one flat address space because hardware-specific data locality can be modeled in the partitioning of the address space.
 
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=6.3in]{fig/pgas.pdf}
+	\caption{Different modes of collective operations.}
+	\label{pgas}
+\end{figure}
+
 \subsubsection{XcalableMP}
 
-XcalableMP \cite{lee2010implementation} is a language extension of C and Fortran for parallel programming on distributed memory systems that help users to reduce those programming efforts. XcalableMP provides two programming models. The first one is the global view model, which supports typical parallelization based on the data and task parallel paradigm, and enables parallelizing the original sequential code using minimal modification with simple, OpenMP-like directives. The other one is the local view model, which allows using CAF-like expressions to describe inter-node communication. Users can even use MPI and OpenMP explicitly in the XMP language to optimize performance explicitly.
+XcalableMP \cite{lee2010implementation} is a PGAS language extension of C and Fortran for parallel programming on distributed memory systems that help users to reduce those programming efforts. XcalableMP provides two programming models. 
+\begin{itemize}
+	\item Global view model, which supports typical parallelization based on the data and task parallel paradigm, and enables parallelizing the original sequential code using minimal modification with simple, OpenMP-like directives. In the global view model, users specify the collective behavior of nodes in the target program to parallelize it. As users specify with the directives how data and computation are distributed on nodes, compilers are responsible for doing it. This model is suitable for regular applications, such as domain-decomposition problems, where every node works in a similar way.
+	
+	\item Local view model, which allows using CAF-like expressions to describe inter-node communication. In the local-view mode, users specify the behavior of each node, just like MPI. Therefore, users are responsible for distributing data and computation onto nodes. Communications in this model can be specified in a one-sided manner based on coarrays. This model is suitable for applications where each node performs a different task.
+\end{itemize}
+
+XcabableMP supports both two-sided (MPI like) and one-sided (remote memory access) communicaitons. Users can even use MPI and OpenMP explicitly in the XMP language to optimize performance explicitly.
 
 \subsection{Task/Graph Based Parallel Programming}
 
 With the increase of the complexity of applications on the supercomputers, it is more and more difficult for the developers to maintain the parallel codes on the modern computing architectures. The task/graph based parallel programming models are proposed to express the task parallelism and data dependencies of complex codes. In fact, an application can be divided temporally and spatially into inter-dependent tasks of different natures. A good runtime scheduler can manager the complex tasks efficiently across a large number of cores on the supercomputing systems. In this section, we list several well-known task/graph based parallel programming models.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=3.2in]{fig/workflow_cholesky.png}
+	\caption{DAG of Cholesky for a 4x4 tile matrix on a 2x2 grid of processors. Figure by Bosilca et al. \cite{bosilca2012dague}}
+	\label{fig:workflow_cholesky}
+\end{figure}
+
 
 \subsubsection{YML}
 
@@ -256,35 +333,29 @@ The exscale computing era is coming, in this section, we analyze the trends of t
 
 \subsection{Increase of Heterogeneity for Supercomputers} \label{Trends of Heterogeneity}
 
-Hardware architecutres have great impatcs on the evolution of supercomputers. At the early age, the processor performance improves mainly by increasing the number of transistors per integrated circuit, According to Moore's law, the number of transistors per integrated circuit doubles every $18$ months, which means that the size of the transistor is reduced to half, which allows achieving faster clock rate. Moore's law is found to be acceptable utils 2002. Since then, the overheating introduced by higher frequency reaches the limit of air cooling. This is the famous \textit{power wall}. Since then, the modern computing architectures with multiple processors on-chip, lower operating frequency and hierarchical architectures come, including the GPGPU, intel MIC, the many-core sw26010, and Matrix-2000 GPDSP. Moreover, Europe (Mont-Blanc \cite{rajovic2016mont}, CEA and Atos \cite{ceaarm}) and Japan (RIKEN and Fujitsu) \cite{japanarm} are now pushing the development of ARM supercomputers. Fig. \ref{top500-acc} shows the trends of supercomputers equiped with accelerators by year. According to the Top 500 list of November 2018, 137 systems out of 500 use accelerator or co-processor technology.
-
-\begin{figure}[htbp]
+\begin{figure}[t]
 	\centering
-	\includegraphics[width=6.2in]{fig/top500.pdf}
+	\includegraphics[width=6.3in]{fig/top500_2.pdf}
+	\caption{HPL Performance in Top500.}
+	\label{hpc_evaluate}
+\end{figure}
+
+Hardware architecutres have great impatcs on the evolution of supercomputers. At the early age, the processor performance improves mainly by increasing the number of transistors per integrated circuit, According to Moore's law, the number of transistors per integrated circuit doubles every $18$ months, which means that the size of the transistor is reduced to half, which allows achieving faster clock rate. Moore's law is found to be acceptable utils 2002. Since then, the overheating introduced by higher frequency reaches the limit of air cooling. This is the famous \textit{power wall}. Fig. \ref{hpc_evaluate} shows the HPL performance by year in Top500 List. Moore's law is not totally accepetable in recent years, where the performance's evolution of supercomputer slow down. Since then, the modern computing architectures with multiple processors on-chip, lower operating frequency and hierarchical architectures come, including the GPGPU, intel MIC, the many-core sw26010, and Matrix-2000 GPDSP, etc. Moreover, Europe (Mont-Blanc \cite{rajovic2016mont}, CEA and Atos \cite{ceaarm}) and Japan (RIKEN and Fujitsu) \cite{japanarm} are now pushing the development of ARM supercomputers. Fig. \ref{top500-acc} shows the trends of supercomputers equiped with accelerators by year. According to the Top 500 list of November 2018, 137 systems out of 500 use accelerator or co-processor technology. The introduction of accelerators on the supercomputers with a large number of cores increase extremely their heterogeneity of communications, memory and computing units.
+
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=6.3in]{fig/top500.pdf}
 	\caption{Number of systems each year boosted by accelerators.}
 	\label{top500-acc}
 \end{figure}
 
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=5.6in]{fig/core_nb.pdf}
-	\caption{Core number of Supercomputers in Top 500 List.}
-	\label{core-nb}
-\end{figure}
 
 Compared with the traditional computing architectures such as Intel, AMD CPUs which dedicate to multiple different purpose that result in bad energy efficiency in HPC, the introduction of low frequency and/or less complex architecture improve the energy efficiency. In the Green500 list\footnote{https://www.top500.org/green500/} of November 2016, 8 out of 10 the most efficient supercomputers are equiped with the Nvidia GPGPU, and the No.1 machine of Green500 list \textit{ZettaScaler-2.2} installed by RIKEN is powered by the intel low frequency processor (\textit{Xeon D-1571 16C 1.3GHz}).
 
 \subsection{Potential Architecture of Exascale Supercomputer} \label{Potential Architecture of Exascale Supercomputer}
 
 This section tries to make a blueprint (shown as Fig. \ref{fig:supercomputer_arch}) for the coming exascale supercomputers based on the future architecture of Aurora Exscale system talked in \cite{TheNextPlatform}.
-
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=6.2in]{fig/top500_hpcg.pdf}
-	\caption{Top10 HPCG list.}
-	\label{top500-hpxg}
-\end{figure}
-
 
 As shown in Fig. \ref{fig:supercomputer_arch}, the exascale supercomputers will be composed of more than 100,000 interconnected nodes (several millions cores). Each compute node is packed with the thin cores and fat cores. The fat cores refer to the intel, AMD X86 CPUs which dedicate to more complex operations. The thin cores can be the accelerators and co-processors (e.g. GPGPU, Matrix-2000, FPGA, etc.) with low frequence and/or less complex operations. A typical fat-thin mode is the Nvidia \textit{Host} and \textit{device} architecture. The fat cores are connected with RAM which has high capacity and low bandwidth, the thin cores are connected with the memory which has low capacity and high bandwidth.
 
@@ -311,11 +382,38 @@ These hierarchical computing architectures introduces multiple level parallelism
 
 \subsection{Parallel Programming Challenges} \label{Parallel Programming Challenges}
 
-HPCG \cite{dongarra2015hpcg} is composed of computations and data access patterns commonly found in scientific applications. HPCG strives for a better correlation to existing codes from the com- putational science domain and be representative of their performance. HPCG is meant to help drive the computer system design and implementation in di- rections that will better impact future performance improvement.
+With the increase of number of cores and compute nodes in the supercomputers, time spent in communication will overcome the computational time, and it becomes a great bottlebeck for the modern applications to take advantages of supercomputers. Facing the challenges, the parallel programming should consider the highly hierarchical architectures of computation and memory, the increase levels and degrees of parallelism, the heterogeneity of computing, memory and scalability. In fact, HPL benchmark is a little out of date, which cannot represents the common operations on modern supercomputers.
 
-With the increase of number of cores and compute nodes in the supercomputers, time spent in communication will overcome the computational time, and it becomes a great bottlebeck for the modern applications to take advantages of supercomputers. Facing the challenges, the parallel programming should consider the highly hierarchical architectures of computation and memory, the increase levels and degrees of parallelism, the heterogeneity of computing, memory and scalability.
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=6.2in]{fig/top500_hpcg.pdf}
+	\caption{Top10 HPCG list.}
+	\label{top500-hpxg}
+\end{figure}
 
-The parallel performance of a common application in HPC is measured by the scalability (also referred as the scaling efficiency). This measurement indicates how efficient an application is when using increasing numbers of parallel processing elements (CPUs/cores/processes/threads, etc.). There are two basic ways to measure the parallel performance of a given application, depending on whether or not one is cpu-bound or memory-bound. These are referred to as strong and weak scaling, respectively: 1) \textit{strong scaling} which is defined as how the solution time varies with the number of processors for a fixed total problem size; 2) \textit{weak scaling} which is defined as how the solution time varies with the number of processors for a fixed problem size per processor.
+The High Performance Conjugate Gradients (HPCG) Benchmark \cite{dongarra2015hpcg} is proposed by Michael Heroux and Jack Dongarra. HPCG project is an effort to create a new metric for ranking HPC systems, which is intended as a complement to the High Performance LINPACK (HPL) benchmark, currently used to rank the TOP500 computing systems. The computational and data access patterns of HPL are still representative of some important scalable applications, but not all. HPCG is designed to exercise computational and data access patterns that more closely match a different and broad set of important applications, and to give incentive to computer system designers to invest in capabilities that will have impact on the collective performance of these applications.
+
+HPCG is a complete, stand-alone code that measures the performance of basic operations in a unified code:
+
+\begin{itemize}
+	\item Sparse matrix-vector multiplication.
+	\item Vector updates.
+	\item Global dot products.
+	\item Local symmetric Gauss-Seidel smoother.
+	\item Sparse triangular solve (as part of the Gauss-Seidel smoother).
+	\item Driven by multigrid preconditioned conjugate gradient algorithm that exercises the key kernels on a nested set of coarse grids.
+	\item Reference implementation is written in C++ with MPI and OpenMP support.
+\end{itemize}
+
+Fig. \ref{top500-hpxg} lists the Top10 computers in the HPCG List of November 2018.  We could conclude that the HPCG test generally achieves only a tiny fraction of the peak FLOPS of the computers. Lots of modern algorithms are much more complex than the HPCG, and their parallel performance tends to be even worse. Thus,  the programming paradigm for parallel applications should be re-considered and re-designed.
+
+In fact, with the increase of heterogeneity of supercomputers, HPC tends to be a little similar with the Grid computing, which is the use of widely distributed computer resources connected to a network (private, public or the Internet) to reach a common goal. Grid computing is distinguished from HPC systems in that grid computers have each node set to perform a different task/application. The geographically dispersed of Grid computers leads in much heterogeneous properties comparing with cluster systems. Since its heterogeneity, coordinating applications of Grid computing can be a complex task, especially when coordinating the flow of information across distributed computing resources. Hence workflow management systems have been developed specifically to compose and execute a series of computational or data manipulation steps, or a workflow. Current parallel applications can be seen as the intersection of distributed and parallel computing.
+
+The parallel performance of a common application in HPC is measured by the scalability (also referred as the scaling efficiency). This measurement indicates how efficient an application is when using increasing numbers of parallel processing elements (CPUs/cores/processes/threads, etc.). There are two basic ways to measure the parallel performance of a given application, depending on whether or not one is cpu-bound or memory-bound. These are referred to as strong and weak scaling, respectively: 
+\begin{itemize}
+	\item  \textit{strong scaling} which is defined as how the solution time varies with the number of processors for a fixed total problem size;
+	\item \textit{weak scaling} which is defined as how the solution time varies with the number of processors for a fixed problem size per processor.
+\end{itemize}
 
 In order to improve the parallel performance and get the best scaling efficiency on modern supercomputers, several prinples should be considered for the development of applications:
 
@@ -324,7 +422,7 @@ In order to improve the parallel performance and get the best scaling efficiency
 		\item Applications should be able to adapt to the hierachical memory on supercomputers.
 		\item The data movements should be limited, and the number of global communications should be minimized.
 		\item The parallel programming should reduce synchronizations and promote the asynchronicity;
-		\item Multi-level scheduling strategies should be proposed,  and the manager engine or other complex software stacks should be implemented to handle huge traffic and improve the fault tolerance and resilience.
+		\item Multi-level scheduling strategies should be proposed,  and the manager engine or other complex software stacks should be implemented to handle huge traffic and improve the fault tolerance and resilience, similarly as for Grid computing.
 	\end{enumerate}
 
 In following chapters, we focus on the work of design and implementation of novel numerical methods for modern supercomputers based on these principles.

@@ -1,7 +1,7 @@
 \begin{displayquote}
 	\textsf{Many problems in science and engineering often require to solve a long sequence of large-scale non-Hermitian linear systems with different Right-hand sides (RHSs) but a unique operator. Efficiently solving such problems on extreme-scale platforms requires the minimization of global communications, reduction of synchronization points and promotion of asynchronous communications. Unite and Conquer GMRES/LS-ERAM (UCGLE) method presented in the last chapter is a suitable candidate with the reduction of global communications and the synchronization points of all computing units. In this chapter, we extend both the mathematical model and the implementation of UCGLE method to adapt to solve sequences of linear systems. The eigenvalues obtained in solving previous linear systems by UCGLE can be recycled, improved on the fly and applied to construct a new initial guess vector for subsequent linear systems, which can achieve a continuous acceleration to solve linear systems in sequence. Numerical experiments using different test matrices to solve sequences of linear systems on supercomputer Tianhe-2 indicate a substantial decrease in both computation time and iteration steps when the approximate eigenvalues are recycled to generate the initial guess vectors.}
 \end{displayquote}
-
+ 
 \vspace{0.6in}
 
 \section{Demand to Solve Linear Systems in Sequence}
@@ -178,12 +178,12 @@ ERAM and LS components in UCGLE demand additional computing units. It is unfair 
 	\renewcommand{\arraystretch}{1.6}
 	\begin{tabular}{c*{9}{c}}
 		\toprule
-		Method              & 1 &  2 &  3 &  4 &  5  &  6  & 7 & 8 & 9\\
-		\hline
+			\cellcolor{gray!50}Method              & \cellcolor{gray!50}1 &  \cellcolor{gray!50}2 &  \cellcolor{gray!50}3 &  \cellcolor{gray!50}4 &  \cellcolor{gray!50}5  &  \cellcolor{gray!50}6  & \cellcolor{gray!50}7 & \cellcolor{gray!50}8 & \cellcolor{gray!50}9\\
+		\midrule
 		GMRES & 509 & 505 & 501 & 505 & 527 & 510  &523&516& 518\\
-		GMRES+SOR            & 169 & 165 & 172 & 130 & 172 & 173 &130&170&130\\
+			\cellcolor{gray!20}GMRES+SOR            & 	\cellcolor{gray!20}169 & 	\cellcolor{gray!20}165 & 	\cellcolor{gray!20}172 & 	\cellcolor{gray!20}130 & 	\cellcolor{gray!20}172 & 	\cellcolor{gray!20}173 &	\cellcolor{gray!20}130&	\cellcolor{gray!20}170&	\cellcolor{gray!20}130\\
 		GMRES+Jacobi            & 274 & 273 & 270 & 276 & 269 & 274 &280&276&273\\
-		UCGLE w/o initial guess     & 120 & 90 & 90 & 90 & 90 &90 &90&90& 90\\
+			\cellcolor{gray!20}UCGLE w/o initial guess     & 	\cellcolor{gray!20}120 & 	\cellcolor{gray!20}90 & 	\cellcolor{gray!20}90 & 	\cellcolor{gray!20}90 & 	\cellcolor{gray!20}90 &	\cellcolor{gray!20}90 &	\cellcolor{gray!20}90&	\cellcolor{gray!20}90& 	\cellcolor{gray!20}90\\
 		UCGLE with initial guess     & 120 & 36 & 35 & 35 & 36 &36  &36&33&35\\
 		\hline
 	\end{tabular}
@@ -213,12 +213,12 @@ For the tests of $Mat1$, the GMRES restart size is $30$, the Krylov subspace of 
 	\renewcommand{\arraystretch}{1.6}
 	\begin{tabular}{c*{9}{c}}
 		\toprule
-		Method              & 1 &  2 &  3 &  4 &  5  &  6  & 7 & 8 & 9\\
-		\hline
+		\cellcolor{gray!50}Method              & \cellcolor{gray!50}1 &  \cellcolor{gray!50}2 &  \cellcolor{gray!50}3 &  \cellcolor{gray!50}4 &  \cellcolor{gray!50}5  &  \cellcolor{gray!50}6  & \cellcolor{gray!50}7 & \cellcolor{gray!50}8 & \cellcolor{gray!50}9\\
+		\midrule
 		GMRES & 1316	&1277	&1460	&1278	&1409	&1325	&1472	&1369	&1342\\
-		GMRES+SOR            & 1197&	1219&	1336&	1173	&1290	&1194	&1335	&1289	&1213\\
+			\cellcolor{gray!20}GMRES+SOR            & 	\cellcolor{gray!20}1197&		\cellcolor{gray!20}1219&		\cellcolor{gray!20}1336&		\cellcolor{gray!20}1173	&	\cellcolor{gray!20}1290	&	\cellcolor{gray!20}1194	&	\cellcolor{gray!20}1335	&	\cellcolor{gray!20}1289	&	\cellcolor{gray!20}1213\\
 		GMRES+Jacobi            & 1278&	1185	&1283&	1220	&1191&	1184	&1218&	1159&	1239\\
-		UCGLE w/o initial guess     & 666	&671	&831	&689	&701	&685	&837	&736	&714\\
+			\cellcolor{gray!20}UCGLE w/o initial guess     & 	\cellcolor{gray!20}666	&	\cellcolor{gray!20}671	&	\cellcolor{gray!20}831	&	\cellcolor{gray!20}689	&	\cellcolor{gray!20}701	&	\cellcolor{gray!20}685	&	\cellcolor{gray!20}837	&	\cellcolor{gray!20}736	&	\cellcolor{gray!20}714\\
 		UCGLE with initial guess     & 666	&595	&470	&491	&544	&464	&485	&532	&440\\
 		\hline
 	\end{tabular}
@@ -245,12 +245,12 @@ In order to use UCGLE for solving a large number of linear systems in sequence, 
 	\renewcommand{\arraystretch}{1.6}
 	\begin{tabular}{c*{9}{c}}
 		\toprule
-		Method              & 1 &  2 &  3 &  4 &  5  &  6  & 7 & 8 & 9\\
-		\hline
+		\cellcolor{gray!50}Method              & \cellcolor{gray!50}1 &  \cellcolor{gray!50}2 &  \cellcolor{gray!50}3 &  \cellcolor{gray!50}4 &  \cellcolor{gray!50}5  &  \cellcolor{gray!50}6  & \cellcolor{gray!50}7 & \cellcolor{gray!50}8 & \cellcolor{gray!50}9\\
+		\midrule
 		GMRES & 914 & 912 & 892 &885  & 895 & 905  &911&892& 904\\
-		GMRES+SOR            & 895 & 871 & 856 & 885 & 879 & 870 &868&838&868\\
+		\cellcolor{gray!20}GMRES+SOR            & 	\cellcolor{gray!20}895 & 	\cellcolor{gray!20}871 & 	\cellcolor{gray!20}856 & 	\cellcolor{gray!20}885 & 	\cellcolor{gray!20}879 & 	\cellcolor{gray!20}870 &	\cellcolor{gray!20}868&	\cellcolor{gray!20}838&	\cellcolor{gray!20}868\\
 		GMRES+Jacobi            & 894 & 888 & 875 & 864 & 876 & 887 &892&888&872\\
-		UCGLE w/o initial guess     & 673 & 364 & 355 & 360 & 367 &363 &363&351& 364\\
+			\cellcolor{gray!20}UCGLE w/o initial guess     & 	\cellcolor{gray!20}673 & 	\cellcolor{gray!20}364 & 	\cellcolor{gray!20}355 & 	\cellcolor{gray!20}360 & 	\cellcolor{gray!20}367 &	\cellcolor{gray!20}363 &	\cellcolor{gray!20}363&	\cellcolor{gray!20}351& 	\cellcolor{gray!20}364\\
 		UCGLE with initial guess     & 673 & 396 & 291 & 283 & 339 & 338  & 274 & 279 & 267\\
 		\hline
 	\end{tabular}

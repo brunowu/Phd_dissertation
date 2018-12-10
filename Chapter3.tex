@@ -361,7 +361,7 @@ There are various strategies to restart the basic Arnoldi method and to accelera
 \end{algorithm}
 
 
-\section{Preconditioners for GMRES}
+\section{Preconditioners for GMRES}\label{Preconditioners for GMRES}
 
 In practice, one weakness of GMRES discussed in the previous section is the lack of robustness, it is likely to suffer from slow convergence for some problems. Preconditioning is a kind of techniques to accelerate the convergence of Krylov subspace methods by transforming the original linear systems from one to another. In this section, we summarize different kinds of existing preconditioners, including the preconditioning by a selected matrix, by the deflation, and by a selected polynomial.
 
@@ -1148,7 +1148,7 @@ The \textbf{Scalable Library for Eigenvalue Problem Computations (SLEPc)} \cite{
 	\item \textbf{Komplex \cite{day2001solving}}: Complex-valued system solver, KOMPLEX is an add-on module to AztecOO that allows users to solve complex-valued linear systems. KOMPLEX solves a complex-valued linear system Ax=b by solving an equivalent real-valued system of twice the dimension.
 \end{itemize}
 
-\section{Toward Extreme Computing, Some Correlated Goals}
+\section{Toward Extreme Computing, Some Correlated Goals}\label{Toward Extreme Computing, Some Correlated Goals}
 %Global vs Local Communication, fault tolerance, multiple level parallellism, etc. 
 
 This section gives the challenges of numerical methods facing the development of HPC platforms. In Section \ref{Exascale Challenges of Supercomputers}, we discussed the tendance of future exascale supercomputing architectures and the related challenges of parallel programming to develop the applications to profit efficiently from these supercomputers. The main objective for the parallel implementation of numerical methods is to minimize the global computing time. The global computing time of an algorithm can be reduced by either accelerating the convergence or improve its parallel scaling performance using much more computing units. In section, we list in details the correlated goals of iterative methods toward the extreme computing below:

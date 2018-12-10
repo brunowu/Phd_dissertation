@@ -219,18 +219,18 @@ M_{i+1}=M_i+\frac{1}{i!}(\widetilde{A_A})^i(M_0), i\in(0,+\infty),
 
 a very simple initial matrix $M_0 \in \mathbb{C}^{n \times n}$ can be transfered into a new sparse, non-trivial and non-Hermitian matrix $M_{+\infty} \in \mathbb{C}^{n \times n}$, which has the same spectra but different eigenvectors with $M_0$.
 
-However, it is not reasonable to generate a matrix by infinity times of iterations. Thus a good selection of matrix $A$ which can make $\widetilde{(A_A)}^i$ tends to $\textbf{0}$ in limited steps is very necessary. We define the matrix $A$  as the formula $A=Q^{-1}PQ$ with $Q \in \mathbb{R}^{n \times n}$ and $P \in \mathbb{N}^{n \times n}$. In addition, the matrix $P$ is set to be a nilpotent matrix, which means that there exists an integer $k$ such that: $P^i=0$ for all $i \ge k$. Such $k$ is called the nilpotency of $P$.  In this paper, we set the matrix $Q$ to be the identity matrix $I \in \mathbb{N}^{n \times n}$ for simplification. Thus $A$ is also a nilpotent matrix.  The selection of a nilpotent matrix will influence the sparsity pattern of the upper band of the generated matrix. 
-
-The exact shape of $A$ is given in Fig. \ref{fig:nilpotent}. Inside an $n \times n$ matrix $A$, its entries are default $0$, except in the upper diagonal with the distance $p$ to the diagonal. In this diagonal, its entries start with $d$ continuous $1$ and a $0$, this term repeats until the end. Matrix $A$ should be nilpotent with good choices of the parameters of $p$, $d$ and $n$. The determination of this series of matrices to be nilpotent or not might be difficult, but the cases that $p=1$ or $p=2$ are straightforward, which can completely fulfill our demands.
-
-If $p=1$, with $d \in \mathbb{N^*}$, or $p=2$ with $d \in \mathbb{N^*}$ to be even, the nilpotency of $A$ and the upper band's bandwidth of generated matrix are respectively $d+1$  and $2pd$. Obviously, there is another constraint that the matrix size $n$ should be greater or equal to the upper band's width $2pd$. For $p=2$, if $d$ is odd, the matrix $A$ will not be nilpotent, thus we do not take it into account.
-
-\begin{figure}[htbp]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=3.0in]{fig/nilpotent_matrix.pdf}
 	\caption{Nilpotent Matrix. $p$ off-diagonal offset, $d$ number of continuous $1$, and $n$ matrix dimension.}
 	\label{fig:nilpotent}
 \end{figure}
+
+However, it is not reasonable to generate a matrix by infinity times of iterations. Thus a good selection of matrix $A$ which can make $\widetilde{(A_A)}^i$ tends to $\textbf{0}$ in limited steps is very necessary. We define the matrix $A$  as the formula $A=Q^{-1}PQ$ with $Q \in \mathbb{R}^{n \times n}$ and $P \in \mathbb{N}^{n \times n}$. In addition, the matrix $P$ is set to be a nilpotent matrix, which means that there exists an integer $k$ such that: $P^i=0$ for all $i \ge k$. Such $k$ is called the nilpotency of $P$.  In this paper, we set the matrix $Q$ to be the identity matrix $I \in \mathbb{N}^{n \times n}$ for simplification. Thus $A$ is also a nilpotent matrix.  The selection of a nilpotent matrix will influence the sparsity pattern of the upper band of the generated matrix. 
+
+The exact shape of $A$ is given in Fig. \ref{fig:nilpotent}. Inside an $n \times n$ matrix $A$, its entries are default $0$, except in the upper diagonal with the distance $p$ to the diagonal. In this diagonal, its entries start with $d$ continuous $1$ and a $0$, this term repeats until the end. Matrix $A$ should be nilpotent with good choices of the parameters of $p$, $d$ and $n$. The determination of this series of matrices to be nilpotent or not might be difficult, but the cases that $p=1$ or $p=2$ are straightforward, which can completely fulfill our demands.
+
+If $p=1$, with $d \in \mathbb{N^*}$, or $p=2$ with $d \in \mathbb{N^*}$ to be even, the nilpotency of $A$ and the upper band's bandwidth of generated matrix are respectively $d+1$  and $2pd$. Obviously, there is another constraint that the matrix size $n$ should be greater or equal to the upper band's width $2pd$. For $p=2$, if $d$ is odd, the matrix $A$ will not be nilpotent, thus we do not take it into account.
 
 \subsection{Numerical Algorithm}
 
@@ -253,14 +253,14 @@ As shown in Algorithm \ref{alg:matgen}, the procedure of SMG2S is simple. Firstl
 	\end{algorithmic}
 \end{algorithm*}
 
-For $M_t$, if $M_0$ is a lower triangular matrix having $h$ non zero diagonals, it will be a band diagonal matrix, whose number of new diagonals in the upper triangular zone will be at most $2pd-1$. Thus the maximal number of the bandwidth of matrix $M_t$ is: $width = h + 2pd-1$, as in Fig. \ref{fig:matgen}. In general, researchers use these matrices to test the iterative methods of sparse linear systems. Thus after the generation of band matrix, it can be transferred to be sparse with the help of permutation matrices. Fig. \ref{fig:matgene} gives an example showing the pattern of the generated matrix by SMG2S. In general, researchers use these matrices to test the iterative methods for sparse linear systems. The $h$ lower diagonals of the initial matrix can set to be sparse, which ensures the sparsity of the final generated matrix, as shown in Fig. \ref{fig:matgene}. Moreover, the permutation matrix can also be applied to change the sparsity of the generated matrix further.
-
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=5.8in]{fig/matgen.pdf}
 	\caption{Matrix Generation. The left is the initial matrix $M_0$ with given spectrum on the diagonal, and the $h$ lower diagonals with random values; the right is the generated matrix $M_t$ with nilpotency matrix determined by the parameters $d$ and $p$.}
 	\label{fig:matgen}
 \end{figure}
+
+For $M_t$, if $M_0$ is a lower triangular matrix having $h$ non zero diagonals, it will be a band diagonal matrix, whose number of new diagonals in the upper triangular zone will be at most $2pd-1$. Thus the maximal number of the bandwidth of matrix $M_t$ is: $width = h + 2pd-1$, as in Fig. \ref{fig:matgen}. In general, researchers use these matrices to test the iterative methods of sparse linear systems. Thus after the generation of band matrix, it can be transferred to be sparse with the help of permutation matrices. Fig. \ref{fig:matgene} gives an example showing the pattern of the generated matrix by SMG2S. In general, researchers use these matrices to test the iterative methods for sparse linear systems. The $h$ lower diagonals of the initial matrix can set to be sparse, which ensures the sparsity of the final generated matrix, as shown in Fig. \ref{fig:matgene}. Moreover, the permutation matrix can also be applied to change the sparsity of the generated matrix further.
 
 The operations complexity $C$ of Algorithm \ref{alg:matgen} is given as: 
 
@@ -307,7 +307,7 @@ G & H & I
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[width=5.in]{fig/spgemm2.pdf}
+	\includegraphics[width=5.4in]{fig/spgemm2.pdf}
 	\caption{The structure of a CPU-GPU implementation of SpGEMM, where each GPU is attached to a CPU. The GPU is in charge of the computation, while the CPU handles the MPI communication among processes.}
 	\label{fig:cuda}
 \end{figure}
@@ -318,12 +318,17 @@ PETSc does not supply the SpGEMM and AXPY operations for GPU clusters. Thus we i
 
 The implementation of SMG2S, especially the parallel SpGEMM kernel's communication can be specifically optimized based on the particular property of nilpotent matrix $A$. In fact, $A$ can be determined by three parameters $p$, $d$ and $n$ that we have mentioned in Section \ref{Matrix_Generation_Method}, thus it is not necessary to explicitly implement this parallel matrix. We note this nilpotent matrix as $A(p,d,n)$. Denote that for any matrix $J$, $J(i,j)$ represents the entry in row $i$ and column $j$; $J(i,:)$ represents all the entries of row $i$; and $J(:,j)$ represents all the entries of column $j$. Then, we observe the effects of right and left-multiplying this nilopotent matrix $A(p,d,n)$ on a general matrix $M$ by basic mathematical matrix operations. As shown in Fig. \ref{fig:am}, the right-multiplcation operation of $A(p,d,n)$ will shift all the entries of first $n-p$ columns to right side with an offset $p$. Denote $MA$ the result matrix gotten by the right-multiplying $A$ on $M$ (the result of $MA$ operation). We have $MA(:,j)=M(:,j-p), \forall j \in p,\cdots, n-1$, and $MA(:,j)=0,  \forall j \in 0,\cdots, p-1$. Similarly, the left-multiplying $A(p,d,n)$ on $M$ will shift the whole entries of last $n-p$ rows to up side with an offset $p$. Denote $AM$ the matrix gotten by the left-multiplying $A$ on $M$ (the result of $AM$ operation). We have $AM(i,:)=M(i+p,:), \forall i \in 0,\cdots, n-p-1$, and $AM(i:,)=0,  \forall i \in p,\cdots, n-1$. Moveover, the parameter $d$ decides that $MA(:,r(d+1))=0$ and $AM(r(d+1),:)=0$ with $r \in 1, \cdots, \lfloor \frac{n}{d+1}\rfloor$. 
 
-\begin{figure*}[htbp]
+\begin{figure}[htbp]
 	\centering
-	\includegraphics[width=6.2in]{fig/AMMA_2.pdf}
-	\caption{(a) AM operation; (b) MA operation.}
-	\label{fig:am}
-\end{figure*}
+	\subfloat[AM Operation.]{\includegraphics[width=6.3in]{fig/AM.pdf}%
+		\label{am}}
+	\\
+	\subfloat[MA Operation.]{\includegraphics[width=6.3in]{fig/MA.pdf}%
+		\label{ma}}
+		\caption{AM and MA operations. }
+	\label{fig:amma}
+\end{figure}
+
 
 When thinking about the implementation in parallel on distributed memory systems, the three integer parameters $p$, $d$ and $n$ can be shared by all MPI processes, and the parallel operations $AM$ and $MA$ are different from the general parallel SpGEMM, which is communication bounded. We analyze these two operations in Fig. \ref{fig:am}. Firstly, the general matrix $M$  is one-dimensional distributed by row across $m$ MPI process. As shown in  Fig. \ref{fig:am} (b), for $MA$, there is no communication inter different MPI processes since the data are moved inside each row. Assume that $ \lfloor \frac{n}{m}\rfloor \geq p$, for $AM$, the inter communication of MPI takes place when the MPI process $k$ ($k \in 1, \cdots, m-1$) should send the first $p$ rows of their sub-matrix to the closest previous MPI process numbering $k-1$. The communication complexity for each process is $\mathcal{O}(np)$. When generating the band matrix with low bandwidth $b$, it tends to be a $\mathcal{O}(bp)$ with $p=1$ or $2$. The MPI-based optimization implementations of AM and MA are respectively given by Algorithm \ref{alg:am} and \ref{alg:ma}. The communication inter MPI process is assumed by the asynchronous sending and receiving functions. In this algorithm, $M_k$, $MA_k$ and $AM_k$ imply the sub-matrices on process $k$ with $t$ rows. The rows and columns of these sub-matrices in Algorithm \ref{alg:am} and \ref{alg:ma} are all indexed by the local indices.
 
@@ -467,9 +472,7 @@ In conclusion, SMG2S always has good strong scalability when $d$ and $h$ are muc
 
 In the last section, we show the good parallel performance of SMG2S, and then it is necessary to verify if the generated matrices are able to keep the given spectra with enough accuracy. Generally, the iterative eigenvalue solvers such as the Arnoldi or other Krylov methods (\cite{petiton1992parallel}) are applied to approximate the dominant eigenvalues. However, the accuracy verification is an opposite case. Now there exists a value, and we want to check if it is an eigenvalue of a given matrix. These iterative methods cannot directly and efficiently deal with this kind of verification. In this section, we present a method for accuracy verification using the Shifted Inverse Power method, which was easily implemented in parallel.
 
-The Power method is an algorithm to approximate the greatest eigenvalue. Meanwhile, the Inverse Power method is a similar iterative algorithm to find the smallest eigenvalue. The middle eigenvalues can be obtained by the Shifted Inverse Power method (\cite{hernandez2005single}).  This method is given in Algorithm \ref{alg:inversePower}. Its operation complexity is $\mathcal{O}(n^3)$. The Shifted Inverse Power method is used to compute the eigenvalue which is the nearest one to a given value in a few steps of iterations. The related eigenvector can be easily calculated by its definition and used to check if this given value is an eigenvalue of the matrix.
-
-\begin{algorithm}[htbp]{}
+\begin{algorithm}[t]{}
 	\caption{ Shifted Inverse Power method}   
 	\label{alg:inversePower}   
 	\begin{algorithmic}[1]
@@ -484,9 +487,12 @@ The Power method is an algorithm to approximate the greatest eigenvalue. Meanwhi
 	\end{algorithmic}  
 \end{algorithm}
 
-\begin{figure}[htbp]
+
+The Power method is an algorithm to approximate the greatest eigenvalue. Meanwhile, the Inverse Power method is a similar iterative algorithm to find the smallest eigenvalue. The middle eigenvalues can be obtained by the Shifted Inverse Power method (\cite{hernandez2005single}).  This method is given in Algorithm \ref{alg:inversePower}. Its operation complexity is $\mathcal{O}(n^3)$. The Shifted Inverse Power method is used to compute the eigenvalue which is the nearest one to a given value in a few steps of iterations. The related eigenvector can be easily calculated by its definition and used to check if this given value is an eigenvalue of the matrix.
+
+\begin{figure}[t]
 	\centering
-	\includegraphics[width=6.2in]{fig/smg2s-check.pdf}
+	\includegraphics[width=2.4in]{fig/smg2s-check.pdf}
 	\caption{SMG2S verification workflow.}
 	\label{smg2s-check}
 \end{figure}
@@ -546,11 +552,19 @@ This acceptance for cases of Fig. \ref{fig_1_case}, Fig. \ref{fig_2_case}, Fig. 
 	\label{fig_third_case}
 \end{figure}
 
+
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=5.8in]{fig/matgen/vector5.eps}
 	\caption{Spec4: Conjugate and Closest Eigenvalues.}
 	\label{fig_forth_case}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=5.8in]{fig/matgen/vector4.eps}
+	\caption{Spec5: Distributed Eigenvalues.}
+	\label{fig_fifth_case}
 \end{figure}
 
 \subsection{Arithmetic Precision Analysis}
@@ -801,6 +815,13 @@ K = ConvertToTrilinosMat(Mt);
 When you launch the program, a new windows opens like Fig. \ref{fig:Home Screen Capture} :
 
 After that, you can click on "Display" to build and open the graphic on the right side of the window. Click on "New window" to open your graphic on a new window. It's possible to open as many windows as you want like Fig. \ref{fig:Home Screen Plot Capture}:
+
+\begin{figure}[htbp]
+	\label{fig:Home}
+	\caption{Home Screen}
+	\centering
+	\includegraphics[width=6.2in]{fig/home.png}
+\end{figure}
 
 \begin{figure}[htbp]
 	\label{fig:Home Screen Plot Capture}

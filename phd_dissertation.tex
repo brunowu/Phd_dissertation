@@ -33,8 +33,9 @@
 \usepackage{graphicx}
 %\usepackage[numbers]{natbib}
 \usepackage{dirtree} % for directory structure.
-
+\usepackage{diagbox} 
 %\usepackage[Glenn]{fncychap}  %chapter styles
+
 
 \usepackage{csquotes}
 
@@ -53,6 +54,11 @@
 
 \usepackage{minitoc} %List sections of chapter at beginning of that chapter
 
+
+\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
+\usepackage{makecell}
+
+\usepackage{CJKutf8}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{corollary}{Corollary}[theorem]
@@ -153,7 +159,6 @@
 	 &Michael Heroux &- Chercheur au Laboratoires National de Sandia \\
 	Examinateurs & Yutong Lu &- Directrice de NSCC-Guangzhou \\
 	&&- Professeur \`a l'Universit\'e de  Sun Yat-Sen\\
- 		& Catherine Lambert  &- Directrice de CERFACS\\
  	& Barbara Chapman  &-  Professeur \`a l'Universit\'e de Stony Brook\\
  	& &-  Chercheur au Laboratoires National de Brookhaven\\
  	&France Boillod-Cerneux& - Chercheur au CEA Saclay \\
@@ -185,7 +190,16 @@
  
 \clearemptydoublepage
 \begin{dedication}
+	\normalsize
 	This thesis is dedicated to my grandmother. Hope you can hear in the heaven.
+	
+	\vspace{0.2in}
+	\begin{CJK*}{UTF8}{bsmi}
+		{\CJKfamily{bkai}
+			\large
+			謹以此文獻給我的祖母劉占仙（1929-2015）}
+	\end{CJK*}
+
 \end{dedication}
 
 \clearemptydoublepage
@@ -193,6 +207,20 @@
 \chapter*{Acknowledgement}
 \thispagestyle{empty}
 First and foremost I would like to thank my adviser of the dissertation, Serge G. Petiton.
+
+
+\begin{CJK*}{UTF8}{bsmi}
+	{\CJKfamily{bkai}
+	趙客縵胡纓，吳鉤霜雪明。銀鞍照白馬，颯沓如流星。
+	十步殺一人，千裏不留行。事了拂衣去，深藏身與名。
+	閑過信陵飲，脫劍膝前橫。將炙啖朱亥，持觴勸侯嬴。
+	三杯吐然諾，五嶽倒為輕。眼花耳熱後，意氣素霓生。
+	救趙揮金槌，邯鄲先震驚。千秋二壯士，煊赫大梁城。
+	縱死俠骨香，不慚世上英。誰能書閤下，白首太玄經。}
+	
+	{\CJKfamily{bkai}男兒生於天地間，當效伊呂管樂，立不世之功，承儒墨道法，創一家之說。}
+\end{CJK*}
+
 
 \clearemptydoublepage
 \chapter*{Abstract}

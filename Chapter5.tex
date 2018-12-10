@@ -1,11 +1,11 @@
 \begin{displayquote}
 	
-	\textsf{Facing the challenges of numerical linear algebra methods on a large-scale machine discussed in Section 3, the new programming model should be proposed with well-suited characteristics on modern architectures. These features include optimized communications, asynchronicity, diversity of natural parallelism and fault tolerance. In such numerical methods, the avoidance of operations involving synchronous communications is most important. Indeed, with a very large number of cores, the overall reductions or global synchronization are a bottleneck. Consequently, large scalar products and overall synchronization, and other operations involving communications between all cores have to be avoided. On the other hand, everywhere that is possible, asynchronicity of communications has to be promoted. Indeed, this kind of communications could allow their overlapping with computation operations inside a task and between the tasks constituting theses methods. The communication avoiding techniques could also be integrated allowing a general reduction of communications in the algorithm. The diversity of natural parallelism existing in such methods can be exploited by taking advantage of heterogeneity of targeted architectures. Fault tolerance and the ability to load balancing should be integral parts of these methods. These characteristics allow the improvement of the performance of applications built on the basis of these methods. Moreover, based on these properties, auto/smart-tuned versions of algorithms can be proposed. In this chapter, we present an asynchronous distributed and parallel Unite and Conquer GMRES/LS-ERAM (UCGLE) method to solve sparse non-Hermitian systems on large platforms. The key feature of UCGLE comparing with the classical hybrid methods using LS polynomial preconditioner \cite{essai1999heterogeneous,he2006hybrid} is its distributed and parallel asynchronous communication and the manager engine implementation among three components, which are specified for the extreme-scale supercomputing platforms. We summarize the UC approach in Section 5.1. The theoretical parts of UCGLE are given in Section 5.2. In Section 5.3, we present the distributed and parallel implementation of UCGLE, including the computing components, the manager engine, and the distributed and parallel asynchronous communications. The experimental results on different supercomputers which evaluate the convergence, the parameters, the scalability, and the fault tolerance are shown in Section 5.5.}
+	\textsf{Facing the challenges of numerical linear algebra methods on a large-scale machine discussed in Section 3, the new programming model should be proposed with well-suited characteristics on modern architectures. These features include optimized communications, asynchronicity, diversity of natural parallelism and fault tolerance. In such numerical methods, the avoidance of operations involving synchronous communications is most important. Indeed, with a very large number of cores, the overall reductions or global synchronization are a bottleneck. Consequently, large scalar products and overall synchronization, and other operations involving communications between all cores have to be avoided. On the other hand, everywhere that is possible, asynchronicity of communications has to be promoted. Indeed, this kind of communications could allow their overlapping with computation operations inside a task and between the tasks constituting theses methods. The communication avoiding techniques could also be integrated allowing a general reduction of communications in the algorithm. The diversity of natural parallelism existing in such methods can be exploited by taking advantage of heterogeneity of targeted architectures. Fault tolerance and the ability to load balancing should be integral parts of these methods. These characteristics allow the improvement of the performance of applications built on the basis of these methods. In this chapter, we present an asynchronous distributed and parallel Unite and Conquer GMRES/LS-ERAM (UCGLE) method to solve sparse non-Hermitian systems on large platforms. The key feature of UCGLE comparing with the classical hybrid methods using LS polynomial preconditioner \cite{essai1999heterogeneous,he2006hybrid} is its distributed and parallel asynchronous communication and the manager engine implementation among three components, which are specified for the extreme-scale supercomputing platforms. We summarize the UC approach in Section \ref{Unite and Conquer approach}. The theoretical parts of UCGLE are given in Section \ref{Asynchronous Unite and Conquer GMRES/LS-ERAM Method}. In Section \ref{Distributed and Parallel Implementation}, we present the distributed and parallel implementation of UCGLE, including the computing components, the manager engine, and the distributed and parallel asynchronous communications. The experimental results on different supercomputers which evaluate the convergence, the parameters, the scalability, and the fault tolerance are shown in Section \ref{Experiment and Evaluation}.}
 \end{displayquote}
 
 \vspace{0.6in}
 
-\section{Unite and Conquer approach}
+\section{Unite and Conquer approach}\label{Unite and Conquer approach}
 
 In general, Unite and Conquer approach is to make collaborate several iterative methods in order to accelerate the convergence of one of them. It is important to recall that the hybrid methods defined according to this approach are particularly interesting when underlying computing platforms are constituted by parallel and/or distributed heterogeneous components. This approach is a model for the design of numerical methods by combining different computation components together to work for the same objective, with asynchronous communication among them. Unite implies the combination of different calculation components, and conquer represents different components work together to solve one problem. Different independent components with asynchronous communication can be deployed on various platforms such as P2P, cloud and the supercomputer systems. The idea of unite and conquer approach came from the article of Saad \cite{saad1984chebyshev} in 1984, where he suggested using Chebyshev polynomial to accelerate the convergence of Explicitly Restarted Arnoldi Method (ERAM) to solve eigenvalue problems. Brezinski \cite{brezinski1994hybrid} proposed in 1994 an approach for solving a system of linear equations which takes a combination of two arbitrary approximate solutions of two methods. The sprout of this approach comes from \cite{edjlali1996interleaved}, in this paper, Edjlali et al. presented an interleaved parallel hybrid Arnoldi method for a parallel machine and a network of workstations. In 2005, Emad \cite{emad2005multiple} proposed a hybrid approach based on a combination of multiple ERAMs, which showed significant improvement in solving different eigenvalue problems. In 2016, Fender \cite{fender2016leveraging} studied a variant of multiple IRAMs and generated multiple subspaces in a nested fashion in order to dynamically pick the best one inside each restart cycle.
 
@@ -25,21 +25,71 @@ The multiple explicitly restarted Arnoldi method (MERAM) is a technique based up
 	\label{meram-perf}
 \end{figure}
 
-\section{Asynchronous Unite and Conquer GMRES/LS-ERAM Method}
+\section{Iterative Methods based on UC Approach}
 
-In this section, we try to propose a new multi-level parallelism programming paradigm to solve linear systems based on the unite and conquer approach. Thus, firstly Section \ref{Divide of Linear Solvers into Components} divide the preconditioned linear solvers into three components, and then discuss in details the proposed paradigm. In Section \ref{UCGLE}, we give an implementation using this programming model by combining the restarted GMRES with the Least Squares polynomial preconditioner.
+In this section, we analyze the methology to construct iterative methods based on UC approach based on the separation of them into different computational components.
 
-\subsection{Divide of Linear Solvers into Components} \label{Divide of Linear Solvers into Components}
+\subsection{Preconditioning Techniques}
 
-As shown in Chapter \ref{Krylov Subspace Methods}, the convergence of linear solvers can be accelerated: 
+As presented in Section \ref{Preconditioners for GMRES}, if Krylov subspace size $m$ is very large, iterative methods are often restarted after a number of iterations, to avoid enormous memory and computational requirements. One weakness of restarted methods is the lack of numerical robustness, they are likely to suffer from slow convergence for some problems. Different preconditioning techniques are applied to accelerate the convergence.
 
-\begin{enumerate}
-	\item by preconditioning matrix;
-	\item by the deflation of eigenvalues/eigenvectors;
-	\item by the selected polynomials.
-\end{enumerate}
+\subsubsection{Preconditioning by Matrix}
 
-For the first type solver, which is preconditioned by selected matrix, it is difficult to divide the linear solver and preconditioning matrix into two independant computing components with asynchronous communications. As shown by Algorithm \ref{alg:rp-gmres} and \ref{alg:lp-gmres} in Chapter \ref{Krylov Subspace Methods}, the preconditioned matrix $M$ should be left or right multiplied with the operator matrix $A$ for each time projection inside the Arnoldi reduction process, which cannot be explicitly seperated. On the other hand, it is much easier to divide explicitly the deflation and the polynomial preconditioned linear solvers into seperate components. 
+The first alternative is to use the preconditioning matrix $M$, and replace the orginal system by $Mx=b$, which is much easier to be solved. $M$ can be applied to the original systems either by the left, right or split preconditioning. Well-known precondtioners include SOR, Jacobi, AMG (Algebric Multigrid), etc.
+
+\subsubsection{Preconditioning by Deflation}
+
+It is not always true, but the convergence of Krylov subspace methods for solving linear systems, depends on the distribution of eigenvalues. The removing or deflation of small eigenvalues might greatly improve the convergence performance. Hence deflated preconditioners should be constructed for each cycle of restart. The small eigenvalues can be explicitly or implicitly deflated. The former uses the approximated Ritz pairs from $H_m$ to construct new restart residual vectors for linear solvers; the latter implicitly deflats these eigenvalues by special operations on $H_m$ and $V_m$ \cite{erhel1996restarted,burrage1998deflation,morgan2002gmres}. For example, a deflated GMRES introduced in \cite{morgan2002gmres}, firstly it approximates $k$ smallest eigenpairs of $H_m+\beta H_m^{-T}e_me_m^T$, secondly these eigenpairs are used to construct new $H_m$ and $V_m$ with the implicit deflation of these smallest eigenvalues.
+
+The iterative methods for solving eigenvalue problems, can be explicitly deflated by the Ritz values and vectors approximated through previous Arnoldi reduction procedures. The Explicitly Restarted Arnoldi Method (ERAM) uses the Ritz pairs to construct a new restart vector, which can deflat the gotten eigenvalues and accelerate the convergence. Two well-known implicitly  deflated Krylov subspace methods for eigenvalue problems are the Implicitly Restarted Arnoldi Method (IRAM) \cite{sorensen1997implicitly} and Krylov-Schur method \cite{stewart2002krylov}, which remove implicitly the unwanted eigenvalues by QR factorization and Krylov-Schur decomposition, respectively.
+
+\subsubsection{Preconditioning by Polynomial}
+
+In order to approximate an solution of linear system (\ref{ax=b1}), one approach is to get the inverse of $A$, denote it as $A^{-1}$, and then an approximate solution can be easily obtained as $\tilde{x}=A^{-1}b$. $\tilde{x}$ can be applied as a new  residual vector for subsequent restart, that is the polynomial precondtioning for linear solvers. In details, the cycle step of iterative methods is able to construct a Hessemberg matrix $H_m$ by the Arnoldi reduction. Then selected number of dominant eigenvalues are approximated from $H_m$. The preconditioning step is to get the best polynomial $p_k$ by these egeinvalues, and $p_k$ is used to generate a new  $\tilde{x}$ for the next time restart of iterative methods.
+
+The idea of polynomial preconditioning for the iterative solvers of eigenvalue problems is similar with the one for linear systems. In details, a selected polynomial $p_k$ is able to constructed by the $r$ unwanted eigenvalues and new gotten Ritz values from previous Arnoldi reduction, and the operator $A$ can be replaced by $B_k=p_k(A)$. This polynomial is able to amplify the $r$ wanted eigenvalues of $A$ into $r$ eigenvalues of $B_k$ with much larger normal comparing with other remaining eigenvalues, which will get much faster convergence. The eigenvalues of $A$ can be obtained from the ones of $B_k$ by a Galerkin projection. The polynomial $p_k$ can be formulated either by the Chebyshev basic with the best ellipse constructed by the unwanted eigenvalues\cite{saad1987least}, or by the refinement of a polygon with these unwanted eigenvalues \cite{manteuffel1977tchebychev}.
+
+\subsubsection{Preconditioning by Shift-Invert}
+
+Classic Krylov method is able to approximate the dominant eigenvalues. If the wanted values are not dominant, it is necessary to enlarge the Krylov subspace size, which requires larger memory and computational operations. One of the most effective techniques for solving such problems is to iterate with the shifted and inverted matrix $(A-\sigma I)^{-1}$. The eigenvalues approximated by this new operator are the ones around the given shift $\sigma$. Different fractions of eigenvalues can be efficiently calculated by changing $\sigma$.
+
+\subsection{Analysis}
+
+TABLE \ref{eigeninfor} summarizes the required information for the deflated, polynomial and Shift-Invert preconditioners of linear and eigen solvers. For the explicit deflation of iterative methods, the Ritz pair obtained from $H_m$ are used to perform the preconditioning. The explicitly deflated solvers use directly the Hessemberg matrix $H_m$ and orthonormal basis of Krylov subspace $V_m$ to accelerate the convergence. The polynomial preconditioners for solving linear systems use the dominant eigenvalues approximated from $H_m$ to construct the best polynomial, and the unwanted Ritz values to formulate the preconditioning polynomial for solving eigenvalue problems. A special Shift-Invert preconditioner for eigenvalue problems is able to quickly approximate different parts of eigenvalues by selecting different shift value $\sigma$. The preconditioners implemented based on matrices is not listed in TABLE \ref{eigeninfor}.
+
+\begin{table}[htbp]
+	\renewcommand{\arraystretch}{1.4}
+	\normalsize
+	\caption{Information used by preconditioners to accelerate the convergence.}
+	\centering
+	\begin{tabular}{c|c|c}
+		\toprule
+		\cellcolor{gray!50}\diagbox{Precond}{Info}{Solver} & \cellcolor{gray!50}Linear Solver & \cellcolor{gray!50}Eigen Solver \\
+		\midrule
+		Explicit Deflation  &Ritz values and vectors& Ritz values and vectors \\
+		\cellcolor{gray!20}Implicit Deflation  &\cellcolor{gray!20}	$H_m$ and $V_m$& \cellcolor{gray!20}$H_m$ and $V_m$ \\
+		polynomial &Dominant Ritz values &unwanted Ritz values  \\
+		\cellcolor{gray!20}Shift-Invert & \cellcolor{gray!20}\textcolor{red}{$\times$} &  \cellcolor{gray!20}shift value $\sigma$   \\
+		\bottomrule
+	\end{tabular}
+	\label{eigeninfor}
+\end{table}
+
+\subsection{Separation of Components}
+
+As presented in Section \ref{Toward Extreme Computing, Some Correlated Goals}, iterative methods for solving linear systems and eigenvalue problems on extreme-scale platforms should be modified and optimized with the minimization of global communications, reduction of synchronization points and promotion of asynchronous communications. Research in recent years concentrates more on the optimization of different parts inside iterative methods, e.g. the communication avoiding techniques for linear algebra operations \cite{hoemmen2010communication, carson2015communication} and pipelined strategies for Krylov methods \cite{morgan2016stochastic, cools2017communication}. Modern supercomputers can be seen as special Grid computers, and it is necessary to divide the iterative methods into different components according to their functionalities. These components should be implemented with asychronous communications, and controlled by a manager engine. That is the motivation for us to propose this multilevel paradigm for iterative methods.
+
+\subsubsection{Mechanism of Separation}
+
+Based on TABLE \ref{eigeninfor}, the mechanism to separate the numerical methods into different computation components is proposed. For the deflation and polynomial preconditioned iterative methods, the important information for the preconditioning are either $H_m$ and $V_m$ or the Ritz pairs obtained from $H_m$ and $V_m$.  Immediately, they can be divided into two parts: the solving and preconditioning parts. Moreover, a supplementary computational component should also be provided which is able to generate the information used by the preconditioners. Finally, these algorithms can be divided into three kinds of computation components:
+
+\begin{itemize}
+	\item \textit{Iterative Solver Component} for solving problems;
+	\item \textit{Precond-Information Generation Component} to generate the data for the preconditioning process;
+	\item \textit{Preconditioning Pretreatment Component} to generate the preconditioned parameters for the solvers.
+\end{itemize}
+
+Fig. \ref{fig:cyclic} gives a cyclic relation of the proposed three components for the deflation and the polynomial preconditioned methods, which communicate with each other by asynchronous communications. Various exisiting algorithms can be transformed into the three type of components, e.g. for the polynomial preconditioned solver for linear systems, three types of computation components are: 1) an iterative method to solve the systems, 2) an eigen-solver to approximate the dominant eigenvalues, 3) an preconditioning pretreatment component to generate the preconditioning parameters; and for the deflation preconditioned eigen solvers: 1) an eigen-solver to solve the problems; 2) another eigen-solver with different parameters (e.g. the Krylov subspace size, the shift value) to generate the information for preconditioning, such as $H_m$ and $V_m$ for the implicit deflation and Ritz pairs for the explicit deflation; 3) best preconditioning information can be selected by the pretreatment component using the information of previous two components (e.g. for explicit deflation, the best information can be the combination of Ritz vectors from different components), and better performance can be obtained compared with conventional deflated iterative methods.
 
 \begin{figure}[htbp]
 	\centering
@@ -48,27 +98,44 @@ For the first type solver, which is preconditioned by selected matrix, it is dif
 	\label{fig:cyclic}
 \end{figure}
 
-Algorithm \ref{alg:gmres-dr} in \ref{Krylov Subspace Methods} gives an example of deflation preconditioned restarted GMRES. Denote the restart Krylov suspace of this algorithm is $m$, the first cyle of GMRES-DR is the standard Arnoldi reduction which generates $V_{m+1}$ and $\overline{H}_m$. Then the $k$ smallest eigenpairs of $Hm+\beta H_m^{-T}e_me_m^T$ can be approximated, and these eigenpairs are used to construct new $H$ and $V$ with the deflation of these smallest eigenvalues. This solver can be divided into two parts, the first part is a basic restarted GMRES, and the second part is a deflation operations which use the eigenpairs to generate new $H$ and $V$. It is similiar for the hybrid linear solvers preconditioned by the selected polynomial. As shown by Algorithm \ref{alg:hybrid-gmres} which gives a general prototype for the polynomial GMRES. The cycle step of polynomial preconditioned GMRES is also a standard Arnoldi reduction which construct a Hessemberg matrix $H_m$, then selected number of dominant eigenvalues are approximated from $H_m$. The preconditioning step is to refine a polygon from these eigenvalues and get best polynomial $p_k$, $p_k$ is used to generate a new $x_m$ which is used as a new restart vector for the next restarting of GMRES. By analyzing the deflation and polynomial preconditioned linear solvers, it is clear the information used to accelerate are the eigenpairs: for the former, the eigenvalues and eigenvectors of a dense matrix of dimension $m$ related to $H_m$, and then generated new $H$ and $V$; for the latter, the dominant eigenvalues approximated from $H_m$ are used to generate a new restarted vector. In summary, the important information for the preconditioning are the eigenpairs related to $H_m$.  When the solving part and preconditioning part of linear solvers are divided into two computing components, a third computing component should also be provided which is able to generate the eigenpairs. In summary, a new programming paradigm for solving linear systems can be proposed with three kinds of computing components:
+For the shift-invert preconditioned eigen-solvers, they can be divided into several similar solvers with different shift value $\sigma$. These components can be tickly restarted with much smaller Krylov subspace size to approximate a small fraction of wanted eigenvalues, the total wanted ones can be the combination of different components. This is similar with the spectrum slicing strategies for restarted Lanczos methods introduced by Campos et al \cite{campos2012strategies}.
+
+For the matrix preconditioned methods, it is difficult to divide the solver and preconditioning matrix into two independant components with asynchronous communications, since the preconditioned matrix $M$ should be left or right multiplied with the operator $A$ for each time projection inside the Arnoldi reduction process, which cannot be explicitly separated. 
+
+\subsubsection{Distributed and Parallel Implementation of Components}
+
+With the separation of preconditioned iterative methods into different computational components, they can be implemented in a distributed manner. These different components communicate with others by asynchronous communications. They can concentrate on their propre tasks indepentantly from other components unless the necessary are asynchronously received from others. The synchronization points for the preconditioning can be covered, and the fault tolerance can be signficantly improved. As we said, recent research works more the optimization on the linear algebra operations inside iterative methods. separation of components makes it easier to profit these optmized implementation, which can improve the parallel performance inside each computational component.
+
+\subsubsection{Benefits of separating Components}
+
+The separation of components and the implementation with asynchronous communication introduce both numeical and parallel benefits for iterative methods.
 
 \begin{itemize}
-	\item \textit{Linear Solver Component} to solve linear systems by standard iterative methods;
-	\item \textit{Eigen-Information Component} to generate eigenpairs for the preconditioning process;
-	\item \textit{Preconditioning Component} to generate the preconditioned parameters for the Linear Solver Component.
+	\item \textit{Numerical benefits}: for the conventional deflation and polynomial preconditioned methods, the information used are obtained from previous Arnoldi reduction, it might be difficult to explore much larger subspace, hence the convergence might be slowed down. For the methods implemented with the proposed paradigm, the solving part and the preconditioning part are independant, thus for the latter, much larger Krylov subspace or other parameters can be set, which introduce a different Arnoldi reduction procedure for the solver, and the limitation of spectral information by restarting can be broke down by enlarging the deflation/search space, and much faster convergence might be obtained. The numerical benefits for linear and eigen solver are already respectively discussed in \cite{Wu:2018:DPA:3149457.3154481} and \cite{emad2005multiple}.
+	
+	\item \textit{Parallel benefits}: parallel performance of iterative can be improved by the promotion of asynchronization and reduction of synchronizations and global communications.
 \end{itemize}
 
-Fig. \ref{fig:cyclic} gives a cyclic relation of \textit{Linear Solver Component}, \textit{Eigen-Information Component} and \textit{Preconditioning Component} for the proposed new multi-level programming paradiagm for the deflation and the polynomial preconditioning based on the \textit{Unite and Conquer approach}.
+\section{Asynchronous Unite and Conquer GMRES/LS-ERAM Method}\label{Asynchronous Unite and Conquer GMRES/LS-ERAM Method}
 
-This proposed paradigm is able to accelerate the convergence by the Least Squares polynomial preconditioning, to minimize the number of communications, promote the asynchronisity and reduce the synchronize points by seperation of the preconditioning part and solving part.
+In this section, we try to propose a new multi-level parallelism programming paradigm to solve linear systems based on the unite and conquer approach. Thus, firstly Section \ref{Divide of Linear Solvers into Components} divide the preconditioned linear solvers into three components, and then discuss in details the proposed paradigm. In Section \ref{UCGLE}, we give an implementation using this programming model by combining the restarted GMRES with the Least Squares polynomial preconditioner.
 
-This linear solvers based on this novel paradigm are the distributed parallel methods which can profit both shared memory and distributed memory of computational architectures. This new paradigm has two levels of parallelism for distributed memory:
+We present the separation of components in this example.
 
-\begin{enumerate}
-	\item Coarse Grain/Component level: this paradigm allows the distribution of different numerical components, including the preconditioning part (LS and ERAM) and the solving part (GMRES) on different platforms or processors;
-	\item Medium Grain/Intra-component level: the linear solver and Eigen-Information components both deployed in parallel on distributed memory systems;
-	\item Fine/Thread level for shared memory: the OpenMP thread level parallelism in CPU, or the accelerator level parallelism if GPUs or other accelerators are available. 
-\end{enumerate} 
 
-The reusability of linear solvers based on this new paradigm can be improved, since the preconditioning and solving parts are separated, and the information used for the preconditioning can be saved into local files and reused to solve the subsequent linear systems with the same operator matrix and different RHSs. The fault tolerance of these methods can be also controlled with the implementation of an engine which manage the asynchronous communications of vectors, signals and arrays among different computing components. The exact implementation this manager engine will be presented later in Section \ref{Distributed and Parallel Manager Engine Implementation}.
+\subsection{Selection of Components} \label{Divide of Linear Solvers into Components}
+
+\subsubsection{Iterative Solver Component}
+ 
+This component is implemented with restarted Block GMRES (BGMRES) \cite{simoncini1996convergence} to solve non-Hermitian linear systems with multiple RHSs. We develop a block version of Least Squares polynomial method based the previous work of Saad \cite{saad1987least}, which allows to accelerate the convergence of BGMRES.
+
+\subsubsection{Precond-Information Generation Component}
+
+The materials for Least Squares polynomial preconditioner are the dominant eigenvalues, thus this type of component is implemented with shifted Krylov-Schur ($s$-KS) algorithm \cite{stewart2002krylov} to approximate the dominant eigenvalues. Various $s$-KS components are allocated in the same time with thick restart using different shift values $\sigma$ to efficiently compute more eigenvalues and improve the acceleration of Least Squares polynomial.
+
+\subsubsection{Precondtioning Pretreatment Component}
+
+This component is to generate the Least Squares polynomial preconditioning parameters using the approximated eigenvalues by the $s$-KS components. In this paper, it is denoted as LP component.
 
 \subsection{UCGLE Method} \label{UCGLE}
 
@@ -86,7 +153,7 @@ Figure \ref{fig:worflow} gives the workflow of UCGLE method with three computati
 \end{figure}
 
 
-\section{Distributed and Parallel Implementation}
+\section{Distributed and Parallel Implementation}\label{Distributed and Parallel Implementation}
 
 This section gives the distributed and parallel implementation, including the components, the multi-level parallelism, the manager engine, and the asynchronous communications.
 \subsection{Component Implementation}
@@ -290,11 +357,8 @@ In addition to having reimplemented MPI's asynchronous receive mechanism, we int
 
 Indeed, even if we go through the proxy to facilitate communication control, data consistency must be checked before any prior use. For example, take the case of a vector. If a vector is partially received, it can not be used, and if it was the case, we could witness a disaster from a numerical point of view. Also, to avoid this kind of pitfall, we have integrated a validation mechanism that will check that the received data are consistent before they are used. The consistency check is conveniently performed by comparing the total size of the data received by each component node against the size of the data to be received at all. If this is consistent, then the reception buffer data is placed in the working memory of each node of the receiving component.
 
-\subsubsection{Implementation for Hetergeneous Platforms with Multi-GPU}
 
-\textcolor{red}{TO DO}
-
-\section{Experiment and Evaluation}
+\section{Experiment and Evaluation}\label{Experiment and Evaluation}
 
 \subsection{Hardware Platforms}
 
@@ -329,12 +393,12 @@ We test its convergence acceleration, fault tolerance and scalability on the lar
 	\centering
 	\begin{tabular}{c|c|c|c}
 		\toprule
-		Matrix  & Size & $s$ NNZ & $s$ Domain\\
+			\cellcolor{gray!50}Matrix  & 	\cellcolor{gray!50}Size & 	\cellcolor{gray!50}NNZ & 	\cellcolor{gray!50}Domain\\
 		\midrule
 		utm300  & $300$ & $3155$ &$\mathbb{R}$ \\
-		utm1700b & $1700$ & $21509$  & $\mathbb{R}$ \\
+			\cellcolor{gray!20}utm1700b & 	\cellcolor{gray!20}$1700$ & 	\cellcolor{gray!20}$21509$  & 	\cellcolor{gray!20}$\mathbb{R}$ \\
 		pde2961 & $2961$ & $14585$& $\mathbb{R}$ \\
-		young4c & $841$ & $4089$& $\mathbb{C}$ \\
+			\cellcolor{gray!20}young4c & 	\cellcolor{gray!20}$841$ & 	\cellcolor{gray!20}$4089$& 	\cellcolor{gray!20}$\mathbb{C}$ \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -420,7 +484,7 @@ The subspace size is a parameter that can be considered as one of the most impor
 
 We have selected four test matrices generated by SMG2S using different given spectra to evaluate the convergence speedup of UCGLE method. The first test matrix $MEG1$ and the second matrix $MEG2$ are all generated randomly inside an annulus with different scale which is symmetric to the real axis in complex plane. The size of $MEG1$ is \num[round-precision=2,round-mode=figures]{18000000}, and the size of $MEG2$ is \num[round-precision=4,round-mode=figures]{10240000}. The convergence of UCGLE is compared with 1) the restarted GMRES without preconditioning, 2) restarted GMRES with Jacobi preconditioner, 3) restarted GMRES with SOR preconditioner. We select the Jacobi and SOR preconditioners for the experimentations because they are well implemented in parallel by PETSc. The GMRES restarted parameter for $MEG1$, $MEG2$, $MEG3$ and $MEG4$ are respectively 250, 280, 30 and 40.
 
-\begin{figure}[htbp]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=4.2in]{fig/matrix_generator.pdf}
 	\caption{Two strategies of large and sparse matrix generator by a original matrix utm300 of Matrix Market.}
@@ -433,10 +497,10 @@ We have selected four test matrices generated by SMG2S using different given spe
 	\caption{Test matrices information}
 	\label{matget}
 	\centering
-	\begin{tabular}{|c|c|c|c|}
-		\hline
-		Matrix Name& n & nnz & Matrix Type\\
-		\hline
+	\begin{tabular}{x{4cm}|x{3cm}|x{3cm}|x{4cm}}
+		\toprule
+			\cellcolor{gray!50}Matrix Name& 	\cellcolor{gray!50}n & 	\cellcolor{gray!50}nnz & 	\cellcolor{gray!50}Matrix Type\\
+		\midrule
 		$matLine$  & \num[round-precision=2,round-mode=figures]{18000000} & \num[round-precision=2,round-mode=figures]{28823000} & non-Symmetric\\
 		\hline
 		$matBlock$  & \num[round-precision=2,round-mode=figures]{18000000} & \num[round-precision=2,round-mode=figures]{192160000} & non-Symmetric\\
@@ -444,7 +508,7 @@ We have selected four test matrices generated by SMG2S using different given spe
 		$MEG1$ & \num[round-precision=4,round-mode=figures]{10240000} & \num[round-mode = places, scientific-notation = fixed, fixed-exponent = 9,round-precision = 2]{7270272000} & non-Hermitian\\
 		\hline
 		$MEG2$ & \num[round-precision=2,round-mode=figures]{5120000} & \num[round-mode = places, scientific-notation = fixed, fixed-exponent = 9,round-precision = 2]{3635136000} & non-Hermitian\\
-		\hline
+		\bottomrule
 	\end{tabular}
 \end{table}
 
@@ -487,18 +551,20 @@ Fig \ref{fig:conv1}, Fig \ref{fig:conv2}, Fig \ref{fig:conv3} and Fig \ref{fig:c
 	\centering
 	\begin{tabular}{*{7}{c}}
 		\toprule
-		Matrix Name& SOR & Jacobi & No preconditioner & UCGLE\_FT(G) &UCGLE\_FT(G) & UCGLE \\
+		\cellcolor{gray!50}Matrix Name& 	\cellcolor{gray!50}SOR & 	\cellcolor{gray!50}Jacobi & 	\cellcolor{gray!50}No preconditioner & 	\cellcolor{gray!50}UCGLE\_FT(G) &	\cellcolor{gray!50}UCGLE\_FT(G) & 	\cellcolor{gray!50}UCGLE \\
 		\midrule
 		$MEG1$  & 1430 & \textcolor{red}{$\times$} & 1924 & 995 & 1073 & \cellcolor{yellow}900\\
 		
-		$MEG2$  & 2481 & 3579 & 3027 & 2048 & 2005 & \cellcolor{yellow}1646\\
+		\cellcolor{gray!20}$MEG2$  & 	\cellcolor{gray!20}2481 & 	\cellcolor{gray!20}3579 & 	\cellcolor{gray!20}3027 & 	\cellcolor{gray!20}2048 & 	\cellcolor{gray!20}2005 & \cellcolor{yellow}1646\\
 		
 		$MEG3$ & 217 & 386 & 400 & 81 & 347 & \cellcolor{yellow}74\\
 		
-		$MEG4$ & 750 & \textcolor{red}{$\times$} & \textcolor{red}{$\times$} & 82 & \textcolor{red}{$\times$} & \cellcolor{yellow}64\\
+		\cellcolor{gray!20}	$MEG4$ & 	\cellcolor{gray!20}750 & 	\cellcolor{gray!20}\textcolor{red}{$\times$} & 	\cellcolor{gray!20}\textcolor{red}{$\times$} & 	\cellcolor{gray!20}82 & 	\cellcolor{gray!20}\textcolor{red}{$\times$} & \cellcolor{yellow}64\\
 		\bottomrule
 	\end{tabular}
 \end{table*}
+
+\subsection{Impacts of Spectrum on Convergence}
 
 \subsection{Scalability Evaluation}
 
