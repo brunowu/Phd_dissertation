@@ -260,6 +260,8 @@ At the end of this journey, I thank Yuxin for being able to accompany me in the 
 \chapter*{Abstract}
 \thispagestyle{empty}
 
+\nomenclature{CPU}{Central Processing Unit}
+
 \iffalse
 An important application of supercomputers is to solve large-scale linear systems and eigenvalue problems by iterative methods. As the number of cores and heterogeneity of supercomputers increases, time spent in communication will be important comparing with the computation time, hence applications can be seen as a combination of distributed and parallel computing. Effectively solving these problems by iterative methods on large-scale platforms requires multi-levels of parallelism, and can minimize global communication, reduce synchronization, and facilitate asynchronous communication. In this thesis, we develop a distributed and parallel multi-level programming paradigm for iterative methods on High-Performance Computing (HPC) clusters. An implementation of a manager engine and runtime can handle the traffic, fault tolerance, and reusability of this paradigm on homogeneous and heterogeneous clusters. Finally, an example of iterative methods is developed based on this paradigm to simultaneously solve linear systems with multiple Right-hand sides (RHSs). Experiments on supercomputers have demonstrated that the implementation achieves better numerical and parallel performance than conventional methods.
 \fi
@@ -288,6 +290,8 @@ An important application of supercomputers is to solve large-scale linear system
 \listofalgorithms
 \addcontentsline{toc}{chapter}{\listalgorithmname}
 }
+
+\printnomenclature
 
 %\listoflistings
 
