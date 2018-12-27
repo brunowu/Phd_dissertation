@@ -35,7 +35,11 @@
 \usepackage{dirtree} % for directory structure.
 \usepackage{diagbox} 
 %\usepackage[Glenn]{fncychap}  %chapter styles
+\usepackage{mathtools}
 
+\usepackage{amssymb}
+
+\usepackage{textpos}
 
 \usepackage{csquotes}
 
@@ -54,6 +58,9 @@
 
 \usepackage{minitoc} %List sections of chapter at beginning of that chapter
 
+% Create a new environment for breaking code listings across pages.
+\newenvironment{longlisting}{\captionsetup{type=listing}}{}
+
 
 \newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
 \usepackage{makecell}
@@ -64,8 +71,14 @@
 \newtheorem{corollary}{Corollary}[theorem]
 \newtheorem{lemma}[theorem]{Lemma}
 
+\makeatletter
+\newcommand*\bigcdot{\mathpalette\bigcdot@{.5}}
+\newcommand*\bigcdot@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@th#1\bullet$}}}}}
+\makeatother
 
 \usepackage{rotating}
+
+\usepackage{minted}
 
 \usepackage[square,numbers]{natbib}
 %\bibliographystyle{dinat}
@@ -77,6 +90,7 @@
 
 \definecolor{maroon}{rgb}{0.5,0,0}
 \definecolor{darkgreen}{rgb}{0,0.5,0}
+
 \lstdefinelanguage{XML}
 {
 	basicstyle=\ttfamily,
@@ -90,7 +104,13 @@
 	identifierstyle=\color{maroon}
 }
 
-
+\lstset{language=C++,
+	basicstyle=\ttfamily,
+	keywordstyle=\color{blue}\ttfamily,
+	stringstyle=\color{red}\ttfamily,
+	commentstyle=\color{green}\ttfamily,
+	morecomment=[l][\color{magenta}]{\#}
+}
 
 %\renewcommand{\baselinestretch}{1.4}  % distance between two lines
 
@@ -141,7 +161,7 @@
 \renewcommand{\nomname}{List of Symbols}
 \renewcommand{\nompreamble}{The next list describes several symbols that will be later used within the body of the document}
 
-\title{\large \textrm{Contribution \`a l’\'emergence de nouvelles m\'ethodes parall\`eles et reparties intelligentes utilisant un paradigme de programmation multi-niveaux pour le calcul extr\^eme}}
+\title{\Large \textrm{Contribution \`a l’\'emergence de nouvelles m\'ethodes parall\`eles et reparties intelligentes utilisant un paradigme de programmation multi-niveaux pour le calcul extr\^eme}}
 
 %\lesoustitre{Le sous titre est facultatif}
 
@@ -156,7 +176,7 @@
 	&& \\
 	Rapporteurs &  Michel Dayd\'e &- Directeur de l'IRT de Toulouse\\
 	 &   &- Professeur \`a l'ENSEEIHT\\
-	 &Michael Heroux &- Chercheur au Laboratoires National de Sandia \\
+	 &Michael A. Heroux &- Chercheur au Laboratoires National de Sandia \\
 	Examinateurs & Yutong Lu &- Directrice de NSCC-Guangzhou \\
 	&&- Professeur \`a l'Universit\'e de  Sun Yat-Sen\\
  	& Barbara Chapman  &-  Professeur \`a l'Universit\'e de Stony Brook\\
@@ -179,7 +199,7 @@
 \scalelogolabo{0.2}
 
 %\unite{Département d'histoire de la typographie}
-\ecoledoc{École doctorale Sciences Pour l'Ing\'enieur Universit\'e Lille Nord-de-France}
+\ecoledoc{\large École doctorale Sciences Pour l'Ing\'enieur Universit\'e Lille Nord-de-France}
 
 \usepackage{nomencl}
 \makenomenclature
@@ -191,14 +211,25 @@
 \clearemptydoublepage
 \begin{dedication}
 	\normalsize
-	This thesis is dedicated to my grandmother. Hope you can hear in the heaven.
+	%This thesis is dedicated to my grandmother. Hope you can hear in the heaven.
 	
 	\vspace{0.2in}
 	\begin{CJK*}{UTF8}{bsmi}
 		{\CJKfamily{bkai}
 			\large
-			謹以此文獻給我的祖母劉占仙（1929-2015）}
+			謹以此文獻給我的祖母劉占仙（1928-2015）}
 	\end{CJK*}
+
+\iffalse
+\begin{textblock*}{\textwidth}(6cm,4cm)
+	
+	\begin{CJK*}{UTF8}{bsmi}
+		\centerline{{\CJKfamily{bkai}戊戌年 $\bigcdot$小寒}}
+		\centerline{{\CJKfamily{bkai}巴黎城}}
+		\centerline{{\CJKfamily{bkai}歡鵲壘新巢}}
+	\end{CJK*}
+\end{textblock*}
+\fi
 
 \end{dedication}
 
@@ -206,26 +237,32 @@
 
 \chapter*{Acknowledgement}
 \thispagestyle{empty}
-First and foremost I would like to thank my adviser of the dissertation, Serge G. Petiton.
 
+First and foremost I would like to express my gratitude to my advisor of the thesis, Prof. Serge G. Petiton, for the continuous support of my Ph.D study and related research, for his patience, motivation, and immense knowledge. He enlightens me in the field of parallel computing and numerical algorithms. Also, he teaches me in how to do academic research during the three years. I am grateful for his wise guidance and inclusiveness throughout my three years' study. I benefited enormously from him about how to do the research and communicate it in an effective way. I feel so lucky to work under his supervision.
 
-\begin{CJK*}{UTF8}{bsmi}
-	{\CJKfamily{bkai}
-	趙客縵胡纓，吳鉤霜雪明。銀鞍照白馬，颯沓如流星。
-	十步殺一人，千裏不留行。事了拂衣去，深藏身與名。
-	閑過信陵飲，脫劍膝前橫。將炙啖朱亥，持觴勸侯嬴。
-	三杯吐然諾，五嶽倒為輕。眼花耳熱後，意氣素霓生。
-	救趙揮金槌，邯鄲先震驚。千秋二壯士，煊赫大梁城。
-	縱死俠骨香，不慚世上英。誰能書閤下，白首太玄經。}
+I warmly thank Michel Dayd\'e, Professor at ENSEEIHT, and Micheal Heroux, senior scientist at Sandia National Laboratory, who have done me the honor of being the reporters of my thesis. Thank you for your recommendations and your help.
+
+My sincere thanks also goes to the MYX project and CNRS for funding my thesis. I am grateful for the warm welcome shown by the Maison de la Simulation, especially Edouard Audit, for accepting me to study at this laboratory and funding me for several international conferences. I would also thank Val\'erie Belle and all secretary members for helping me with numerous administrative work. I thank all the people I met during these three years for the pleasant atmosphere they were able to install. 
+
+I have been privileged to visit with National Supercomputing Center in Guangzhou. I would like to thank them, especially Prof. Yutong Lu for sharing their knowledge and I have benefited from the fruitful discussion with them.
+
+I would like to thank ROMEO HPC Center, Universit\'e de Reims Champagne-Ardenne. They provide me the access to their supercomputer ROMEO (both 2013 and 2018 versions), which are the major platforms for the experimentation within my dissertation. I appreciate Dr. Arnaud RENARD and his engnieering team for their technique supports.
+
+Special thanks to my lovely friends in Paris for their help and encouragement. I am very thankful to have these friends who enrich my life with great happiness. It is hard to forget the days of drinking Chinese liquor together, which really eased my homesickness.
+
+I also want to thank those who are dear to me. Their attentions and encouragements have accompanied me throughout this journey. I thank my parents for their support and unfailing confidence. Words cannot express how grateful I am to my mother and father for all of the sacrifices that you’ve made on my behalf. Thanks to my sister Kunze for being present at every moment.
 	
-	{\CJKfamily{bkai}男兒生於天地間，當效伊呂管樂，立不世之功，承儒墨道法，創一家之說。}
-\end{CJK*}
+At the end of this journey, I thank Yuxin for being able to accompany me in the best way and to continue to inspire me daily.
 
 
 \clearemptydoublepage
+
 \chapter*{Abstract}
 \thispagestyle{empty}
-The abstract of rapport $\cdots$
+
+\iffalse
+An important application of supercomputers is to solve large-scale linear systems and eigenvalue problems by iterative methods. As the number of cores and heterogeneity of supercomputers increases, time spent in communication will be important comparing with the computation time, hence applications can be seen as a combination of distributed and parallel computing. Effectively solving these problems by iterative methods on large-scale platforms requires multi-levels of parallelism, and can minimize global communication, reduce synchronization, and facilitate asynchronous communication. In this thesis, we develop a distributed and parallel multi-level programming paradigm for iterative methods on High-Performance Computing (HPC) clusters. An implementation of a manager engine and runtime can handle the traffic, fault tolerance, and reusability of this paradigm on homogeneous and heterogeneous clusters. Finally, an example of iterative methods is developed based on this paradigm to simultaneously solve linear systems with multiple Right-hand sides (RHSs). Experiments on supercomputers have demonstrated that the implementation achieves better numerical and parallel performance than conventional methods.
+\fi
 
 \clearemptydoublepage
 
@@ -235,22 +272,25 @@ The abstract of rapport $\cdots$
 
 \frontmatter
 
-{\small \tableofcontents}
+{\tableofcontents}
 
-{\small
+{
 \listoffigures
 \addcontentsline{toc}{chapter}{\listfigurename}
 }
 
-{\small
+{
 \listoftables
 \addcontentsline{toc}{chapter}{\listtablename}
 }
 
-{\small
+{
 \listofalgorithms
 \addcontentsline{toc}{chapter}{\listalgorithmname}
 }
+
+%\listoflistings
+
 
 \mainmatter % Ne pas oublier, avec \frontmatter et \backmatter
 
@@ -271,7 +311,7 @@ The abstract of rapport $\cdots$
 
 \input{Chapter4}
 
-\chapter[Unite and Conquer GMRES/LS-ERAM Method]{Unite and Conquer GMRES/LS-ERAM Method}\label{Unite and Conquer GMRES/LS-ERAM Method}
+\chapter[Unite and Conquer GMRES/LS-ERAM Method (UCGLE)]{Unite and Conquer GMRES/LS-ERAM Method (UCGLE)}\label{Unite and Conquer GMRES/LS-ERAM Method}
 
 \input{Chapter5}
 
@@ -291,18 +331,23 @@ The abstract of rapport $\cdots$
 
 \input{Chapter9}
 
-\chapter{Conclusion and Pespectives} \label{Conclusion and Pespectives}
+\chapter{Conclusion and Perspectives} \label{Conclusion and Pespectives}
 
 \input{Conclusion}
 
 %\tableofcontents
-\chapter*{Scientific Communication}
-\addcontentsline{toc}{chapter}{Scientific Communication}
-
-\input{Communication}
+\clearemptydoublepage
 
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliography{biblio}
+\clearemptydoublepage
+
+\appendix
+\chapter{Scientific Communication}
+%\addcontentsline{toc}{chapter}{Scientific Communication}
+
+\input{Communication}
+
 \clearemptydoublepage
 
 \end{document}

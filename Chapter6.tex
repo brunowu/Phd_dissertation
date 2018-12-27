@@ -1,12 +1,12 @@
 \begin{displayquote}
-	\textsf{Many problems in science and engineering often require to solve a long sequence of large-scale non-Hermitian linear systems with different Right-hand sides (RHSs) but a unique operator. Efficiently solving such problems on extreme-scale platforms requires the minimization of global communications, reduction of synchronization points and promotion of asynchronous communications. Unite and Conquer GMRES/LS-ERAM (UCGLE) method presented in the last chapter is a suitable candidate with the reduction of global communications and the synchronization points of all computing units. In this chapter, we extend both the mathematical model and the implementation of UCGLE method to adapt to solve sequences of linear systems. The eigenvalues obtained in solving previous linear systems by UCGLE can be recycled, improved on the fly and applied to construct a new initial guess vector for subsequent linear systems, which can achieve a continuous acceleration to solve linear systems in sequence. Numerical experiments using different test matrices to solve sequences of linear systems on supercomputer Tianhe-2 indicate a substantial decrease in both computation time and iteration steps when the approximate eigenvalues are recycled to generate the initial guess vectors.}
+	\textsf{Many problems in science and engineering often require to solve a long sequence of large-scale non-Hermitian linear systems with different Right-hand sides (RHSs) but a unique operator. Efficiently solving such problems on extreme-scale platforms requires the minimization of global communications, reduction of synchronization points and promotion of asynchronous communications. UCGLE method presented in the last chapter is a suitable candidate with the reduction of global communications and the synchronization points of all computing units. In this chapter, we extend both the mathematical model and the implementation of UCGLE method to adapt to solve sequences of linear systems. The eigenvalues obtained in solving previous linear systems by UCGLE can be recycled, improved on the fly and applied to construct a new initial guess vector for subsequent linear systems, which can achieve a continuous acceleration to solve linear systems in sequence. Numerical experiments using different test matrices to solve sequences of linear systems on supercomputer Tianhe-2 indicate a substantial decrease in both computation time and iteration steps when the approximate eigenvalues are recycled to generate the initial guess vectors.}
 \end{displayquote}
  
 \vspace{0.6in}
 
 \section{Demand to Solve Linear Systems in Sequence}
 
-We consider the solution of a long sequence of general linear systems 
+We consider to solve a long sequence of general linear systems 
 
 \begin{equation}
 Ax^{(i)}=b^{(i)}, i=1,2,\cdots
@@ -14,9 +14,9 @@ Ax^{(i)}=b^{(i)}, i=1,2,\cdots
 
 where $A \in \mathbf{C}^{n\times n}$ is a fixed matrix, and the right-hand side $b^{i} \in \mathbf{C}^n$ which changes from one system to another. Moreover, these systems are typically not available simultaneously. Many scientific applications require the resolution this kind of sequent linear systems, such as the finite element analysis in modeling fatigue \cite{newman1976finite, gullerud2001mpi,sukumar2003extended}, diffuse optical tomography \cite{kilmer2006recycling,arridge1993finite,schweiger1995finite}, electromagnetic \cite{bastos2003electromagnetic,pridmore1981investigation, ye2008generalized} and wave-propagation for the earthquake simulation \cite{Fujita:2018:WPS:3149457.3149474,moczo2007finite,chen2015transient}, etc. Generally, these systems are formatted by the time-dependent applications, where the operator matrix $A$ keeps the same, but the right-hand side $b^{(i)}$ cannot be gotten in the same time. In many fields, the next right-hand side of the linear system depends on the previous solution. Thus only one linear system is available at a time. Another application of these sequent linear systems are the Newton methods for solving nonlinear equations (e.g., \cite{brown1990hybrid,knoll2004jacobian,bellavia2001globally,flueck1998solving,an2007globally}). 
 
-If the direct solvers are applicable, their decompositions can be shared and reused for the successive linear systems by the forward/backward solves. When the matrix has a large dimension or special sparsity pattern, and the direct solvers are not applicable, then the iterative methods based on Krylov subspace, such as CG (Conjugate Gradient) method \cite{kershaw1978incomplete} for symmetric systems, and GMRES (Generalized minimal residual ) method \cite{saad1986gmres} for non-Hermitian systems, are considerable. Obviously, this naive implementation is not efficient enough, since the sequence of linear systems shares the same matrix $A$. The intermediate information computed from the previous system's solution can be reused to speed up the solution of the next systems. There are already several methods proposed to take advantage of this temporary information in order to speed up resolving the sequences of linear systems. The first approach is to use the seed methods (e.g., \cite{saad1987lanczos,papadrakakis1990new,smith1989conjugate,gu2002seed,simoncini1995iterative,abdel2014improved}). This method selects one seed system and solve it by the Krylov iterative method, and then a Galerkin projection of the other right-hand sides is performed onto the Krylov subspace generated by the seed system. It is efficient since the Krylov subspace generated by the previous time resolution develops a good approximation to the eigenvectors of small eigenvalues of $A$, and the projection of the other right-hand sides over this subspace can remove the components of their residual vectors in the directions these eigenvectors. The seed method requires more memory space to store the subspace of seed systems. The speedup cannot always be guaranteed for the uncorrelated right-hand sides.  It can also be inefficient for the restarted methods, in this case, even the convergence of resolving the seed systems maybe stagne. Another approach is to improve the convergence for a sequence of linear systems by the process of Krylov Subspace Recycling (e.g. \cite{parks2006recycling,jolivet2016block,kilmer2006recycling,ye2008generalized}). For example, by recycling the Krylov subspace generated by previous resolution, the method GCRO-DR (Generalized Conjugate Residual method with inner Orthogonalization
-and Deflated Restarting) proposed by M.L. Parks \cite{parks2006recycling} allows to speed up the solution of systems from one right-hand side to another or even between two times restart of iterative methods through the maintain of the Arnoldi subspace orthogonalization and the deflation of smallest eigenvalues. Additionally, Block iterative methods are a popular way to solve systems with multiple-right hands (e.g., \cite{simoncini1995iterative,calvetti1994application, baker2006improving,gutknecht2006block}), but the different right-hand sides should simultaneously known, which is not the exact case talked in this paper. 
+If the direct solvers are applicable, their decompositions can be shared and reused for the successive linear systems by the forward/backward solves. When the matrix has a large dimension or special sparsity pattern, and the direct solvers are not applicable, then the iterative methods based on Krylov subspace, such as CG (Conjugate Gradient) method \cite{kershaw1978incomplete} for symmetric systems, and GMRES (Generalized minimal residual ) method \cite{saad1986gmres} for non-Hermitian systems, are considerable. Obviously, this naive implementation is not efficient enough, since the sequence of linear systems shares the same matrix $A$. The intermediate information computed from the previous system's solution can be reused to speed up the solution of the next systems. There are already several methods proposed to take advantage of this temporary information in order to speed up resolving the sequences of linear systems. The first approach is to use the seed methods (e.g., \cite{saad1987lanczos,papadrakakis1990new,smith1989conjugate,gu2002seed,simoncini1995iterative,abdel2014improved}). This method selects one seed system and solve it by the Krylov iterative method, and then a Galerkin projection of the other right-hand sides is performed onto the Krylov subspace generated by the seed system. It is efficient since the Krylov subspace generated by the previous time resolution develops a good approximation to the eigenvectors of small eigenvalues of $A$, and the projection of the other right-hand sides over this subspace can remove the components of their residual vectors in the directions these eigenvectors. The seed method requires more memory space to store the subspace of seed systems. The speedup cannot always be guaranteed for the uncorrelated right-hand sides.  It can also be inefficient for the restarted methods, in this case, even the convergence of resolving the seed systems maybe stagne. Another approach is to improve the convergence for a sequence of linear systems by the process of Krylov Subspace Recycling (e.g. \cite{parks2006recycling,jolivet2016block,kilmer2006recycling,ye2008generalized}). For example, by recycling the Krylov subspace generated by previous resolution, the method GCRO-DR (Generalized Conjugate Residual method with inner Orthogonalization and Deflated Restarting) proposed by M.L. Parks \cite{parks2006recycling} allows to speed up the solution of systems from one right-hand side to another or even between two times restart of iterative methods through the maintain of the Arnoldi subspace orthogonalization and the deflation of smallest eigenvalues. Additionally, Block iterative methods are a popular way to solve systems with multiple-right hands (e.g., \cite{simoncini1995iterative,calvetti1994application, baker2006improving,gutknecht2006block}), but the different right-hand sides should simultaneously known, which is not the exact case talked in this paper. 
 
+\iffalse
 \section{Existing Methods and Analysis}
 \subsection{Seeds Method}
 
@@ -34,27 +34,103 @@ Algorithm \ref{alg:seed_gmres} gives one kind of implementation of seeds method.
 		\State For each RHS $l$ that has not converged, set $r_0^{(l)}=r_n^{(l)}$. Choose a vector to run a cycle of GMRES. Traditionaly we take the first $l$ in the list $k, k+1, \cdots p$, so that the system $l$ has not converged and go to step $2$. 
 	\end{algorithmic}  
 \end{algorithm}
+\fi
 
-\subsection{Krylov Subspace Recycling Methods}
+\section{Krylov Subspace Recycling Method - GCR-DO}
 
-\textcolor{red}{This section gives an example as GCR-DO, anaylze the synchronization points, etc.}
+In this section, we give an example of Krylov subspace recycling method proposed by Parks et al. \cite{parks2006recycling} to solve sequences of linear systems. This method is called GCRO-DR which is a combination of GMRES-DR and GCRO \cite{de1996nested}. The pseudocode of GCRO-DR is given as Algorithm \ref{alg:gcrdo}. When solving a single linear system, GCRO-DR and GMRES-DR are algebraically equivalent. The primary advantage of GCRO-DR is its capability for solving sequences of linear systems.
 
-The workflow of GCR-DO is given in Fig. \ref{fig:gcrdo}.
+The \textit{Krylov Subspace Recycling} methods are proposed for the solution of sequences of general matrices, and do not assume that all matrices are pairwise close or that the sequence of matrices converges to a particular matrix. The recyling techniques are effective under these assumptions that: 
+\begin{enumerate}[label=(\arabic*)]
+	\item  the method must be able to identify and converge to an effective subspace for recycling (the recycle space) in a reasonable number of iterations, it must be able to converge to an effective recycle space over the solution of multiple linear systems. Otherwise, a good recycle space may never be found for a sequence of changing matrices;
+	\item for efficiency a significant convergence improvement for the linear solver must be obtained with a relatively small recycle space;
+	\item the method must be able to converge quickly to an effective perturbed recycle space for an updated matrix, and it must provide an inexpensive mechanism for regularly updating the recycle space to reflect the changes in the linear systems.
+\end{enumerate}
+
+The workflow of GCR-DO (shown as \ref{fig:gcrdo}) for solving sequences of linear systems by recycling the Krylov subspaces  is: 
+\begin{enumerate}[label=(\arabic*)]
+	\item Perform $m$ steps of Arnoldi reduction in parallel, and generate the subspace $V_{m+1}$ and Hessenberg matrix $\underline{H}_m$; 
+	\item Solve the least squares problem $||c-\underline{H}_my||_2$ in sequence; 
+	\item solve the eigenvalue problem $(H_m+h^2_{m+1,m}H_{m}^{-H}e_me_m^H)z_{\lambda}=\theta_{\lambda}z_{\lambda}$ in sequence; 
+	\item perform the reduced QR factorization in sequence; 
+	\item compute $U_k$, $V_{m+1}$, $W_{m+1}$ and $\underline{G}_m$ in parallel; 
+	\item solve the least squares problem $||W^H_{m+1}r_{i-1}-\underline{G}_my||_2$ and perform the reduced factorization in sequence; 
+	\item for the next iteration until the convergence; 
+	\item for the subsequent systems, the first step is recycing the matrices $C_k$ and $U_k$ in parallel, and then perform the iterations until the convergence.
+\end{enumerate}
+
+\begin{algorithm}[htbp]{}
+	\caption{GCRO-DR algorithm \cite{parks2006recycling}}   
+	\label{alg:gcrdo}   
+	\begin{algorithmic}[1]
+		\State Choose $m$, the maximum size of the subspace, and $k$, the desired number of approximate eigenvectors. Let $tol$ be tge convergence tolerance. Choose an initial guess $x_0$. 
+		\State $r_0=b-Ax_0$
+		\State set $i=1$
+		\If {$U_k$ is defined from solving previous systems}
+			\If {$A_i \neq A_{i-1}$}
+				\State $[Q,R]=\text{distributed qr}(A_iU_k)$
+				\State $C_k=Q$
+				\State $U_k=U_kR^{-1}$ 	
+			\EndIf
+			\State $x_1=x_0+U_kC_k^Hr_0$
+			\State $r_1=r_0-C_kC_k^Hr_0$
+		\Else
+			\State $v_1=r_0/||r_0||_2$
+			\State $c=||r_0||_2e_1$
+			\State $\text{$m$ steps of GMRES, solving min } ||c-\underline{H}_my||_2$ for $y$ and generating $V_{m+1}$ and ${H}_m$.
+			\State $x_1=x_0+V_my$
+			\State $r_1=V_{m+1}(c-\underline{H}_my)$
+			\State solve $(H_m+h^2_{m+1,m}H_{m}^{-H}e_me_m^H)z_{\lambda}=\theta_{\lambda}z_{\lambda}$
+			\State store the $k$ eigenvectors $z_{\lambda}$ associated to the smallest eigenvalues in magnitude in $P_k$
+			\State $[Q,R]=\text{qr}(\underline{H_m}P_k)$
+			\State $C_k=V_{m+1}Q$
+			\State $U_k=V_mP_kR^{-1}$
+		\EndIf
+		
+		\While{not converge}
+			\State $i+=1$
+			\State $\text{Perform m-k steps of GMRES with}$ $(I-C_kC_k^H)A_i$, $\text{, thus generating} V_{m+1-k}$, $\underline{H}_{m-k}$ and $B_{m-k}$ and letting $v_i=r_{i-1}/||r_{i-1}||_2$.
+			\State let $D_k$ be a diagobal scaling matrix such that $U_k=U_kD_k$ with the columns having unit norm.
+			\State $V_m=[U_k \quad V_{m-k}]$.
+			\State $W_{m+1}=[C_k \quad V_{m-k+1}]$.
+			\State $\underline{G}_m=\begin{bmatrix}
+			\,
+			D_k \quad B_{m-k}
+			\\[2\jot]
+			\hfill 0 \quad \underline{H}_{m-k}
+			\,
+			\end{bmatrix}$
+			\State find $y$ such that min $||W^H_{m+1}r_{i-1}-\underline{G}_my||_2$
+			\State $x_i=x_{i-1}+V_my$
+			\State $r_i=r_{i-1}-W_{m+1}\underline{G}_my$
+			\State $R_j=B_i-A_iX_j$
+			\If{$A_i \neq A_{i-1}$}
+				\State Compute the k eigenvectors $z_i$ of $\underline{G}_m^H\underline{G}_mz_i=\theta_i\underline{G}_m^HW_{m+1}^HV_mz_i$ associated with smallest magnitude eigenvalues $\theta_i$ and store in $P_k$
+				\State $Y_m=V_mP_k$
+				\State $[Q,R]=\text{qr}(\underline{\underline{G}_m}P_k)$
+				\State $C_k=W_{m+1}Q$
+				\State $U_k=Y_kR^{-1}$
+			\EndIf
+		\EndWhile
+		\State let $Y_k=U_k$ for the next system.
+	\end{algorithmic}  
+\end{algorithm}
+
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=5.in]{fig/gcrdo.pdf}
+	\includegraphics[width=0.9\linewidth]{fig/gcrdo.pdf}
 	\caption{GCR-DO workflow.}
 	\label{fig:gcrdo}
 \end{figure}
 
-\subsection{Challenges of Exising Methods}
+GCR-DO is a useful itertive methods to solve sequences of linear systems with acceleration by recycling the Krylov subspace. The only limitation of the different synchronization points introduced by the processus of recycling. For the implementation of iterative methods on large-scale platforms, these synchronization points should be avoided.
+%\subsection{Challenges of Exising Methods}
 
-\textcolor{red}{TO DO}
 
 \section{UCGLE method for Linear Systems with Sequent Right-hand-sides}
 
-In this section, we introduce another point of view to solve sequences of non-Hermitian linear systems for modern computer architectures, based on UCGLE method. Inside of UCGLE, the dominant eigenvalues are used to accelerate the convergence of iterative methods. The more the eigenvalues are calculated, the more accurate these values are, the more significant the acceleration will be. When using UCGLE to solve the sequences of linear systems, the eigenvalues computed during the previous resolution can be reused, and sometimes improved, to resolve the following sequences of different linear systems. Theoretically, the continuous amelioration of convergence for the rest of the linear systems can be achieved. Moreover, the eigenvalues computed from the previous resolution can be used to construct an approximative solution by LS method and serve as an initial guess vector to speedup up the next time resolution.
+In this section, we introduce another point of view to solve sequences of non-Hermitian linear systems for modern computer architectures, based on UCGLE method. Inside of UCGLE, the dominant eigenvalues are used to accelerate the convergence of iterative methods. The more the eigenvalues are calculated, the more accurate these values are, the more significant the acceleration will be. When using UCGLE to solve the sequences of linear systems, the eigenvalues computed during the previously solving of linear systems can be reused, and sometimes improved, to resolve the following sequences of different linear systems. Theoretically, the continuous amelioration of convergence for the rest of the linear systems can be achieved. Moreover, the eigenvalues computed from the previously linear systems can be used to construct an approximative solution for the subsequent linear systems by LS method and serve as an initial guess vector to speedup up the next time resolution.
 
 \subsection{Relation between LS Residual and Dominant Eigenvalues}
 
@@ -65,18 +141,20 @@ Suppose that the computed convex hull by Least Squares contains eigenvalues $\la
 r = \sum_{i=1}^{k}\rho_i (R_d(\lambda_i))^l u_i + \sum_{i=m+1}^{n}\rho_i (R_d(\lambda_i))^l u_i,
 \end{equation}
 
-this residual can be divided into two parts. The first part is formulated with the first known $m$ eigenvalues which are used to computed the convex hull by LS Component, the second part represents the residual with unknown eigenpairs.
+this residual can be divided into two parts. The first part is formulated with the first known $m$ eigenvalues which are used to compute the convex hull by LS Component. The second part represents the residual with unknown eigenpairs.
 
-\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=6.2in]{fig/conv2.eps}
-	\caption{Convergence comparison of UCGLE method vs classic GMRES.}
-	\label{fig:convg}
-\end{figure}
-
-In practice, for each time preconditioning by LS polynomial method, it is often repeated for several times to improve its acceleration of convergence, that is the meaning of parameter $l$ in Equation (\ref{rnk3}). The LS polynomial preconditioning applies $r_d$ as a deflation vector for each time GMRES restart process. Fig. \ref{fig:conv} gives the comparison between classic GMRES and UCGLE with different values for the parameter $l$. As shown in this figure, the first part in Equation (\ref{rnk3}) is small since the LS method finds $R_d$ minimizing $|R_d(\lambda)|$ in the convex hull, but not with the second part, where the residual will be rich in the eigenvectors associated with the eigenvalues outside $H_k$. As the number of approximated eigenvalues $k$ increasing, the first part will be much closer to zero, but the second part keeps still large. This results in an enormous increase of restarted GMRES preconditioned vector norm. Meanwhile, when GMRES restarts with the combination of a number of eigenvectors, the convergence will be faster even if the residual is enormous, and the convergence of GMRES can still be significantly accelerated. The peaks are shown in Fig. \ref{fig:convg} for each time restart of UCGLE represent these enormous residuals. The $l$ times repeat of $r_d$ before applying to next time restart can still enlarge its norm, and the selection of $l$ is important for the acceleration. In the example of Fig. \ref{fig:convg}, we conclude that if $l$ is too large, the norm trends enormous, which slows down the speedup, if $l$ is small, the acceleration may not be evident. In some situation, the preconditioned residual may be too large, and it results that GMRES cannot converge enough before the next restart. Hence the LS preconditioning can be applied each $L$ times of GMRES restart, and the best $l$ should be found.
+In practice, for each time preconditioning by LS polynomial method, it is often repeated for several times to improve its acceleration of convergence, that is the meaning of parameter $l$ in Equation (\ref{rnk3}). The LS polynomial preconditioning applies $r_d$ as a deflation vector for each time GMRES restart process. Fig. \ref{fig:lsdegree} in Section \ref{Experiment and Evaluation} gives the comparison between classic GMRES and UCGLE with different values for the parameter $l$. As shown in this figure, the first part in Equation (\ref{rnk3}) is small since the LS method finds $R_d$ minimizing $|R_d(\lambda)|$ in the convex hull, but not with the second part, where the residual will be rich in the eigenvectors associated with the eigenvalues outside $H_k$. As the number of approximated eigenvalues $k$ increasing, the first part will be much closer to zero, but the second part keeps still large. This results in an enormous increase of restarted GMRES preconditioned vector norm. Meanwhile, when GMRES restarts with the combination of a number of eigenvectors, the convergence will be faster even if the residual is enormous, and the convergence of GMRES can still be significantly accelerated. The peaks are shown in Fig. \ref{fig:lsdegree} for each time restart of UCGLE represent these enormous residuals. The $l$ times repeat of $r_d$ before applying to next time restart can still enlarge its norm, and the selection of $l$ is important for the acceleration. In the example of Fig. \ref{fig:lsdegree}, we conclude that if $l$ is too large, the norm trends enormous, which slows down the speedup, if $l$ is small, the acceleration may not be evident. In some situation, the preconditioned residual may be too large, and it results that GMRES cannot converge enough before the next restart. Hence the LS preconditioning can be applied each $L$ times of GMRES restart, and the best $l$ should be found.
 
 \subsection {Eigenvalues Recycling to Solve Linear Systems in Sequence}
+
+Suppose that the computed convex hull by Least Squares contains eigenvalues $\lambda_1,\cdots, \lambda_m$, the residual given by Least Squares polynomial of degree $d-1$ is
+
+\begin{equation}
+\label{rnk3}
+r = \sum_{i=1}^{k}\rho_i (R_d(\lambda_i))^l u_i + \sum_{i=m+1}^{n}\rho_i (R_d(\lambda_i))^l u_i,
+\end{equation}
+
+this residual can be divided into two parts. The first part is formulated with the first known $m$ eigenvalues which are used to compute the convex hull by LS Component. The second part represents the residual with unknown eigenpairs.
 
 After the analysis of relation between LS polynomial residual and the approximated eigenvalues, it is apparent that these dominant eigenvalues used by LS Component to accelerate the convergence, can be recycled and improved from the procedure of solving system with one RHS to another, which will introduce a potential continuous improvement for solving a long sequence of linear systems.
 
@@ -91,32 +169,30 @@ k_t &= f(m_t) \\
 \right.
 \end{equation}
 
-With the enlargement of ERAM Component Krylov subspace size, the more eigenvalues are calculated, then the first part of $(r_d)_t$ in Equation (\ref{rnk2}) are more important, and the more significant the  acceleration will be. The continuous amelioration of convergence for solving linear systems in sequence can be gotten. With the changing of ERAM component Krylov subspace size, it may not be guaranteed to get the demanded eigenvalues in time for each restart of GMRES component if this size is too large comparing with GMRES Component Krylov subspace size. In order to improve the robustness of UCGLE, the previously calculated eigenvalues are kept in memory and updated if there come the new ones. These values in memory can be utilized in case that the failure of ERAM component when the parameters are too strict. In Equation (\ref{rnk2}), we did not define the upper limit for $(m_a)_t$, which depends on properties of operator matrices and $P_g$ and $P_a$ for GMRES and ERAM components. 
+With the enlargement of Krylov subspace size inside ERAM Component, the more eigenvalues are calculated, then the first part of $(r_d)_t$ in Equation (\ref{rnk2}) are more important, and the more significant the acceleration will be. The continuous amelioration of convergence for solving linear systems in sequence can be gotten. With the changing of ERAM component Krylov subspace size, it may not be guaranteed to get the demanded eigenvalues in time for each restart of GMRES component if this size is too large comparing with GMRES Component Krylov subspace size. In order to improve the robustness of UCGLE, the previously calculated eigenvalues are kept in memory and updated if there come the new ones. These values in memory can be utilized in case that the failure of ERAM component when the parameters are too strict. In Equation (\ref{rnk2}), we did not define the upper limit for $(m_a)_t$, which depends on properties of operator matrices and $P_g$ and $P_a$ for GMRES and ERAM components. 
 
-For $t \in 2,3, \cdots$, since the eigenvalues calculated when solving $Ax = b_{t-1}$ are kept in memory, they can be used to construct an approximative solution for the current linear system $Ax=b_t$ through the LS polynomial method before its solve by GMRES. Obviously, this approximative solution can be used as a non-zero initial guess vector $(x_0)_t$ to solve $Ax=b_t$. It will introduce an acceleration on the convergence for solving the linear systems in sequence. With the number of linear systems to be solved increasing, there will be more eigenvalues approximated, the initial guess vector constructed by LS component will be more accurate, and thus the speedup for solves from one to another can be still gotten. In fact, the impact of initial guess vector on the convergence is different from the restarted residual vector inside the iterative method, we propose a new parameter $l'_t$ for the initial guess generation procedure which is different from the $l$ in LS preconditioning part. The residual vector $(g_d)_t$ for $Ax=b_t$ with $t \in 2,3, \cdots$ is given in Equation (\ref{rnk4}), which is constructed  by the $k_{t-1}$ number of eigenvalues calculated when solving $Ax=b_{t-1}$.
+For $t \in 2,3, \cdots$, since the eigenvalues calculated when solving $Ax = b_{t-1}$ are kept in memory, they can be used to construct an approximative solution for the current linear system $Ax=b_t$ through the LS polynomial method before its solve by GMRES. This approximative solution can be used as a non-zero initial guess vector $(x_0)_t$ to solve $Ax=b_t$. It will introduce an acceleration on the convergence for solving the linear systems in sequence. With the number of linear systems to be solved increasing, there will be more eigenvalues approximated, the initial guess vector constructed by LS component will be more accurate, and thus the speedup for solves from one to another can be still gotten. The impact of the initial guess vector on the convergence is different from the restarted residual vector inside the iterative method. We propose a new parameter $l'_t$ for the initial guess generation procedure which is different from the $l$ in LS preconditioning part. The residual vector $(g_d)_t$ for $Ax=b_t$ with $t \in 2,3, \cdots$ is given in Equation (\ref{rnk4}), which is constructed  by the $k_{t-1}$ number of eigenvalues calculated when solving $Ax=b_{t-1}$.
 
 \begin{equation}
 \label{rnk4}
 (g_d)_t=\sum_{i=1}^{k_{t-1}}(R_d(\lambda_i))^{l'_t} \rho_i u_i + \sum_{i=k_{t-1}+1}^{n}(R_d(\lambda_i))^{l'_t} \rho_i u_i.
 \end{equation}
 
-In this section, two parameters are added in order to resolve linear systems in sequence using UCGLE, they are listed as below:
+In this section, two parameters are added in order to resolve linear systems in sequence using UCGLE. They are listed as below:
 
 \begin{enumerate}
 	\item $(m_a)_t$: ERAM Krylov subspace size for solving $Ax=b_t$
 	\item $l'$: times that LS polynomial applied for the generation of initial guess vector
 \end{enumerate}
 
-It is predictable that this speedup for solving successive systems will stagnate after the optimized values of $m_a$ and $l'$ are found. It is useless to use ERAM Component to approximate the eigenvalues continuously. Thus $P_a$ computing units allocated for ERAM Component can be redistributed to GMRES Component. It is expected to get an extra speedup on the performance with more computing resources.
+It is predictable that this speedup for solving successive systems will stagnate after the optimized values of $m_a$ and $l'$ are found. It is useless to use the ERAM Component to approximate the eigenvalues continuously. Thus $P_a$ computing units allocated for ERAM Component can be redistributed to GMRES Component. It is expected to get an extra speedup on the performance with more computing resources.
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=6.2in]{fig/uclge_seq_workflow.pdf}
-	\caption{Workflow of UCGLE to Solve Linear Systems In Sequence.}
+	\includegraphics[width=.99\linewidth]{fig/uclge_seq_workflow.pdf}
+	\caption{Workflow of UCGLE to Solve Linear Systems In Sequence by Recycling of Eigenvalues.}
 	\label{fig:uclge_seq_workflow}
 \end{figure}
-
-The Algorithm \ref{alg:gmres_multi} gives the procedure of UCGLE for the resolution of a sequence of linear systems $Ax= b_t$ with $t \in 1,2,3, \cdots$. Initially, $P_g$ and $P_a$ are respectively set to be $proc_g$ and $proc_a$.  If $t=1$, UCGLE loads normally the three computation components with the ERAM component's Krylov subspace to be $(m_a)_1$, and the initial guess vector for GMRES component to be zero. For the resolution of the successive linear systems, before the update of three components, a $INITIAL\_GUESS$ function is performed which is the same as the LS component but with different parameter $l'$. The $INITIAL\_GUESS$ function will generate an initial guess vector ${g_d}_t$. Inside GMRES component, the initial guess vector is updated by ${g_d}_t$ before the start of resolution. Moreover, the Krylov subspace Size of ERAM Component is replaced by $(m_a)_t$. When the optimized values of $(m_a)_{op}$ and $l'_{op}$ are found, the eigenvalues are kept into a local file $eigenvalue.bin$. The $P_g$ and $P_a$ are respectively updated as  $proc_g+proc_a-1$ and $1$. The $INITIAL\_GUESS$ function executes by loading $eigenvalue.bin$. $LOADGMRES$ is restarted with the redeployment of its data onto $proc_g+proc_a-1$ computing units. $LS$ also executes with $eigenvalue.bin$. The retainment of $1$ computing unit for ERAM Component aims to ensure the distributed and parallel implementation of UCGLE with high fault tolerance. However, the inside kernel of ERAM Component is replaced by a simple function with keeping the data sending and receiving functionalities.
 
 \begin{algorithm}
 	\caption{UCGLE for sequences of linear systems}
@@ -148,17 +224,19 @@ The Algorithm \ref{alg:gmres_multi} gives the procedure of UCGLE for the resolut
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Experiments of UCGLE for Sequences of Linear Systems}
+The Algorithm \ref{alg:gmres_multi} and Fig. \ref{fig:uclge_seq_workflow} give the procedure of UCGLE for solving  a sequence of linear systems $Ax= b_t$ with $t \in 1,2,3, \cdots$. Initially, $P_g$ and $P_a$ are respectively set to be $proc_g$ and $proc_a$.  If $t=1$, UCGLE loads normally the three computation components with the ERAM component's Krylov subspace to be $(m_a)_1$, and the initial guess vector for GMRES component to be zero. For solving the successive linear systems, before the update of three components, a $INITIAL\_GUESS$ function is performed which is the same as the LS component but with different parameter $l'$. The $INITIAL\_GUESS$ function will generate an initial guess vector ${g_d}_t$. Inside the GMRES component, the initial guess vector is updated by ${g_d}_t$ before the start of solving procedure. Moreover, the Krylov subspace Size of ERAM Component is replaced by $(m_a)_t$. When the optimized values of $(m_a)_{op}$ and $l'_{op}$ are found, the eigenvalues are kept into a local file $eigenvalue.bin$. The $P_g$ and $P_a$ are respectively updated as  $proc_g+proc_a-1$ and $1$. The $INITIAL\_GUESS$ function executes by loading $eigenvalue.bin$. $LOADGMRES$ is restarted with the redeployment of its data onto $proc_g+proc_a-1$ computing units. $LS$ also executes with $eigenvalue.bin$. The retainment of $1$ computing unit for ERAM Component aims to ensure the distributed and parallel implementation of UCGLE with high fault tolerance. However, the inside kernel of ERAM Component is replaced by a simple function with keeping the data sending and receiving functionalities.
 
-In this section, we evaluate the UCGLE for solving the sequences of linear systems on the supercomputer using different generated test matrices. UCGLE with or without initial guess vector generation is compared with conventional restarted GMRES with or without available preconditioners (Jacobi and SOR) in our implementations. The parallel performance on different homogeneous and heterogeneous platforms is presented in \cite{Wu:2018:DPA:3149457.3154481}. Thus this paper concentrates on the numerical performance of UCGLE for solving non-Hermitian linear systems in sequence, and the parallel performance comparison will not be discussed. Indeed, the performance of UCGLE can achieve further improvement with unique implementation targeting at different computer architectures, but this is not the purpose of this paper. \textit{Unite and Conquer approach} (including UCGLE) is a particular programming model which introduces a better performance on top of classic solvers and makes them be more suitable for modern computers. It is fair to prove the benefits of \textit{Unite and Conquer approach} by comparing it with the implementations of classic solvers based on the same basic operations (distribution of matrix across the cores, parallel sparse matrix-vector operation, the orthogonalization in Arnoldi reduction, etc.) without specific optimization for different platforms. In fact, if we optimize the parallel implementation of classic solvers and also the components (especially GMRES Component) in UCGLE at the same time, the benefits of UCGLE by reducing the global communications and promoting the asynchronization are still there.  
+\section{Experiments of UCGLE for Sequences of Linear Systems}
 
-\subsubsection{Experimental Hardwares}
+In this section, we evaluate the UCGLE for solving the sequences of linear systems on the supercomputer using different generated test matrices. UCGLE with or without initial guess vector generation is compared with conventional restarted GMRES with or without available preconditioners (Jacobi and SOR) in our implementations. The parallel performance on different homogeneous and heterogeneous platforms is presented in Chapter \ref{Unite and Conquer GMRES/LS-ERAM Method}. Thus this chapter concentrates on the numerical performance of UCGLE for solving non-Hermitian linear systems in sequence, and the parallel performance comparison will not be discussed. It is fair to prove the benefits of \textit{Unite and Conquer approach} by comparing it with the implementations of classic solvers based on the same basic operations (distribution of matrix across the cores, parallel sparse matrix-vector operation, the orthogonalization in Arnoldi reduction, etc.) without specific optimization for different platforms. If we optimize the parallel implementation of classic solvers and also the components (especially GMRES Component) in UCGLE at the same time, the benefits of UCGLE by reducing the global communications and promoting the asynchronous communications are still there.  
+
+\subsection{Experimental Hardwares}
 
 UCGLE is implemented on the supercomputer \textit{Tianhe-2}, installed at the National Super Computer Center in Guangzhou of China. It is a heterogeneous system made of Intel Xeon CPUs and Matrix2000, with 16000 compute nodes in total. Each node composes 2 Intel Ivy Bridge 12 cores @ 2.2 GHz. In this paper, we did not test UCGLE with co-processor Matrix2000 on \textit{Tianhe-2} since our implementation does not support it with good performance. 
 
-\subsubsection{Experimental Results}
+\subsection{Experimental Results}
 
-We evaluate UCGLE for solving sequences of linear systems using three test matrices of size $1.572\times10^7$ generated by SMG2S with different given spectra. They are respectively denoted as $Mat1$, $Mat2$ and $Mat3$. The different right-hand sides of these sequent linear systems are generated at random. The parameter $l$ for all tests using UCGLE keeps the same as $10$. The numbers of process for GMRES and ERAM Components in UCGLE are respectively $768$ and $384$. Five methods are compared in the experiments, and the notations of different methods are given as below:
+We evaluate UCGLE for solving sequences of linear systems using three test matrices of size $1.572\times10^7$ generated by SMG2S with differently given spectra. They are respectively denoted as $Mat1$, $Mat2$ and $Mat3$. The different right-hand sides of these sequent linear systems are generated at random. The parameter $l$ for all tests using UCGLE keeps the same as $10$. The numbers of processes for GMRES and ERAM Components in UCGLE are respectively $768$ and $384$. Five methods are compared in the experiments, and the notations of different methods are given below:
 
 \begin{itemize}
 	\item GMRES: classic restarted GMRES;
@@ -168,9 +246,14 @@ We evaluate UCGLE for solving sequences of linear systems using three test matri
 	\item UCGLE with initial guess: UCGLE using previously obtained eigenvalues to generate an initial guess vector for the next systems by LS polynomial method.
 \end{itemize}
 
-ERAM and LS components in UCGLE demand additional computing units. It is unfair to test only the conventional methods of their numbers of CPUs equal to the number of GMRES components in UCGLE. Therefore, experiments have also been tested that the numbers of computing units of the classical iterative method are equal to the total CPU in UCGLE (hence, the CPUs for GMRES and ERAM components are included). In the captions of figures, a given method "with total CPUs" means that its number of CPUs equals the total CPU in UCGLE. The time comparisons for solving nine sequent linear systems of $Mat1$, $Mat2$ and $Mat3$ are given respectively in Fig. \ref{fig:seqrhs1} (a), Fig. \ref{fig:seqrhs3} (a) and Fig. \ref{fig:seqrhs2} (a), the comparison of the number of iteration for convergence are respectively given in Table 1, Table 2 and Table 3. From these three tables, we conclude that UCGLE can speed up the convergence to solve linear systems with test matrices comparing with the conventional methods. The generation of initial vectors using the eigenvalues for subsequent linear systems can still speed up the convergence over the UCGLE without initial guess.
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=0.99\linewidth]{fig/seqrhs1.eps}
+	\caption{$Mat1$: time comparison for solving a sequence of linear systems. (a) shows the solution time for 9 sequent linear systems; (b) shows the cases extracted from (a) after the good selection of parameters in UCGLE.}
+	\label{fig:seqrhs1}
+\end{figure}
 
-\begin{table}[htbp]
+\begin{table}[t]
 	\small
 	\label{tb1}
 	\caption{$Mat1$: iterative step comparison for solving a sequence of linear systems.}
@@ -178,32 +261,30 @@ ERAM and LS components in UCGLE demand additional computing units. It is unfair 
 	\renewcommand{\arraystretch}{1.6}
 	\begin{tabular}{c*{9}{c}}
 		\toprule
-			\cellcolor{gray!50}Method              & \cellcolor{gray!50}1 &  \cellcolor{gray!50}2 &  \cellcolor{gray!50}3 &  \cellcolor{gray!50}4 &  \cellcolor{gray!50}5  &  \cellcolor{gray!50}6  & \cellcolor{gray!50}7 & \cellcolor{gray!50}8 & \cellcolor{gray!50}9\\
+		\cellcolor{gray!50}Method              & \cellcolor{gray!50}1 &  \cellcolor{gray!50}2 &  \cellcolor{gray!50}3 &  \cellcolor{gray!50}4 &  \cellcolor{gray!50}5  &  \cellcolor{gray!50}6  & \cellcolor{gray!50}7 & \cellcolor{gray!50}8 & \cellcolor{gray!50}9\\
 		\midrule
 		GMRES & 509 & 505 & 501 & 505 & 527 & 510  &523&516& 518\\
-			\cellcolor{gray!20}GMRES+SOR            & 	\cellcolor{gray!20}169 & 	\cellcolor{gray!20}165 & 	\cellcolor{gray!20}172 & 	\cellcolor{gray!20}130 & 	\cellcolor{gray!20}172 & 	\cellcolor{gray!20}173 &	\cellcolor{gray!20}130&	\cellcolor{gray!20}170&	\cellcolor{gray!20}130\\
+		\cellcolor{gray!20}GMRES+SOR            & 	\cellcolor{gray!20}169 & 	\cellcolor{gray!20}165 & 	\cellcolor{gray!20}172 & 	\cellcolor{gray!20}130 & 	\cellcolor{gray!20}172 & 	\cellcolor{gray!20}173 &	\cellcolor{gray!20}130&	\cellcolor{gray!20}170&	\cellcolor{gray!20}130\\
 		GMRES+Jacobi            & 274 & 273 & 270 & 276 & 269 & 274 &280&276&273\\
-			\cellcolor{gray!20}UCGLE w/o initial guess     & 	\cellcolor{gray!20}120 & 	\cellcolor{gray!20}90 & 	\cellcolor{gray!20}90 & 	\cellcolor{gray!20}90 & 	\cellcolor{gray!20}90 &	\cellcolor{gray!20}90 &	\cellcolor{gray!20}90&	\cellcolor{gray!20}90& 	\cellcolor{gray!20}90\\
+		\cellcolor{gray!20}UCGLE w/o initial guess     & 	\cellcolor{gray!20}120 & 	\cellcolor{gray!20}90 & 	\cellcolor{gray!20}90 & 	\cellcolor{gray!20}90 & 	\cellcolor{gray!20}90 &	\cellcolor{gray!20}90 &	\cellcolor{gray!20}90&	\cellcolor{gray!20}90& 	\cellcolor{gray!20}90\\
 		UCGLE with initial guess     & 120 & 36 & 35 & 35 & 36 &36  &36&33&35\\
 		\hline
 	\end{tabular}
 \end{table}
 
-\begin{figure}
-	\centering
-	\includegraphics[width=6.4in]{fig/seqrhs1.eps}
-	\caption{$Mat1$: time comparison for solving a sequence of linear systems. (a) shows the solution time for 9 sequent linear systems; (b) shows the cases extracted from (a) after the good selection of parameters in UCGLE.}
-	\label{fig:seqrhs1}
-\end{figure}
+ERAM and LS components in UCGLE demand additional computing units. It is unfair to test only the conventional methods of their numbers of CPUs equal to the number of GMRES components in UCGLE. Therefore, experiments have also been tested that the numbers of computing units of the classical iterative method are equal to the total CPU in UCGLE (hence, the CPUs for GMRES and ERAM components are included). In the captions of figures, a given method "with total CPUs" means that its number of CPUs equals the total CPU in UCGLE. The time comparisons for solving nine sequent linear systems of $Mat1$, $Mat2$ and $Mat3$ are given respectively in Fig. \ref{fig:seqrhs1} (a), Fig. \ref{fig:seqrhs3} (a) and Fig. \ref{fig:seqrhs2} (a), the comparison of the number of iteration for convergence are respectively given in Table 1, Table 2 and Table 3. From these three tables, we conclude that UCGLE can speed up the convergence to solve linear systems with test matrices comparing with the conventional methods. The generation of initial vectors using the eigenvalues for subsequent linear systems can still speed up the convergence over the UCGLE without initial guess.
 
 For the tests of $Mat1$, the GMRES restart size is $30$, the Krylov subspace of ERAM Component for solving the first three linear systems are respectively $10$, $20$ and $30$, the size of this subspace of ERAM for the remaining systems keeps being $30$. For the tests of $Mat2$, the GMRES restart size is $300$, the Krylov subspace of ERAM Component for solving the first three linear systems are respectively $100$, $150$ and $200$, the size of this subspace of ERAM for the remaining systems keeps being $200$. For the cases that UCGLE with initial guess, the parameter $l'$ for $Mat1$ and $Mat2$ keeps $30$. With the augmentation of the size of ERAM Krylov subspace, there will be more eigenvalues to be approximated, and we find that there is acceleration with the accumulation of more eigenvalues for both the case UCGLE with and without initial guess. The influence of subspace of ERAM can be found through the curves of UCGLE with/without initial guess in Fig. \ref{fig:seqrhs1} (a) and Fig. \ref{fig:seqrhs3} (a). However, it is not practical to enlarge too much the Krylov subspace of ERAM to approximated more eigenvalues, since if it is too large, it takes too much time by ERAM, LS Component cannot receive the eigenvalues in time, thus it will be difficult for the GMRES Component to perform the LS preconditioning for it each time restart.
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=6.4in]{fig/seqrhs3.eps}
+	\includegraphics[width=0.99\linewidth]{fig/seqrhs3.eps}
 	\caption{$Mat2$: time comparison for solving a sequence of linear systems. (a) shows the solution time for 9 sequent linear systems; (b) shows the cases extracted from (a) after the good selection of parameters in UCGLE.}
 	\label{fig:seqrhs3}
 \end{figure}
+
+For the tests of $Mat3$, the GMRES restart size is $150$, and the Krylov subspace size of ERAM Components keeps the same to be $200$. Meanwhile, for the 2nd, 3rd and 4th linear systems, the parameter $l'$ of initial guess are respectively $20$, $30$ and $40$, for the remaining linear systems, this parameter keeps $40$. For the solving the linear systems by UCGLE with an initial guess, we can find that with the augmentation of $l'$, the iteration numbers for the first four linear systems decrease quickly from $360$ to $283$ with approximately $1.3 \times$ speedup. For $Mat3$, SOR preconditioned GMRES is already good, but UCGLE with initial guess has still about $2.2 \times$ speedup of convergence. Even in the case that the computing unit number of SOR preconditioned GMRES equals the total number of UCGLE, UCGLE with initial guess can achieve $2.2 \times$ of execution time speedup. With the augmentation of the parameter $l'$, there will be a strong impact on the convergence. Since the $Mat3$ is generated with the clustered eigenvalues which are randomly distributed inside a fixed region of the real-imaginary plan, if $l'$ is larger, it can be seen as there are much more eigenvalues generated, even they are not very accurate compared with the real ones. The inaccuracy of eigenvalues can result in the enlargement the norm in Equation (\ref{rnk2}), but it can still very quickly converge. It is effective to generate an initial guess vector with very large $l'$, but not the same case for the parameter $l$ inside each preconditioning, since the too many times of repeats for each time restart will amplify quicky this inaccuracy of norm, and it is easy to result in the difficulties of convergence.
+
 
 \begin{table}[htbp]
 	\small
@@ -216,21 +297,19 @@ For the tests of $Mat1$, the GMRES restart size is $30$, the Krylov subspace of 
 		\cellcolor{gray!50}Method              & \cellcolor{gray!50}1 &  \cellcolor{gray!50}2 &  \cellcolor{gray!50}3 &  \cellcolor{gray!50}4 &  \cellcolor{gray!50}5  &  \cellcolor{gray!50}6  & \cellcolor{gray!50}7 & \cellcolor{gray!50}8 & \cellcolor{gray!50}9\\
 		\midrule
 		GMRES & 1316	&1277	&1460	&1278	&1409	&1325	&1472	&1369	&1342\\
-			\cellcolor{gray!20}GMRES+SOR            & 	\cellcolor{gray!20}1197&		\cellcolor{gray!20}1219&		\cellcolor{gray!20}1336&		\cellcolor{gray!20}1173	&	\cellcolor{gray!20}1290	&	\cellcolor{gray!20}1194	&	\cellcolor{gray!20}1335	&	\cellcolor{gray!20}1289	&	\cellcolor{gray!20}1213\\
+		\cellcolor{gray!20}GMRES+SOR            & 	\cellcolor{gray!20}1197&		\cellcolor{gray!20}1219&		\cellcolor{gray!20}1336&		\cellcolor{gray!20}1173	&	\cellcolor{gray!20}1290	&	\cellcolor{gray!20}1194	&	\cellcolor{gray!20}1335	&	\cellcolor{gray!20}1289	&	\cellcolor{gray!20}1213\\
 		GMRES+Jacobi            & 1278&	1185	&1283&	1220	&1191&	1184	&1218&	1159&	1239\\
-			\cellcolor{gray!20}UCGLE w/o initial guess     & 	\cellcolor{gray!20}666	&	\cellcolor{gray!20}671	&	\cellcolor{gray!20}831	&	\cellcolor{gray!20}689	&	\cellcolor{gray!20}701	&	\cellcolor{gray!20}685	&	\cellcolor{gray!20}837	&	\cellcolor{gray!20}736	&	\cellcolor{gray!20}714\\
+		\cellcolor{gray!20}UCGLE w/o initial guess     & 	\cellcolor{gray!20}666	&	\cellcolor{gray!20}671	&	\cellcolor{gray!20}831	&	\cellcolor{gray!20}689	&	\cellcolor{gray!20}701	&	\cellcolor{gray!20}685	&	\cellcolor{gray!20}837	&	\cellcolor{gray!20}736	&	\cellcolor{gray!20}714\\
 		UCGLE with initial guess     & 666	&595	&470	&491	&544	&464	&485	&532	&440\\
 		\hline
 	\end{tabular}
 \end{table}
 
-For the tests of $Mat3$, the GMRES restart size is $150$, and the Krylov subspace size of ERAM Components keeps the same to be $200$. Meanwhile, for the 2nd, 3rd and 4th linear systems, the parameter $l'$ of initial guess are respectively $20$, $30$ and $40$, for the remaining linear systems, this parameter keeps $40$. For the solving the linear systems by UCGLE with an initial guess, we can find that with the augmentation of $l'$, the iteration numbers for the first four linear systems decrease quickly from $360$ to $283$ with approximately $1.3 \times$ speedup. For $Mat3$, SOR preconditioned GMRES is already good, but UCGLE with initial guess has still about $2.2 \times$ speedup of convergence. Even in the case that the computing unit number of SOR preconditioned GMRES equals the total number of UCGLE, UCGLE with initial guess can achieve $2.2 \times$ of execution time speedup. With the augmentation of the parameter $l'$, there will be a strong impact on the convergence. Since the $Mat3$ is generated with the clustered eigenvalues which are randomly distributed inside a fixed region of the real-imaginary plan, if $l'$ is larger, it can be seen as there are much more eigenvalues generated, even they are not very accurate compared with the real ones. The inaccuracy of eigenvalues can result in the enlargement the norm in Equation (\ref{rnk2}), but it can still very quickly converge. It is effective to generate an initial guess vector with very large $l'$, but not the same case for the parameter $l$ inside each preconditioning, since the too many times of repeats for each time restart will amplify quicky this inaccuracy of norm, and it is easy to result in the difficulties of convergence.
+In order to use UCGLE for solving a large number of linear systems in sequence, it is necessary to choose the suitable parameters by the evaluation of a small number of sequent linear systems. After the selection of parameters, we compare the best cases of each method with the least time-consuming. The results for three test matrices are shown in Fig. \ref{fig:seqrhs1} (b), Fig. \ref{fig:seqrhs2} (b) and Fig. \ref{fig:seqrhs3} (b). We conclude that for $Mat1$, UCGLE with initial guess has about $4.4\times$ for the acceleration of convergence and $1.7\times$ for the speedup of execution time. For $Mat2$, it has about $2.6\times$ acceleration for the convergence and $4.3\times$ for the speedup of time. For $Mat3$, it has about $3.2\times$ acceleration for the convergence and $2.0\times$ for the speedup of time. 
 
-In order to use UCGLE for solving a large number of linear systems in sequence, it is necessary to choose the suitable parameters by the evaluation of a small number of sequent linear systems. After the selection of parameters, we compare the best cases of each method with the least time consumption. The results for three test matrices are shown in Fig. \ref{fig:seqrhs1} (b), Fig. \ref{fig:seqrhs2} (b) and Fig. \ref{fig:seqrhs3} (b). We conclude that for $Mat1$, UCGLE with initial guess has about $4.4\times$ for the acceleration of convergence and $1.7\times$ for the speedup of execution time. For $Mat2$, it has about $2.6\times$ acceleration for the convergence and $4.3\times$ for the speedup of time. For $Mat3$, it has about $3.2\times$ acceleration for the convergence and $2.0\times$ for the speedup of time. 
-
-\begin{figure}[htbp]
+\begin{figure}[t]
 	\centering
-	\includegraphics[width=6.4in]{fig/seqrhs2.eps}
+	\includegraphics[width=0.99\linewidth]{fig/seqrhs2.eps}
 	\caption{$Mat3$: time comparison for solving a sequence of linear systems. (a) shows the solution time for 9 sequent linear systems; (b) shows the cases extracted from (a) after the good selection of parameters in UCGLE.}
 	\label{fig:seqrhs2}
 \end{figure}
@@ -256,10 +335,12 @@ In order to use UCGLE for solving a large number of linear systems in sequence, 
 	\end{tabular}
 \end{table}
 
-\subsubsection{Analysis and Conclusions}
+\subsection{Analysis}
 
-In conclusion, the UCGLE, especially it with the recycling eigenvalues to generate initial guess vector using the eigenvalues, can significantly accelerate the convergence and reduce the time consumption for solving a sequence of linear systems. However, the time employed by the LS iterative recurrence, especially a small number of Sparse Matrix-Vector Product operations inside makes the time speedup not consistent with the convergence speedup. For example, in Table 3, UCGLE with initial guess has almost $3.0 \times$ acceleration on the convergence over the classic GMRES for solving the 3rd linear system. However, it has only about $2.0 \times$ acceleration on the performance in the case that the classic GMRES and GMRES Component inside UCGLE have the same number of computing units. It is caused by the recurrence of LS iterations to perform the preconditioning on GMRES Component after receiving the parameters from LS Component. Nevertheless, UCGLE is more efficient to solve the sequences of linear systems, and with its distributed and parallel communication framework, it is a good candidate for solving non-Hermitian linear systems in sequence on much larger machines.
+In conclusion, the UCGLE, especially it with the recycling eigenvalues to generate initial guess vector using the eigenvalues, can significantly accelerate the convergence and reduce the time consumption for solving a sequence of linear systems. However, the time employed by the LS iterative recurrence, especially a small number of SpMV operations inside makes the time speedup not consistent with the convergence speedup. For example, in Table \ref{tb2}, UCGLE with initial guess has almost $3.0 \times$ acceleration on the convergence over the classic GMRES for solving the 3rd linear system. However, it has only about $2.0 \times$ acceleration on the performance in the case that the classic GMRES and GMRES Component inside UCGLE have the same number of computing units. It is caused by the recurrence of LS iterations to perform the preconditioning on GMRES Component after receiving the parameters from LS Component. Nevertheless, UCGLE is more efficient to solve the sequences of linear systems, and with its distributed and parallel communication framework, it is a good candidate for solving non-Hermitian linear systems in sequence on much larger machines.
 
 \section{Conclusion}
+
+In this chapter, we propose an extended version of the distributed parallel method UCGLE, which is used to solve a large number of linear systems with unique matrices and different right sides on a large platform. UCGLE method was proposed to solve large-scale linear systems on modern computing platforms, which is able to minimize the global communication, cover the synchronous points in the parallel implementation, improve the fault tolerance and reusability and speed up the convergence. In this paper, It is proved this developed variant of UCGLE method can solve the linear systems with special spectral distribution in sequence more effectively than several preconditioned iterative methods. The recycling of a small group of dominant eigenvalues and generating initial guess vector using them by Least Squares polynomial method has a significant impact on the performance improvement for solving continuous linear systems.
 
 \clearemptydoublepage

@@ -9,7 +9,9 @@
 \ProvidesClass{xinzhewu}[14/05/2018]
 
 %\LoadClass[12pt,a4paper]{book}	% notez le "twoside", essentiellement pour alterner les en-tete et pieds de page gauche et droit si on veut utliser les fancyhead. 
-\LoadClass[twoside,12pt,a4paper]{book}
+\LoadClass[twoside,11pt,a4paper]{book}
+
+%\LoadClass[twoside,12pt,a4paper]{book}
 
 \RequirePackage[utf8]{inputenc} 
 \RequirePackage[french, english]{babel}
@@ -39,6 +41,7 @@
 \frenchspacing
 \FrenchFootnotes
 
+\renewcommand{\baselinestretch}{1.213}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -266,7 +269,7 @@
 		\@jury
 	\end{small}
 	\begin{flushright}
-		\textbf{Th\`ese pr\'ent\'ee et soutenue \`a} \@date
+		\textbf{Th\`ese pr\'esent\'ee et soutenue \`a} \@date
 	\end{flushright}
 }
 };
@@ -294,26 +297,26 @@
 	{\parbox{15.5cm}{
 			
 			\begin{center}
-			\textsc{\LARGE \textbf{TH\`ESE DE DOCTORAT}}\\ 
+			\textsc{\huge \textbf{TH\`ESE DE DOCTORAT}}\\ 
 			\end{center}
 			\begin{center}
-			\textsc{\large{pr\'esent\'ee \`a}}
+			\textsc{\Large{pr\'esent\'ee \`a}}
 			\end{center}
 			\begin{center}
-			\textsc{\large \@nomdeuniversite}
+			\textsc{\Large \@nomdeuniversite}
 			\end{center}
 			\begin{center}
-			\textsc{\large{par}}
+			\textsc{\Large{par}}
 			\end{center}
 			\begin{center}
-			\textsc{\large \textbf{{\@author}}}
+			\textsc{\Large \textbf{{\@author}}}
 			\end{center}
 			%\begin{center}
 			%\begin{huge}
 			%\end{huge}
 			%\end{center}
 			\begin{center}
-			\textbf{Sp\'ecialit\'e de doctorat : \@discipline}
+			\textbf{\large Sp\'ecialit\'e de doctorat : \@discipline}
 			\end{center}
 			\begin{center}
 			%\@unite \\
@@ -324,7 +327,7 @@
 			\begin{center}
 			{\setlength{\baselineskip}{1.2\baselineskip}
 				\begin{huge}
-				\textbf{\@title}
+				\textbf{\Large \@title}
 				\end{huge}
 				\par}
 			\end{center}
@@ -346,9 +349,10 @@
 			\textsc{Membres du jury:}
 			\begin{small}
 			\@jury
+			\vspace{0.5cm}
 			\end{small}
 			\begin{flushright}
-			\textbf{Th\`ese pr\'ent\'ee et soutenue \`a} \@date
+			\textbf{Th\`ese pr\'esent\'ee et soutenue \`a} \@date
 			\end{flushright}
 		}
 	};
