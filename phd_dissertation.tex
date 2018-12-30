@@ -58,6 +58,11 @@
 
 \usepackage{minitoc} %List sections of chapter at beginning of that chapter
 
+
+\usepackage{rotating}
+\usepackage{pdflscape}
+
+
 % Create a new environment for breaking code listings across pages.
 \newenvironment{longlisting}{\captionsetup{type=listing}}{}
 
@@ -86,6 +91,21 @@
 
 \setcounter{tocdepth}{3}
 \setcounter{secnumdepth}{3}
+
+
+
+
+% New definitions switch mode in Algorithm
+\algnewcommand\algorithmicswitch{\textbf{switch}}
+\algnewcommand\algorithmiccase{\textbf{case}}
+\algnewcommand\algorithmicassert{\texttt{assert}}
+\algnewcommand\Assert[1]{\State \algorithmicassert(#1)}%
+% New "environments"
+\algdef{SE}[SWITCH]{Switch}{EndSwitch}[1]{\algorithmicswitch\ #1\ \algorithmicdo}{\algorithmicend\ \algorithmicswitch}%
+\algdef{SE}[CASE]{Case}{EndCase}[1]{\algorithmiccase\ #1}{\algorithmicend\ \algorithmiccase}%
+%\algtext*{EndSwitch}%
+%\algtext*{EndCase}%
+
 
 
 \definecolor{maroon}{rgb}{0.5,0,0}
@@ -156,8 +176,6 @@
 \makeatother
 
 
-%
-\makenomenclature
 \renewcommand{\nomname}{List of Symbols}
 \renewcommand{\nompreamble}{The next list describes several symbols that will be later used within the body of the document}
 
@@ -188,20 +206,19 @@
 
 }
 
-\author{M. Xinzhe WU}
+\author{Xinzhe WU}
 
 \date{Saclay, le 22 Mars 2019}
 
-\nomdeuniversite{\textbf{\textrm{Universit\'e de Lille}}}
-\logouniversite{logo_univ} %nom du fichier
-\scalelogouniversite{0.2} % mise a l'echelle de l'image (0.5=50% par exemple)
+\nomdeuniversite{\textbf{\textrm{UNIVERSIT\'E DE LILLE}}}
+\logouniversite{fig/lille.png} %nom du fichier
+\scalelogouniversite{0.15} % mise a l'echelle de l'image (0.5=50% par exemple)
 \logolabo{logo_labo}
 \scalelogolabo{0.2}
 
-%\unite{Département d'histoire de la typographie}
+\unite{Centre de Recherche en Informatique, Signal et Automatique de Lille}
 \ecoledoc{\large École doctorale Sciences Pour l'Ing\'enieur Universit\'e Lille Nord-de-France}
 
-\usepackage{nomencl}
 \makenomenclature
 
 \begin{document}
@@ -238,15 +255,15 @@
 \chapter*{Acknowledgement}
 \thispagestyle{empty}
 
-First and foremost I would like to express my gratitude to my advisor of the thesis, Prof. Serge G. Petiton, for the continuous support of my Ph.D study and related research, for his patience, motivation, and immense knowledge. He enlightens me in the field of parallel computing and numerical algorithms. Also, he teaches me in how to do academic research during the three years. I am grateful for his wise guidance and inclusiveness throughout my three years' study. I benefited enormously from him about how to do the research and communicate it in an effective way. I feel so lucky to work under his supervision.
+First and foremost, I would like to express my gratitude to my advisor of the thesis, Prof. Serge G. Petiton, for the continuous support of my Ph.D. study and related research, for his patience, motivation, and immense knowledge. He enlightens me in the field of parallel computing and numerical algorithms. In addition, he has taught me how to conduct academic research in the past three years. I am grateful for his wise guidance and inclusiveness throughout my three years' study. I feel so lucky to work under his supervision.
 
-I warmly thank Michel Dayd\'e, Professor at ENSEEIHT, and Micheal Heroux, senior scientist at Sandia National Laboratory, who have done me the honor of being the reporters of my thesis. Thank you for your recommendations and your help.
+I warmly thank Michel Dayd\'e, Professor at ENSEEIHT, and Micheal Heroux, senior scientist at Sandia National Laboratory. I feel really honored that they can be the reviewers of my thesis. Thanks for their revisions and relevant remarks. I would also like to thank all the members of my jury.
 
 My sincere thanks also goes to the MYX project and CNRS for funding my thesis. I am grateful for the warm welcome shown by the Maison de la Simulation, especially Edouard Audit, for accepting me to study at this laboratory and funding me for several international conferences. I would also thank Val\'erie Belle and all secretary members for helping me with numerous administrative work. I thank all the people I met during these three years for the pleasant atmosphere they were able to install. 
 
 I have been privileged to visit with National Supercomputing Center in Guangzhou. I would like to thank them, especially Prof. Yutong Lu for sharing their knowledge and I have benefited from the fruitful discussion with them.
 
-I would like to thank ROMEO HPC Center, Universit\'e de Reims Champagne-Ardenne. They provide me the access to their supercomputer ROMEO (both 2013 and 2018 versions), which are the major platforms for the experimentation within my dissertation. I appreciate Dr. Arnaud RENARD and his engnieering team for their technique supports.
+I would like to thank ROMEO HPC Center, Universit\'e de Reims Champagne-Ardenne. They provide me the access to their supercomputer ROMEO (both 2013 and 2018 versions), which are the major platforms for the experimentation within my dissertation. I appreciate Dr. Arnaud RENARD and his engineering team for their technique supports.
 
 Special thanks to my lovely friends in Paris for their help and encouragement. I am very thankful to have these friends who enrich my life with great happiness. It is hard to forget the days of drinking Chinese liquor together, which really eased my homesickness.
 
@@ -260,11 +277,18 @@ At the end of this journey, I thank Yuxin for being able to accompany me in the 
 \chapter*{Abstract}
 \thispagestyle{empty}
 
-\nomenclature{CPU}{Central Processing Unit}
+Because of their simplicity and generality, Krylov iterative methods are frequently used on High-Performance Computing (HPC) systems to solve the extremely large linear systems and eigenvalue problems from science and engineering fields. With the increase of both number of computing units and the heterogeneity of supercomputers, time spent in the global communication and synchronization severely damage the parallel performance of iterative methods. Programming on supercomputers tends to be the intersection of distributed and parallel computing. Algorithm development should consider the principles: 1) multi-granularity parallelism; 2) hierarchical memory; 3) minimization of global communication; 4) promotion of the asynchronicity; 5) proposition of multi-level scheduling strategies and manager engines to handle huge traffic and improve the fault tolerance. 
 
-\iffalse
-An important application of supercomputers is to solve large-scale linear systems and eigenvalue problems by iterative methods. As the number of cores and heterogeneity of supercomputers increases, time spent in communication will be important comparing with the computation time, hence applications can be seen as a combination of distributed and parallel computing. Effectively solving these problems by iterative methods on large-scale platforms requires multi-levels of parallelism, and can minimize global communication, reduce synchronization, and facilitate asynchronous communication. In this thesis, we develop a distributed and parallel multi-level programming paradigm for iterative methods on High-Performance Computing (HPC) clusters. An implementation of a manager engine and runtime can handle the traffic, fault tolerance, and reusability of this paradigm on homogeneous and heterogeneous clusters. Finally, an example of iterative methods is developed based on this paradigm to simultaneously solve linear systems with multiple Right-hand sides (RHSs). Experiments on supercomputers have demonstrated that the implementation achieves better numerical and parallel performance than conventional methods.
-\fi
+In response to these goals, we present a distributed and parallel multi-level programming paradigm for Krylov methods on HPC platforms. The first part of our work focuses on an implementation of a scalable matrix generator to create test matrices with customized eigenvalue for benchmarking iterative methods on supercomputers. In the second part, we aim to study the numerical and parallel performance of proposed distributed and parallel iterative method. Its implementation with a manager engine and runtime can handle the huge communication traffic, fault tolerance, and reusability. In the third part, an auto-tuning scheme is introduced for the smart selection of its parameters at runtime. Finally, we analyse the possibility to implement the distributed and parallel paradigm by a graph-based workflow runtime environment.
+
+\clearemptydoublepage
+
+\chapter*{R\'esum\'e}
+\thispagestyle{empty}
+
+Les m\'ethodes it\'eratives de Krylov sont utilis\'ees sur les plate-formes de Calcul Haute Performance (CHP) pour r\'esoudre les grands syst\`emes linéaires issus des domaines de la science et de l'ing\'enierie, en raison de leur simplicit\'e et de leur g\'en\'eralit\'e. Avec l'augmentation du nombre de cœurs et de l'h\'et\'erog\'en\'eit\'e des superordinateurs, le temps consacr\'e \`a la communication et synchronisation globales nuit gravement aux leurs performances parall\`eles. La programmation tend \`a \^etre l'intersection du calcul distribu\'e et parall\`el. Le d\'eveloppement d'algorithmes devrait prendre en compte les principes: 1) parall\'elisme avec multi-granularit\'e; 2) m\'emoire hi\'erarchique; 3) minimisation de la communication globale; 4) promotion de l'asynchronicit\'e; 5) proposition de strat\'egies d'ordonnancement et de moteurs de gestion pour g\'erer les trafic et la tol\'erance aux pannes.
+
+En r\'eponse \`e ces objectifs, nous pr\'esentons un paradigme de programmation multi-niveaux distribu\'es et parall\`els pour les m\'ethodes de Krylov sur les plates-formes de CHP. La premi\`ere partie porte sur la mise en œuvre d'un g\'en\'erateur de matrices avec des valeurs propres prescrites pour la r\'ef\'erence des m\'ethodes it\'eratives. Dans la deuxi\'eme partie, nous \'etudions les performances num\'eriques et parall\`eles de la m\'ethode it\'erative propos\'ee. Son impl\'ementation avec un moteur de gestion peut g\'erer le communication, la tol\'erance aux pannes et la réutilisabilit\'e. Dans la troisi\`eme partie, un sch\'ema de r\'eglage automatique est introduit pour la s\'election intelligente de ses param\`etres lors de l'ex\'ecution. Enfin, nous \'etudions la possibilit\'e d'impl\'ementer ce paradigme dans un environnement d'ex\'ecution de flux de travail.
 
 \clearemptydoublepage
 
@@ -291,7 +315,10 @@ An important application of supercomputers is to solve large-scale linear system
 \addcontentsline{toc}{chapter}{\listalgorithmname}
 }
 
-\printnomenclature
+\mbox{}
+\input{Nomenclatures}
+
+\printnomenclature[1.5in]
 
 %\listoflistings
 
@@ -335,7 +362,7 @@ An important application of supercomputers is to solve large-scale linear system
 
 \input{Chapter9}
 
-\chapter{Conclusion and Perspectives} \label{Conclusion and Pespectives}
+\chapter{Conclusion and Perspective} \label{Conclusion and Pespectives}
 
 \input{Conclusion}
 

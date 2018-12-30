@@ -215,7 +215,7 @@
   \draw [draw=white,fill=white]
     (current page.north west) rectangle (\paperwidth,1);
   \node[xshift=0\paperwidth,yshift=2cm,text=white,font=\bf\Large] {
-  %\includegraphics[scale=\@scalelogouniversite]{\@logouniversite}
+  \includegraphics[scale=\@scalelogouniversite]{\@logouniversite}
   };
   \node[xshift=.6\paperwidth,yshift=2cm,text=white,font=\bf\Large] {
  % \includegraphics[scale=\@scalelogolabo]{\@logolabo}
@@ -287,40 +287,49 @@
 	\begin{tikzpicture}[remember picture,overlay,line width=0mm]
 	\draw [draw=white,fill=white]
 	(current page.north west) rectangle (\paperwidth,1);
-	\node[xshift=0\paperwidth,yshift=2cm,text=white,font=\bf\Large] {
-		%\includegraphics[scale=\@scalelogouniversite]{\@logouniversite}
+	\node[xshift=0.0\paperwidth,yshift=1.5cm,text=white,font=\bf\Large] {
+		\includegraphics[scale=\@scalelogouniversite]{\@logouniversite}
 	};
 	\node[xshift=.6\paperwidth,yshift=2cm,text=white,font=\bf\Large] {
 		% \includegraphics[scale=\@scalelogolabo]{\@logolabo}
 	};
 	\node at (current page.center)
 	{\parbox{15.5cm}{
-			
-			\begin{center}
-			\textsc{\huge \textbf{TH\`ESE DE DOCTORAT}}\\ 
-			\end{center}
-			\begin{center}
-			\textsc{\Large{pr\'esent\'ee \`a}}
-			\end{center}
+			\vspace{0mm}
 			\begin{center}
 			\textsc{\Large \@nomdeuniversite}
 			\end{center}
+
+			\begin{center}
+			\@ecoledoc
+			\\
+			\@unite
+			\end{center}
+			\vspace{3mm}
+			\begin{center}
+			\textsc{\huge \textbf{TH\`ESE}}\\ 
+			\end{center}
+			\begin{center}
+			{\Large{pr\'epar\'ee et soutenue publiquement}}
+			\end{center}
+			%\begin{center}
+			%\textsc{\Large \@nomdeuniversite}
+			%\end{center}
 			\begin{center}
 			\textsc{\Large{par}}
 			\end{center}
 			\begin{center}
 			\textsc{\Large \textbf{{\@author}}}
 			\end{center}
+			\begin{center}
+			\large \textbf{\`a} {\@date}
+			\end{center}
 			%\begin{center}
 			%\begin{huge}
 			%\end{huge}
 			%\end{center}
 			\begin{center}
-			\textbf{\large Sp\'ecialit\'e de doctorat : \@discipline}
-			\end{center}
-			\begin{center}
-			%\@unite \\
-			\@ecoledoc
+			{\large pour obtenir le grade de Docteur en \textsc{\textbf{\@discipline}}}
 			\end{center}
 			\vspace{0.4cm}
 			\noindent\rule{15.5cm}{0.5mm}
@@ -331,7 +340,7 @@
 				\end{huge}
 				\par}
 			\end{center}
-			\vspace{0.4cm}
+			\vspace{0.2cm}
 			%	\begin{center}
 			
 			%\textbf{\@lesoustitre}
@@ -352,7 +361,7 @@
 			\vspace{0.5cm}
 			\end{small}
 			\begin{flushright}
-			\textbf{Th\`ese pr\'esent\'ee et soutenue \`a} \@date
+			%\textbf{Th\`ese pr\'esent\'ee et soutenue \`a} \@date
 			\end{flushright}
 		}
 	};
